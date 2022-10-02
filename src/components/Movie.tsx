@@ -18,8 +18,7 @@ export default function Movie(props: IMovieProps) {
                     borderRadius: '7px',
                     marginLeft: props.marginLeft ? props.marginLeft : "10px", width: '115px', cursor: 'pointer'
                 }} />
-            <div style={{
-                display: movieInfo ? "block" : "none",
+            {movieInfo && <div style={{
                 padding: '10px', width: '300px',
                 height: '160px',
                 marginLeft: '135px',
@@ -27,8 +26,7 @@ export default function Movie(props: IMovieProps) {
                 position: 'absolute', background: 'rgba(24, 24, 24, 0.95)', top: 0,
                 color: '#fff'
             }}>
-                Adam olana çok bile
-            </div>
+            </div>}
         </div>
     )
 }

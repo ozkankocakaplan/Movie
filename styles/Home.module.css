@@ -13,6 +13,119 @@
   flex-direction: row;
 }
 
+.headerNotificationContainer {
+  background-color: #161616;
+  padding: 10px;
+  position: absolute;
+  width: 420px;
+  top: 10px;
+  max-height: 360px;
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+  right: 40px;
+  z-index: 7;
+  display: flex;
+  flex-direction: column;
+}
+
+.headerLeftNotificationTitle {
+  flex-direction: row;
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headerLeftNotificationBell {
+  margin: 5px;
+
+}
+
+.headerLeftNotificationTitle h3 {
+  color: #fff;
+  padding-bottom: 10px;
+}
+
+.headerNotificationLeftCol {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.headerNotificationIcons {
+  display: flex;
+  padding: 10px 15px;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.50);
+}
+
+.headerNotificationIconContainer {
+  margin-bottom: 10px;
+  flex: 1;
+  display: flex;
+  background-color: #181818;
+  border-radius: 5px;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.headerNotificationRightCol {
+  margin-top: 10px;
+  padding: 10px;
+  display: flex;
+  flex: 1;
+  overflow-y: scroll;
+}
+
+.headerNotificationRightCol::-webkit-scrollbar {
+  width: 0;
+}
+
+.headerNotificatonIconLine {
+  width: 2px;
+  height: 100%;
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.50);
+}
+
+.headerSearchContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: row-reverse;
+  position: relative;
+  z-index: 6;
+}
+
+.headerSearchText {
+  outline: 0;
+  border: 0;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  width: 345px;
+  padding-left: 10px;
+  background-color: transparent;
+
+}
+
+.headerSearchResultContainer {
+  background-color: #161616;
+  padding: 10px;
+  position: absolute;
+  width: 420px;
+  top: 58px;
+  max-height: 360px;
+  overflow-y: scroll;
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+}
+
+.headerSearchResultContainer::-webkit-scrollbar {
+  width: 0;
+}
 
 .headerRight, .headerLeft {
   flex: 1;
@@ -50,7 +163,6 @@
 .headerLeft ul li a:hover, .headerRight ul li a:hover {
   color: rgba(255, 255, 255, 0.9);
 }
-
 
 
 
@@ -132,9 +244,10 @@
 
 .homePage2 {
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
-  background: url('http://localhost:3000/homePage2.png');
-  background-size: 100% 100%;
+  background: url('http://localhost:3000/homePage2.jpeg');
+
   background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .leftContainer {
@@ -161,4 +274,472 @@
   left: 483.5px;
   background: linear-gradient(0deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), rgba(24, 24, 24, 0.01), url('http://localhost:3000/children.png');
   /* backdrop-filter: blur(1.5px); */
+}
+
+.siteAnimeModal {
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  bottom: 25%;
+  top: 5%;
+  z-index: 4;
+
+}
+
+.archiveBackground {
+  background-image: url('http://localhost:3000/archive.png');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  box-sizing: content-box;
+
+}
+
+.archiveContainer {
+  height: calc(100vh);
+  margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.menuContainer {
+  height: 33px;
+  display: flex;
+  flex-direction: row;
+}
+
+.leftMenuContainer {
+  flex: 1;
+  display: flex;
+}
+
+.rightMenuContainer {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.menuButon {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 32px;
+  background: #282828;
+  color: #fff;
+  border-radius: 7px 7px 0px 0px;
+  margin-top: 1px;
+  cursor: pointer;
+}
+
+.downMenuButon {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 32px;
+  background: #202020;
+  color: #fff;
+  border-radius: 7px 7px 0px 0px;
+  margin-top: 1px;
+  cursor: pointer;
+  margin-left: 10px;
+  width: 157px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.butonButonShadown {
+  box-shadow: 0px 7px 4px rgba(0, 0, 0, 0.25), 8px 0px 4px #000000;
+  border: 1px solid #000000;
+}
+
+.contentContainer {
+  border-radius: 0px 0px 7px 7px;
+  max-height: 750px;
+  gap: 2px;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  justify-content: center;
+  background: #141414;
+  overflow-x: auto;
+}
+
+.contentContainer::-webkit-scrollbar {
+  width: 0px;
+}
+
+.contentContainer::-webkit-scrollbar-track {
+  background-color: #141414;
+}
+
+/* Handle */
+.contentContainer::-webkit-scrollbar-thumb {
+  background-color: #141414;
+}
+
+
+.filterBlur {
+  filter: blur(2.5px);
+}
+
+.borderButon {
+  padding: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 7px;
+  color: #fff;
+  font-weight: 400;
+  min-width: 130px;
+  margin-bottom: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.infoModalDescriptionModal {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 0;
+  right: 0;
+  top: 150px;
+  z-index: 0
+}
+
+.infoModalCloseContainer {
+  margin-right: 10px;
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+.infoModalContent {
+  width: 730px;
+  background-color: #181818;
+  border-radius: 7px;
+}
+
+.infoHeaderContainer {
+  margin: 20px 10px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.infoLineContainer {
+  display: flex;
+  flex: 1;
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+}
+
+.line {
+  width: 100px;
+  height: 2px;
+  background: #fff;
+  opacity: .5
+}
+
+.bodyContainer {
+  text-align: justify;
+  margin: 15px;
+  padding: 5px;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.65)
+}
+
+.titleContainer {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-direction: column;
+}
+
+.footerContainer {
+  display: flex;
+  flex: 1;
+  margin: 20px;
+  cursor: pointer;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.archiveMovieCoverContainer {
+  height: 230px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.archiveMovieCoverImg {
+  cursor: pointer;
+  border: 0;
+  height: 218px;
+  width: 145px;
+  margin-top: 10px;
+  margin-right: 20px;
+}
+
+.archiveMovieCoverImgFilter {
+  cursor: pointer;
+  border: 0;
+  height: 218px;
+  width: 145px;
+  margin-top: 10px;
+  margin-right: 20px;
+  filter: blur(2.5px);
+}
+
+.searchResultCard {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  padding: 5px;
+}
+
+.searchResultImg {
+  display: flex;
+}
+
+.searchResultImg img {
+  height: 102px;
+  width: 78px;
+  border-radius: 7px;
+  opacity: .65;
+}
+
+.searchResultContent {
+  flex: 1;
+  display: flex;
+  margin-left: 10px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.searchContentButon {
+  width: 140px;
+  border-radius: 7px;
+  height: 30px;
+  margin-right: 10px;
+  text-align: center;
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 13px;
+  background-color: #1C1C1C;
+  border: 1px solid #232323;
+}
+
+.filterBlurBackground {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  z-index: 12;
+  backdrop-filter: blur(2.5px);
+}
+
+.homeBg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.loginModal, .registerModal {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100px;
+  z-index: 15;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.loginContainer, .registerContainer {
+  width: 450px;
+  border-radius: 7px;
+  background-color: #161616;
+  -webkit-box-shadow: -1px 2px 5px 0px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: -1px 2px 5px 0px rgba(0, 0, 0, 0.75);
+  box-shadow: -1px 2px 5px 0px rgba(0, 0, 0, 0.75);
+}
+
+.loginHeader, .registerHeader {
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.loginClose {
+  margin: 10px;
+  cursor: pointer;
+}
+
+.loginContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  flex-direction: column;
+  padding-bottom: 70px;
+}
+
+.registerContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  flex-direction: column;
+}
+
+.registerBody {
+  margin: 0px 30px;
+  padding-bottom: 70px;
+}
+
+.textInput {
+  min-width: 300px;
+  max-width: 100%;
+  background: #1A1A1A;
+  border: none;
+  outline: 0;
+  color: #fff;
+  padding: 10px 10px;
+  margin-bottom: 10px;
+  border-radius: 7px;
+}
+
+.registerInput {
+  min-width: 100%;
+  width: 350px;
+  background: #1A1A1A;
+  border: none;
+  outline: 0;
+  color: #fff;
+  padding: 10px 10px;
+  margin-bottom: 10px;
+  border-radius: 7px;
+}
+
+.smallInput {
+  width: 78px !important;
+}
+
+.datePickerInput {
+  width: 190px !important;
+  background: #1A1A1A;
+  border: none;
+  outline: 0;
+  color: #fff;
+  padding: 10px 10px;
+  margin-bottom: 10px;
+  border-radius: 7px;
+}
+
+.registerLeftCol {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.registerRightCol {
+  display: flex;
+  margin-left: 10px;
+  flex: 1;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logoContainer {
+  height: 150px;
+  width: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 50px;
+
+}
+
+
+.logoContainer img {
+  border-radius: 100%;
+  height: 150px;
+  width: 150px;
+}
+
+.loginButon {
+  margin-top: 20px;
+  width: 200px;
+  height: 30px;
+  background-color: #1A1A1A;
+  border: none;
+  border-radius: 7px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.registerButon {
+  margin-top: 20px;
+  width: 200px;
+  height: 30px;
+  background-color: #1A1A1A;
+  border: none;
+  border-radius: 7px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.loginOrRegister {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.orText {
+  color: rgba(255, 255, 255, 0.50);
+  margin: 0px 10px;
+  font-size: 14px;
+}
+
+.registerCol {
+  flex-direction: row;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+@media screen and (max-width:1024px) {
+  .rightMenuContainer {
+    display: none;
+  }
+
+  .archiveMovieCoverImg {
+    margin-right: 0px;
+  }
+
+  .pageContainer:nth-child(1) {
+    min-height: calc(50vh);
+  }
+
+  .homeBg {
+    height: 50%;
+  }
 }
