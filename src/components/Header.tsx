@@ -11,7 +11,7 @@ import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import Link from 'next/link';
 import Line from './Line';
-import { handleOpenBackgroundBlur, handleOpenLoginModal } from '../store/features/modalReducer';
+import { handleOpenBackgroundBlur, handleOpenLoginModal, handleOpenMessageModal } from '../store/features/modalReducer';
 
 
 interface IHeaderProps {
@@ -82,8 +82,11 @@ export default function Header(props: IHeaderProps) {
                         <a onClick={() => setNotificationShow(!notificationShow)}><FontAwesomeIcon size="xl" icon={faBell} /></a>
                         {notificationShow && <NotificationsContainer />}
                     </li>}
-                    {user != undefined && <li>
-                        <a><FontAwesomeIcon size="xl" icon={faEnvelope} /></a>
+                    {user == undefined && <li>
+                        <a onClick={() => {
+                            dispatch(handleOpenBackgroundBlur(true))
+                            dispatch(handleOpenMessageModal(true))
+                        }}><FontAwesomeIcon size="xl" icon={faEnvelope} /></a>
                     </li>}
                     <li>
                         <span>

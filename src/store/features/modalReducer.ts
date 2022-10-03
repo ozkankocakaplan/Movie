@@ -4,6 +4,7 @@ export const INITIAL_STATE = {
     backgroundBlur: false,
     loginModal: false,
     registerModal: false,
+    messageModal: false
 };
 export const modalSlice = createSlice({
     name: "modal",
@@ -17,9 +18,17 @@ export const modalSlice = createSlice({
         },
         handleOpenRegisterModal: (state, action) => {
             state.value.registerModal = action.payload
+        },
+        handleOpenMessageModal: (state, action) => {
+            state.value.messageModal = action.payload
         }
     }
 });
 
 export const modalReducer = modalSlice.reducer;
-export const { handleOpenBackgroundBlur, handleOpenLoginModal, handleOpenRegisterModal } = modalSlice.actions;
+export const {
+    handleOpenBackgroundBlur,
+    handleOpenLoginModal,
+    handleOpenRegisterModal,
+    handleOpenMessageModal
+} = modalSlice.actions;

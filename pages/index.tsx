@@ -27,7 +27,7 @@ const HomePage = () => {
   return (
     <div className={styles.pageContainer}>
       <HomeSlider>
-        <Header />
+        <Header  />
         {/* <SiteAnimeModal /> */}
       </HomeSlider>
     </div>
