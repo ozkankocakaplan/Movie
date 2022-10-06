@@ -5,13 +5,14 @@ import ProfilImage from './ProfilImage';
 
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSearch, faUser, faBell, faEnvelope, faHome, faArchive, faComment, faWarning, faFilm } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faUser, faBell, faEnvelope, faHome, faArchive, faComment, faWarning, faFilm, faCompass } from '@fortawesome/free-solid-svg-icons'
 import { useAuth } from '../hooks/useAuth';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
+import { handleOpenBackgroundBlur, handleOpenLoginModal, handleOpenMessageModal } from '../store/features/modalReducer';
 import Link from 'next/link';
 import Line from './Line';
-import { handleOpenBackgroundBlur, handleOpenLoginModal, handleOpenMessageModal } from '../store/features/modalReducer';
+
 
 
 interface IHeaderProps {
@@ -56,9 +57,7 @@ export default function Header(props: IHeaderProps) {
                     </li>
                     <li>
                         <Link href={"/discover"}>
-                            <a>
-                                <FontAwesomeIcon size="xl" icon={faSearch} />
-                            </a>
+                            <a><FontAwesomeIcon size="xl" icon={faCompass} /></a>
                         </Link>
                     </li>
                 </ul>
@@ -81,28 +80,29 @@ export default function Header(props: IHeaderProps) {
                     {props.notification && <li style={{ position: 'relative', zIndex: 15 }}>
                         <a onClick={() => setNotificationShow(!notificationShow)}><FontAwesomeIcon size="xl" icon={faBell} /></a>
                         {notificationShow && <NotificationsContainer />}
-                    </li>}
-                    {user == undefined && <li>
-                        <a onClick={() => {
-                            dispatch(handleOpenBackgroundBlur(true))
-                            dispatch(handleOpenMessageModal(true))
-                        }}><FontAwesomeIcon size="xl" icon={faEnvelope} /></a>
+                    </li>
+                    }
+                    {loggedUser !== undefined && <li>
+                        <div>
+                            <a onClick={() => {
+                                dispatch(handleOpenBackgroundBlur(true))
+                                dispatch(handleOpenMessageModal(true))
+                            }}><FontAwesomeIcon size="xl" icon={faEnvelope} /></a>
+                        </div>
                     </li>}
                     <li>
-                        <span>
-                            {
-                                loggedUser != null && Object.keys(loggedUser).length != 0 ?
-                                    <Link href={"/profile"}>
-                                        <a>
-                                            <ProfilImage alt={"Profil Resmi"} height='40px' width='40px' src='/profilImage.png' />
-                                        </a>
-                                    </Link> :
-                                    <a onClick={() => {
-                                        dispatch(handleOpenBackgroundBlur(true));
-                                        dispatch(handleOpenLoginModal(true));
-                                    }}><FontAwesomeIcon fontSize={"20px"} icon={faUser} /></a>
-                            }
-                        </span>
+                        {
+                            loggedUser === null ?
+                                <Link href={"/profile"}>
+                                    <a>
+                                        <ProfilImage alt={"Profil Resmi"} height='40px' width='40px' src='/profilImage.png' />
+                                    </a>
+                                </Link> :
+                                <a onClick={() => {
+                                    dispatch(handleOpenBackgroundBlur(true));
+                                    dispatch(handleOpenLoginModal(true));
+                                }}><FontAwesomeIcon fontSize={"20px"} icon={faUser} /></a>
+                        }
                     </li>
                 </ul>
             </div>

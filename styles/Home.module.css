@@ -1,3 +1,9 @@
+.userSelected {
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 .pageContainer {
   box-sizing: content-box;
   min-height: calc(100vh);
@@ -330,6 +336,9 @@
   border-radius: 7px 7px 0px 0px;
   margin-top: 1px;
   cursor: pointer;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .downMenuButon {
@@ -344,8 +353,13 @@
   margin-top: 1px;
   cursor: pointer;
   margin-left: 10px;
-  width: 100px;
+  width: 130px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  z-index: 30;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
 }
 
 .butonButonShadown {
@@ -726,6 +740,37 @@
   flex: 1;
 }
 
+.modal {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 100px;
+  z-index: 15;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.modalContainer {
+  width: 750px;
+  border-radius: 7px;
+  background-color: #161616;
+  -webkit-box-shadow: -1px 2px 5px 0px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: -1px 2px 5px 0px rgba(0, 0, 0, 0.75);
+  box-shadow: -1px 2px 5px 0px rgba(0, 0, 0, 0.75);
+}
+
+.modalHeader {
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.modalClose {
+  margin: 10px;
+  cursor: pointer;
+}
+
 .messageModal {
   position: absolute;
   left: 0;
@@ -762,11 +807,21 @@
   max-height: 540px;
 }
 
-.messageUserSearchContainer {
+.searchContainer {
   margin-bottom: 10px;
 }
 
-.messageUserSearch {
+.defaultSearch {
+  background: #1A1A1A;
+  border: 0;
+  outline: 0;
+  border-radius: 7px;
+  color: rgba(255, 255, 255, 0.50);
+  padding: 10px;
+  width: 100%;
+}
+
+.defaultInput {
   background: #1A1A1A;
   border: 0;
   outline: 0;
@@ -1096,9 +1151,12 @@
   border-radius: 7px;
   text-align: center;
   cursor: pointer;
+  flex: 1;
+  text-overflow: ellipsis;
 }
 
 .movieSummary {
+  margin-top: 10px;
   margin-right: 20px;
   color: rgba(255, 255, 255, 0.50);
   font-size: 14px;
@@ -1127,7 +1185,8 @@
 }
 
 .detailsImagesContainer img {
-  width: 550px;
+  width: 100%;
+  height: 370px;
   border-radius: 7px;
 }
 
@@ -1137,28 +1196,20 @@
   flex-direction: row;
 }
 
-.epidoseSeasons {
-  flex: 1;
-  display: flex;
-  background-color: green;
-  padding: 10px;
-}
-
 .seasonsMusic {
   flex: 1;
   display: flex;
   background-color: yellow;
-  padding: 10px;
 }
 
 .detailsImagesListContainer {
   margin-top: 30px;
-  margin-right: 65px;
-  margin-left: 65px;
+  /* margin-right: 65px;
+  margin-left: 65px; */
   overflow-x: scroll;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  /* justify-content: center;
+  align-items: center; */
 }
 
 .detailsImagesListContainer::-webkit-scrollbar {
@@ -1180,6 +1231,918 @@
   cursor: pointer;
 }
 
+.epidoseSeasons {
+  border-radius: 7px;
+  background-color: #1c1c1c;
+  display: flex;
+  flex: 2;
+  margin-right: 10px;
+  flex-direction: column;
+}
+
+.seasonsMusic {
+  border-radius: 7px;
+  background-color: #1c1c1c;
+  display: flex;
+}
+
+.seasonMusicBody {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  overflow-y: scroll;
+  max-height: 450px;
+  text-overflow: ellipsis;
+}
+
+.seasonMusicBody::-webkit-scrollbar {
+  width: 0;
+}
+
+.episodesBody {
+  padding: 10px;
+  align-content: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
+  flex: 1;
+  overflow-y: scroll;
+  max-height: 200px;
+  text-overflow: ellipsis;
+
+}
+
+.episodesBody::-webkit-scrollbar {
+  width: 0;
+}
+
+.episode {
+  height: 30px;
+  background: rgba(217, 217, 217, 0.03);
+  margin-bottom: 10px;
+  border: 0.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 7px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 100%;
+  letter-spacing: 1px;
+  font-size: 12.5px;
+  padding: 5px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.episdeCardname {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+}
+
+.episodeCardWith {
+  width: 48.5% !important;
+}
+
+.seasonContainer {
+  max-width: 400px;
+  overflow-x: scroll;
+  display: flex;
+  flex-direction: row;
+}
+
+.seasonContainer::-webkit-scrollbar {
+  width: 0;
+}
+
+.seasonButon {
+  text-align: center;
+  background-color: #282828;
+  border-radius: 7px;
+  font-size: 12px;
+  padding: 5px;
+  color: rgba(255, 255, 255, 0.50);
+  letter-spacing: 1px;
+  margin-right: 5px;
+}
+
+.discoverContainer {
+  display: flex;
+  flex-direction: row;
+  max-height: 750px;
+  overflow-y: scroll;
+  background: #141414;
+  padding: 5px 0px;
+}
+
+.discoverLeft {
+  flex: .5;
+  flex-direction: column;
+  display: flex;
+}
+
+.discoverFanArt {
+  display: flex;
+  flex: 1;
+  padding: 50px 20px;
+  justify-content: center;
+  align-items: center;
+  background-color: #1A1A1A;
+}
+
+.discoverReview {
+  display: flex;
+  flex: 1;
+  padding: 50px 20px;
+  justify-content: center;
+  align-items: center;
+  background-color: #1A1A1A;
+}
+
+.discoverReview img {
+  height: 200px;
+  width: 200px;
+}
+
+.discoverReview img {
+  height: 200px;
+  width: 200px;
+}
+
+.discoverDivider {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.discoverDivider span {
+  height: 2px;
+  width: 200px;
+  background-color: rgba(255, 255, 255, 0.50);
+}
+
+.discoverMiddle {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 10px;
+  max-height: 700px;
+  overflow-y: scroll;
+}
+
+.discoverMiddle::-webkit-scrollbar {
+  width: 0;
+}
+
+.discoverRight {
+  display: flex;
+  flex: .5;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.discoverContainer::-webkit-scrollbar {
+  width: 0;
+}
+
+.fanArtContainer {
+  margin-bottom: 20px;
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.50);
+  border-left: 1px solid rgba(255, 255, 255, 0.50);
+  border-right: 1px solid rgba(255, 255, 255, 0.50);
+}
+
+.fanArtContainerImg {
+  width: 130px;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fanArtImg {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  width: 120px;
+  border-radius: 7px;
+}
+
+.fanArtImg img {
+  height: 100px;
+}
+
+.ImgDivider {
+  height: 110px;
+  width: 2px;
+  background-color: rgba(255, 255, 255, 0.50);
+}
+
+.fanArtBody {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  color: rgba(255, 255, 255, 0.50);
+  font-size: 13px;
+  padding-left: 10px;
+  text-align: justify;
+}
+
+.fanArtRight {
+  flex-direction: row;
+  display: flex;
+  padding: 10px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fanArtIconButons {
+  cursor: pointer;
+  display: flex;
+  margin-bottom: 15px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.fanArtDivider {
+  margin-left: 15px;
+}
+
+.shareUserName {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  text-align: center;
+  justify-content: center;
+}
+
+.shareUserName a {
+  color: rgba(255, 255, 255, 0.50);
+  font-size: 12x;
+  font-weight: bold;
+  letter-spacing: 0px;
+}
+
+.weekAnime {
+  padding: 10px;
+  background-color: #1A1A1A;
+  border-radius: 7px;
+}
+
+.weekAnimeHeader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.weekAnimeHeader h3 {
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.weekAnimeBody {
+  padding: 10px;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 1px;
+  font-size: 13px;
+  text-align: left;
+}
+
+
+
+.top100 {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #1A1A1A;
+  border-radius: 7px;
+}
+
+.top100Header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.top100Header h3 {
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.top100Body {
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  overflow-y: scroll;
+  max-height: 260px;
+}
+
+.top100Body::-webkit-scrollbar {
+  width: 0;
+}
+
+.top100Card {
+  display: flex;
+  padding: 10px;
+  flex: 1;
+  background-color: #1C1C1C;
+  flex-direction: row;
+  margin-right: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.top100Img {
+  display: flex;
+  height: 53px;
+  width: 43px;
+}
+
+.topBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 1px;
+  justify-content: center;
+  align-items: center;
+  padding-right: 5px;
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.topNumber {
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 1px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  padding-left: 5px;
+}
+
+.topViewCount {
+  text-align: center;
+  font-size: 13px;
+
+}
+
+.discoverSearchContainer {
+  display: flex;
+}
+
+.searchIcon {
+  position: absolute;
+  margin-left: 10px;
+  margin-top: 6px;
+}
+
+.discoverSearchContainer input[type="text"] {
+  background: #232323;
+  border-radius: 7px 7px 0px 0px;
+  outline: 0;
+  border: 0;
+  padding: 5px 30px;
+  color: rgba(255, 255, 255, 0.50);
+}
+
+.dropdownMenu {
+  position: absolute;
+  background-color: #1c1c1c;
+  width: 130px;
+  margin-left: 10px;
+  z-index: 20;
+  padding: 10px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.star {
+  font-size: 20px;
+}
+
+.listButons {
+  border: 0.5px solid rgba(255, 255, 255, 0.5);
+  border-radius: 7px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 10px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 13px;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.profileHeaderContainer {
+  height: calc(20vh - 9px);
+}
+
+.profileHeader {
+  height: 191px;
+  background: url("http://localhost:3000/profileHeader.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.userImg {
+  position: absolute;
+  top: 60px;
+}
+
+.profileHeader .userImg img {
+  height: 166px;
+  width: 166px;
+}
+
+.profileContainer {
+  height: calc(80vh + 9px);
+  background-color: #161616;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.listHeader {
+  display: flex;
+  width: 44%;
+  flex-direction: column;
+
+}
+
+.profileMiddle {
+  display: flex;
+  width: 12%;
+  background-color: red;
+
+}
+
+.rosetteContainer {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+  width: 98%;
+  background-color: #1A1A1A;
+  overflow-x: scroll;
+}
+
+.rosetteContainer::-webkit-scrollbar {
+  height: 0;
+}
+
+.profile {
+  display: flex;
+  width: 44%;
+  flex-direction: column;
+}
+
+.rosette {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #424242;
+  border-radius: 100%;
+  height: 40px;
+  width: 40px;
+  margin-right: 10px;
+}
+
+.rosette img {
+  height: 38px;
+  width: 38px;
+  cursor: pointer;
+}
+
+.listContainer, .statusContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.listHeaderTitle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.listHeaderTitle h1 {
+  font-weight: 400;
+  font-size: 60px;
+  line-height: 81px;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 1px;
+}
+
+.listBody {
+  overflow-y: scroll;
+  max-height: calc(60vh);
+  padding: 10px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.listBody::-webkit-scrollbar {
+  width: 0;
+}
+
+.listCard {
+  border-left: 2px solid #262626;
+  background: #131313;
+  border-top-right-radius: 7px;
+  border-bottom-right-radius: 7px;
+  height: 221px;
+  bottom: 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.listCard2 {
+  border-left: 2px solid #262626;
+  background: #131313;
+  border-top-right-radius: 7px;
+  border-bottom-right-radius: 7px;
+  bottom: 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardImage {
+  cursor: pointer;
+  height: 141px;
+  width: 114px;
+  margin-right: 10px;
+  opacity: .4;
+}
+
+.topLeftBorder {
+  width: 60%;
+  background-color: #262626;
+  height: 2px;
+  position: relative;
+}
+
+
+.bottomBorder {
+  height: 2px;
+  background-color: #262626;
+  width: 20%;
+  margin-left: 80%;
+  position: relative;
+}
+
+.rightBorder {
+  height: 100px;
+  background-color: #262626;
+  width: 2px;
+  margin-left: 100%;
+  margin-top: -100px;
+  position: relative;
+}
+
+.listOptions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.sliderContainer {
+  display: flex;
+  flex-direction: row;
+  padding: 20px;
+  justify-content: space-between;
+  align-content: flex-start;
+}
+
+.sliderLeft {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+}
+
+.sliderImages {
+  display: flex;
+  overflow-x: scroll;
+  flex-direction: row;
+  flex: 1;
+}
+
+.sliderImages::-webkit-scrollbar {
+  height: 0;
+}
+
+.sliderRight {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+}
+
+.listOptionsLeft {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.listOptionsLeft svg:hover {
+  color: #fff;
+}
+
+.topWatchBorder {
+  width: 80%;
+  display: flex;
+  height: 40px;
+  justify-content: flex-end;
+  align-items: center;
+  border-top: 2px solid #262626;
+}
+
+.addListButon {
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.changeListButon {
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.listOptionsRight {
+  color: rgba(255, 255, 255, 0.35);
+  padding-right: 10px;
+  font-size: 20px;
+}
+
+.profileInfoContainer {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+  width: 100%;
+  justify-content: space-between;
+  background-color: #1A1A1A;
+}
+
+.profileInfo {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 400;
+  letter-spacing: 1px;
+}
+
+.profileOptions {
+  display: flex;
+  padding-right: 20px;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.optionsIcon {
+  padding: 10px;
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+}
+
+.optionsIcon:hover {
+  color: rgba(255, 255, 255);
+  font-size: 20px;
+}
+
+.statusDateText {
+  font-size: 16px;
+}
+
+.fanArtView {
+  background-color: #111111;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  line-height: 32px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.reviewView {
+  background-color: #111111;
+  display: flex;
+  flex: 1;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 24px;
+  color: rgba(255, 255, 255, 0.45);
+
+}
+
+.addListContainer {
+  margin: 20px;
+}
+
+.resultContainer {
+  margin-top: 10px;
+  max-height: 500px;
+  overflow-y: scroll;
+}
+
+.resultContainer::-webkit-scrollbar {
+  width: 0;
+}
+
+.resultCard {
+  flex: 1;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #1a1a1a;
+  border-radius: 7px;
+  display: flex;
+  flex-direction: column;
+}
+
+.resultImg {
+  height: 70px;
+  width: 60px;
+  opacity: .4;
+}
+
+.resultImg img {
+  height: 100%;
+  width: 100%;
+}
+
+.searchBody {
+  margin-left: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  flex-direction: column;
+}
+
+.categoriesList {
+  display: flex;
+  flex-direction: row;
+  overflow-y: scroll;
+  max-width: 580px;
+}
+
+.categoriesList::-webkit-scrollbar {
+  width: 0;
+}
+
+.searchResultOpen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.75);
+  padding: 10px;
+  cursor: pointer;
+}
+
+.categoriesList .category {
+  font-size: 13px;
+  margin-right: 10px;
+  border-radius: 7px;
+  padding: 5px 10px;
+  border: 1px solid #424242;
+}
+
+.resultSeasonsContainer {
+  margin-top: 10px;
+  border-top: 1px solid #424242;
+  background-color: #161616;
+  padding: 10px;
+  overflow-y: scroll;
+  max-height: 300px;
+}
+
+.resultSeasonsContainer::-webkit-scrollbar {
+  width: 0;
+}
+
+.checkBox {
+  height: 20px;
+  width: 20px;
+  cursor: pointer;
+  border-radius: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #424242;
+}
+
+.resultEpisodeContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.resultEpisodeCard {
+  background-color: #1a1a1a;
+  border-radius: 10px;
+  padding: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+}
+
+.resultEpisodeCard a {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  margin-left: 10px;
+}
+
+.resultSeasonTitle {
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 30px;
+}
+
+.deleteListContainer {
+  display: flex;
+  justify-content: center;
+  margin-left: 15px;
+  align-items: center;
+  height: 40px;
+  width: 40px;
+  color: rgba(255, 255, 255, 0.50);
+  border-radius: 7px;
+  background-color: #1a1a1a;
+}
+
+.deleteListContainer:hover {
+  cursor: pointer;
+  color: #fff;
+}
+
+.custom-file-input {
+  color: transparent;
+}
+
+.custom-file-input::-webkit-file-upload-button {
+  visibility: hidden;
+}
+
+.custom-file-input::before {
+  content: '';
+  position: absolute;
+  background: transparent;
+  z-index: 20;
+  top: 0px;
+  border-radius: 3px;
+  padding: 5px 8px;
+  height: 166px;
+  width: 166px;
+  outline: none;
+  white-space: nowrap;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 10pt;
+  border-radius: 100%;
+}
+
+.custom-file-input:hover::before {}
+
+.custom-file-input:active {
+  outline: 0;
+}
+
+.custom-file-input:active::before {
+  background: transparent;
+}
+
+
+
+
+
+
+
 
 
 @media screen and (max-width:1024px) {
@@ -1193,6 +2156,27 @@
 
   .pageContainer:nth-child(1) {
     min-height: calc(50vh);
+  }
+
+  .profileHeaderContainer {
+    height: inherit !important;
+  }
+
+  .profileContainer {
+    height: inherit !important;
+    flex-direction: column-reverse;
+  }
+
+  .profile {
+    width: 100% !important;
+  }
+
+  .profileMiddle {
+    display: none !important;
+  }
+
+  .listHeader {
+    width: 100%;
   }
 
   .homeBg {

@@ -38,11 +38,11 @@ const Archive: NextPage = () => {
               <MenuButon width='45px' icon={faShuffle} />
             </div>
             <div className={styles.rightMenuContainer}>
-              <DownButon icon={faAngleDown} name='Puan' />
-              <DownButon icon={faAngleDown} name='Popülerite' />
-              <DownButon icon={faAngleDown} name='Tür' />
-              <DownButon icon={faAngleDown} name='Kategori' />
-              <DownButon icon={faAngleDown} name='A-Z' />
+              <DownButon type="buton" icon={faAngleDown} name='A-Z' />
+              <DownButon type="dropdown" icon={faAngleDown} name='Kategori' />
+              <DownButon type="dropdown" icon={faAngleDown} name='Tür' />
+              <DownButon type="dropdown" icon={faAngleDown} name='Popülerite' />
+              <DownButon type="dropdown" icon={faAngleDown} name='Puan' />
             </div>
           </MenuContainer>
           <div className={styles.contentContainer}>

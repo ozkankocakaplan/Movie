@@ -3,12 +3,12 @@ import React, { createContext, useContext, useMemo, useState } from 'react'
 import { useLocalStorage } from './useLocalStorage';
 
 interface IAuthContext {
-    user: {},
+    user: { name: string },
     login: (data: any) => void,
     logout: () => void,
 }
 const state = {
-    user: {},
+    user: { name: '' },
     login: () => { },
     logout: () => { }
 }
