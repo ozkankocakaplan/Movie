@@ -3,12 +3,12 @@ import React, { createContext, useContext, useMemo, useState } from 'react'
 import { useLocalStorage } from './useLocalStorage';
 
 interface IAuthContext {
-    user: { name: string },
+    user: { token: string },
     login: (data: any) => void,
     logout: () => void,
 }
 const state = {
-    user: { name: '' },
+    user: { token: '' },
     login: () => { },
     logout: () => { }
 }
@@ -18,10 +18,12 @@ export const AuthProvider = (props: { children: any }) => {
     const router = useRouter();
 
     const login = async (data: any) => {
-        router.push("");
+        setUser(data);
+        router.reload();
     }
     const logout = () => {
-        setUser({});
+        setUser(null);
+        router.push("/");
     }
     const value = useMemo(() => ({
         user,

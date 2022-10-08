@@ -1,118 +1,131 @@
-import { faAddressCard, faAngleLeft, faAngleRight, faBan, faBorderAll, faEdit, faEnvelope, faPersonCircleExclamation, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faAddressCard, faAngleLeft, faAngleRight, faBan, faBorderAll, faEdit, faEnvelope, faPersonCircleExclamation, faPlus, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { FanArtCard, ReviewCard } from '../src/components/Card';
 import { useAuth } from '../src/hooks/useAuth';
 import { handleOpenAddListItemModal, handleOpenAddListModal, handleOpenBackgroundBlur, handleOpenEditListItemModal, handleOpenEditListModal, handleOpenEditUserModal } from '../src/store/features/modalReducer';
 import styles from '../styles/Home.module.css';
+
+
 export default function Profile() {
   const dispatch = useDispatch();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [loggedUser, setLoggedUser] = useState({});
+  const navigate = useRouter();
   useEffect(() => {
-    setLoggedUser({ name: 'a' });
+    setLoggedUser(user);
   }, [user])
-
-  const LeftContent = () => {
-    return (
-      <div className={styles.listHeader}>
-        <div className={styles.rosetteContainer}>
-          <RosetteCard source='http://localhost:3000/rosette.png' />
-          <RosetteCard source='http://localhost:3000/rosette2.png' />
-          <RosetteCard source='http://localhost:3000/rosette3.png' />
-          <RosetteCard source='http://localhost:3000/rosette.png' />
-          <RosetteCard source='http://localhost:3000/rosette2.png' />
-          <RosetteCard source='http://localhost:3000/rosette3.png' />
-          <RosetteCard source='http://localhost:3000/rosette.png' />
-          <RosetteCard source='http://localhost:3000/rosette2.png' />
-          <RosetteCard source='http://localhost:3000/rosette3.png' />
-          <RosetteCard source='http://localhost:3000/rosette.png' />
-          <RosetteCard source='http://localhost:3000/rosette2.png' />
-          <RosetteCard source='http://localhost:3000/rosette3.png' />
-          <RosetteCard source='http://localhost:3000/rosette.png' />
-          <RosetteCard source='http://localhost:3000/rosette2.png' />
-          <RosetteCard source='http://localhost:3000/rosette3.png' />
-          <RosetteCard source='http://localhost:3000/rosette.png' />
+  if (loggedUser !== null) {
+    const LeftContent = () => {
+      return (
+        <div className={styles.listHeader}>
+          <div className={styles.rosetteContainer}>
+            <RosetteCard source='http://localhost:3000/rosette.png' />
+            <RosetteCard source='http://localhost:3000/rosette2.png' />
+            <RosetteCard source='http://localhost:3000/rosette3.png' />
+            <RosetteCard source='http://localhost:3000/rosette.png' />
+            <RosetteCard source='http://localhost:3000/rosette2.png' />
+            <RosetteCard source='http://localhost:3000/rosette3.png' />
+            <RosetteCard source='http://localhost:3000/rosette.png' />
+            <RosetteCard source='http://localhost:3000/rosette2.png' />
+            <RosetteCard source='http://localhost:3000/rosette3.png' />
+            <RosetteCard source='http://localhost:3000/rosette.png' />
+            <RosetteCard source='http://localhost:3000/rosette2.png' />
+            <RosetteCard source='http://localhost:3000/rosette3.png' />
+            <RosetteCard source='http://localhost:3000/rosette.png' />
+            <RosetteCard source='http://localhost:3000/rosette2.png' />
+            <RosetteCard source='http://localhost:3000/rosette3.png' />
+            <RosetteCard source='http://localhost:3000/rosette.png' />
+          </div>
+          <div className={styles.listContainer}>
+            <div className={styles.listHeaderTitle + " " + styles.userSelected}>
+              <h1 onClick={() => {
+                dispatch(handleOpenBackgroundBlur(true));
+                dispatch(handleOpenAddListModal(true));
+              }}>Listeler</h1>
+            </div>
+            <div className={styles.listBody}>
+              <Slider user={loggedUser} />
+              <Slider user={loggedUser} />
+              <Slider user={loggedUser} />
+              <Slider user={loggedUser} />
+            </div>
+          </div>
         </div>
-        <div className={styles.listContainer}>
-          <div className={styles.listHeaderTitle + " " + styles.userSelected}>
-            <h1 onClick={() => {
-              dispatch(handleOpenBackgroundBlur(true));
-              dispatch(handleOpenAddListModal(true));
-            }}>Listeler</h1>
+      )
+    }
+    const MiddleContent = () => {
+      return (
+        <div className={styles.profileMiddle}></div>
+      )
+    }
+    const RightContent = () => {
+      const dispatch = useDispatch();
+      return (
+        <div className={styles.profile}>
+          <div className={styles.profileInfoContainer}>
+            <div className={styles.profileInfo + " " + styles.userSelected}>erayatmaca</div>
+            <div className={styles.profileOptions}>
+              {
+                loggedUser !== null && Object.keys(loggedUser).length !== 0 && <div onClick={() => {
+                  dispatch(handleOpenBackgroundBlur(true))
+                  dispatch(handleOpenEditUserModal(true))
+                }} className={styles.optionsIcon}><FontAwesomeIcon icon={faEdit} /></div>
+              }
+
+              <div className={styles.optionsIcon}><FontAwesomeIcon icon={faAddressCard} /></div>
+              <div className={styles.optionsIcon}><FontAwesomeIcon icon={faEnvelope} /></div>
+              <div className={styles.optionsIcon}><FontAwesomeIcon icon={faBan} /></div>
+              <div className={styles.optionsIcon}><FontAwesomeIcon icon={faPersonCircleExclamation} /></div>
+              <div onClick={logout} className={styles.optionsIcon}><FontAwesomeIcon icon={faRightFromBracket} /></div>
+            </div>
           </div>
-          <div className={styles.listBody}>
-            <Slider user={loggedUser} />
-            <Slider user={loggedUser} />
-            <Slider user={loggedUser} />
-            <Slider user={loggedUser} />
+          <div className={styles.statusContainer}>
+            <div className={styles.listHeaderTitle + " " + styles.userSelected}>
+              <h1>Gönderiler</h1>
+            </div>
+            <div className={styles.listBody}>
+              <ReviewCard user={loggedUser} />
+              <ReviewCard user={loggedUser} />
+              <FanArtCard user={loggedUser} />
+              <FanArtCard user={loggedUser} />
+            </div>
           </div>
+        </div>
+      )
+    }
+    return (
+      <div className={styles.pageContainer}>
+        <div className={styles.profileHeaderContainer}>
+          <div className={styles.profileHeader}>
+            <div className={styles.userImg}>
+              <Link href={"/"}>
+                <a>
+                  <img src='http://localhost:3000/profilePhoto.png' />
+                </a>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.profileContainer}>
+          <LeftContent />
+          <MiddleContent />
+          <RightContent />
         </div>
       </div>
     )
   }
-  const MiddleContent = () => {
-    return (
-      <div className={styles.profileMiddle}></div>
-    )
+  else {
+    navigate.push("/")
   }
-  const RightContent = () => {
-    const dispatch = useDispatch();
-    return (
-      <div className={styles.profile}>
-        <div className={styles.profileInfoContainer}>
-          <div className={styles.profileInfo + " " + styles.userSelected}>erayatmaca</div>
-          <div className={styles.profileOptions}>
-            {
-              loggedUser !== null && Object.keys(loggedUser).length !== 0 && <div onClick={() => {
-                dispatch(handleOpenBackgroundBlur(true))
-                dispatch(handleOpenEditUserModal(true))
-              }} className={styles.optionsIcon}><FontAwesomeIcon icon={faEdit} /></div>
-            }
 
-            <div className={styles.optionsIcon}><FontAwesomeIcon icon={faAddressCard} /></div>
-            <div className={styles.optionsIcon}><FontAwesomeIcon icon={faEnvelope} /></div>
-            <div className={styles.optionsIcon}><FontAwesomeIcon icon={faBan} /></div>
-            <div className={styles.optionsIcon}><FontAwesomeIcon icon={faPersonCircleExclamation} /></div>
-          </div>
-        </div>
-        <div className={styles.statusContainer}>
-          <div className={styles.listHeaderTitle + " " + styles.userSelected}>
-            <h1>Gönderiler</h1>
-          </div>
-          <div className={styles.listBody}>
-            <ReviewCard user={loggedUser} />
-            <ReviewCard user={loggedUser} />
-            <FanArtCard user={loggedUser} />
-            <FanArtCard user={loggedUser} />
-          </div>
-        </div>
-      </div>
-    )
-  }
-  return (
-    <div className={styles.pageContainer}>
-      <div className={styles.profileHeaderContainer}>
-        <div className={styles.profileHeader}>
-          <div className={styles.userImg}>
-            <Link href={"/"}>
-              <a>
-                <img src='http://localhost:3000/profilePhoto.png' />
-              </a>
-            </Link>
-          </div>
-        </div>
-      </div>
 
-      <div className={styles.profileContainer}>
-        <LeftContent />
-        <MiddleContent />
-        <RightContent />
-      </div>
-    </div>
-  )
+
+
 }
 const Slider = (props: { user: {} }) => {
   const dispatch = useDispatch();

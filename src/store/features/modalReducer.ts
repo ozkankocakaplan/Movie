@@ -9,7 +9,8 @@ export const INITIAL_STATE = {
     editListItemModal: false,
     addListModal: false,
     editListModal: false,
-    editUserModal: false
+    editUserModal: false,
+    siteInfoModal: false,
 };
 export const modalSlice = createSlice({
     name: "modal",
@@ -41,6 +42,9 @@ export const modalSlice = createSlice({
         },
         handleOpenEditUserModal: (state, action) => {
             state.value.editUserModal = action.payload
+        },
+        handleOpenInfoSiteModal: (state, action) => {
+            state.value.siteInfoModal = action.payload
         }
     }
 });
@@ -55,5 +59,6 @@ export const {
     handleOpenEditListItemModal,
     handleOpenAddListModal,
     handleOpenEditListModal,
-    handleOpenEditUserModal
+    handleOpenEditUserModal,
+    handleOpenInfoSiteModal
 } = modalSlice.actions;

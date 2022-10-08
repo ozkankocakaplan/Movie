@@ -282,14 +282,163 @@
   /* backdrop-filter: blur(1.5px); */
 }
 
-.siteAnimeModal {
-  position: absolute;
-  left: 15%;
-  right: 15%;
-  bottom: 25%;
-  top: 5%;
-  z-index: 4;
+.newEpisodesContainer {
+  position: relative;
+  display: flex;
+  flex: 1;
+  top: 250px;
+  overflow-x: scroll;
+  max-width: 500px;
+  margin-right: 10px;
+}
 
+.newEpisodesContainer::-webkit-scrollbar {
+  height: 0;
+}
+
+.new2EpisodesContainer {
+  position: relative;
+  display: flex;
+  flex: 1;
+  top: 350px;
+  margin-right: 10px;
+  max-width: 490px;
+  overflow-x: scroll;
+}
+
+.new2EpisodesContainer::-webkit-scrollbar {
+  height: 0;
+}
+
+.homePage2Footer {
+  flex: 1;
+  display: flex;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.leftFooter {
+  flex-direction: column;
+  display: flex;
+  padding: 10px;
+  flex: 1;
+}
+
+.leftFooterInfo {
+
+  display: flex;
+  height: 190px;
+  padding: 10px;
+  width: 77%;
+}
+
+.footerSocialInfo {
+  position: relative;
+  left: 160px;
+  width: 230px;
+  height: 60px;
+  bottom: 40px;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.footerSocialInfo span {
+  padding: 5px 7px;
+}
+
+.footerContentInfo {
+  color: rgba(255, 255, 255, 0.75);
+  position: relative;
+  left: 185px;
+  width: 230px;
+  height: 120px;
+  top: 10px;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contentText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.contentText h5 {
+  letter-spacing: 1px;
+  line-height: 20px;
+}
+
+.contentText h4 {
+
+  margin-bottom: 10px;
+}
+
+.rightFooterInfo {
+  display: flex;
+  flex: 1;
+  padding: 10px;
+}
+
+.rightFooter {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 10px;
+}
+
+.rightFooterContainer {
+  justify-content: flex-end;
+}
+
+.nextBackButon {
+  padding: 5px;
+  color: rgba(255, 255, 255, 0.50);
+  cursor: pointer;
+}
+
+.nextBackButon:hover {
+  color: #fff;
+}
+
+
+.topEpisodeContainer {
+  position: relative;
+  display: flex;
+  flex: 1;
+  top: 250px;
+  overflow-x: scroll;
+  max-width: 600px;
+}
+
+.topEpisodeContainer::-webkit-scrollbar {
+  height: 0;
+}
+
+.top2EpisodeContainer {
+  position: relative;
+  display: flex;
+  flex: 1;
+  top: 350px;
+  margin-left: 0px;
+  overflow-x: scroll;
+  max-width: 500px;
+
+}
+
+.top2EpisodeContainer::-webkit-scrollbar {
+  height: 0;
 }
 
 .archiveBackground {
@@ -298,6 +447,36 @@
   background-size: 100% 100%;
   box-sizing: content-box;
 
+}
+
+.childrenContainer {
+  position: relative;
+  margin-left: 41%;
+  top: 170px;
+  z-index: 200;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 445px;
+}
+
+.childrenMangaText {
+
+  position: absolute;
+  font-weight: 400;
+  font-size: 32px;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 4px 4px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+.childrenMangaTextAnimation {
+  animation: mangaTextAnimation 1s ease-in-out forwards;
+}
+
+.childrenContainer img {
+  width: 445px;
+  height: 830px;
 }
 
 .archiveContainer {
@@ -829,6 +1008,21 @@
   color: rgba(255, 255, 255, 0.50);
   padding: 10px;
   width: 100%;
+}
+
+.defaultTextare {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 7px;
+  resize: none;
+  height: 510px;
+}
+
+.contactInput {
+  height: 30px;
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .messageOptions {
@@ -1686,7 +1880,7 @@
 .profileMiddle {
   display: flex;
   width: 12%;
-  background-color: red;
+  background-color: #131313;
 
 }
 
@@ -1695,7 +1889,7 @@
   display: flex;
   align-items: center;
   padding-left: 20px;
-  width: 98%;
+  width: 100%;
   background-color: #1A1A1A;
   overflow-x: scroll;
 }
@@ -2137,9 +2331,280 @@
   background: transparent;
 }
 
+.siteInfoModalContainer {
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+}
 
+.siteInfoModalBody {
+  display: flex;
+  flex: 1;
+}
 
+.siteInfoModalFooter {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
 
+.siteInfoModalFooterButonContainer {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.footerNextBackContainer {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.footerNextBackContainer:nth-child(1), .footerNextBackContainer:nth-child(2) {
+  padding: 10px;
+  color: rgba(255, 255, 255, 0.50);
+}
+
+.footerNextBackContainer div svg {
+  cursor: pointer;
+}
+
+.footerNextBackContainer div svg:hover {
+  color: #fff;
+}
+
+.siteInfoModalFooterButon {
+  display: flex;
+  flex: 1;
+  padding: 5px 15px;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 20px;
+  background: #232323;
+  filter: blur(1.5px);
+  border-radius: 3px;
+}
+
+.announcementsContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+  row-gap: 30px;
+  justify-content: space-between;
+}
+
+.announcementImg, .announcementBody {
+  display: flex;
+  flex: 1;
+  justify-content: flex-start;
+  align-items: flex-end;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.announcementBody {
+  padding: 5px 10px;
+  text-align: justify;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 350px;
+  font-size: 14px;
+
+}
+
+.about {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+.aboutContainer {
+  background: #1C1C1C;
+  border-radius: 7px;
+  padding: 10px;
+  width: 350px;
+  height: 707px;
+}
+
+.contact {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.contactForm {
+  display: flex;
+  flex: 1;
+  margin-right: 10px;
+  flex-direction: column;
+}
+
+.contactSendButonContainer {
+  display: flex;
+  flex: .5;
+}
+
+.contactSendButon {
+  font-size: 17px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.65);
+  flex: 1;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 7px;
+  outline: none;
+}
+
+.contactContainer {
+  background: #1C1C1C;
+  border-radius: 7px;
+  padding: 10px;
+  width: 350px;
+  height: 707px;
+  display: flex;
+  flex-direction: column;
+}
+
+.contactContainer:nth-child(2) {
+  align-items: center;
+}
+
+.contactSocialCard {
+  height: 200px;
+  width: 200px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  padding: 15px;
+  flex-direction: column;
+}
+
+.contactSocialCard img {
+  height: 100%;
+  width: 100%;
+}
+
+.contactSocialCardDivider {
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  height: 0px;
+  width: 200px;
+}
+
+.aboutContainer:nth-child(1) {
+  overflow-y: scroll;
+  max-height: 710px;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 27px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.aboutContainer:nth-child(2) {
+  overflow-y: scroll;
+  max-height: 710px;
+}
+
+.aboutSocialCard {
+  flex: 1;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 30px;
+}
+
+.aboutSocialCardBody {
+  flex: 1;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+}
+
+.aboutSocialInfo {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.aboutSocialCardDivider {
+  width: 160px;
+  height: 2px;
+  margin-left: 75px;
+  background: #fff;
+  opacity: .5;
+}
+
+.rowDirection {
+  width: 200px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rowDirection img {
+  width: 25px;
+  height: 25px;
+}
+
+.aboutContainer:nth-child(1)::-webkit-scrollbar, .aboutContainer:nth-child(2)::-webkit-scrollbar {
+  width: 0;
+}
+
+.aboutContainerRoleText {
+  font-size: 14px;
+}
+
+.footerButonActive {
+  background: #282828;
+  filter: inherit;
+}
+
+.announcementsCard {
+  height: 200px;
+  width: 350px;
+  display: flex;
+  background: #1C1C1C;
+  border-radius: 7px;
+  flex-direction: column;
+}
+
+.announcementsCard img {
+  width: 100%;
+  height: 100%;
+}
+
+.announcementTitleContainer {
+  width: 330px;
+  justify-content: space-between;
+  position: absolute;
+  display: flex;
+  margin-bottom: 5px;
+  margin-left: 10px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.announcementDateTitle {
+  font-size: 13px;
+}
+
+.errorText {
+  color: #ff000080;
+  font-size: 14px;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
 
 
 
@@ -2181,5 +2646,16 @@
 
   .homeBg {
     height: 50%;
+  }
+}
+
+@keyframes mangaTextAnimation {
+  0% {
+    top: 170px;
+  }
+
+  100% {
+    top: -10%;
+
   }
 }

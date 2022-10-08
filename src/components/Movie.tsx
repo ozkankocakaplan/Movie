@@ -1,13 +1,21 @@
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux';
 import styles from '../../styles/Home.module.css'
+import { handleOpenBackgroundBlur } from '../store/features/modalReducer';
 interface IMovieProps {
     src: string,
-    marginLeft?: string
+    marginLeft?: string,
+    infoContainerLeft?: string
 }
 export default function Movie(props: IMovieProps) {
+    const dispatch = useDispatch();
     const [movieInfo, setMovieInfo] = useState(false);
     return (
-        <div onMouseOver={() => setMovieInfo(true)} onMouseLeave={() => setMovieInfo(false)}>
+        <div onMouseOver={() => {
+            setMovieInfo(true);
+        }} onMouseLeave={() => {
+            setMovieInfo(false);
+        }}>
             <img src={props.src}
                 className={styles.movieCover}
                 style={{
@@ -21,8 +29,8 @@ export default function Movie(props: IMovieProps) {
             {movieInfo && <div style={{
                 padding: '10px', width: '300px',
                 height: '160px',
-                marginLeft: '135px',
-                zIndex: 200,
+                marginLeft: props.infoContainerLeft ? props.infoContainerLeft : '-135px',
+                zIndex: 300,
                 position: 'absolute', background: 'rgba(24, 24, 24, 0.95)', top: 0,
                 color: '#fff'
             }}>

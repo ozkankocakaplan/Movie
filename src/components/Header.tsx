@@ -9,7 +9,7 @@ import { faSearch, faUser, faBell, faEnvelope, faHome, faArchive, faComment, faW
 import { useAuth } from '../hooks/useAuth';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
-import { handleOpenBackgroundBlur, handleOpenLoginModal, handleOpenMessageModal } from '../store/features/modalReducer';
+import { handleOpenBackgroundBlur, handleOpenInfoSiteModal, handleOpenLoginModal, handleOpenMessageModal } from '../store/features/modalReducer';
 import Link from 'next/link';
 import Line from './Line';
 
@@ -39,7 +39,10 @@ export default function Header(props: IHeaderProps) {
             <div className={styles["headerLeft"] + " " + styles["headerLeftContent"]}>
                 <ul>
                     <li>
-                        <span style={{ cursor: 'pointer' }} onClick={() => router.push("/")}>
+                        <span style={{ cursor: 'pointer' }} onClick={() => {
+                            dispatch(handleOpenBackgroundBlur(true))
+                            dispatch(handleOpenInfoSiteModal(true))
+                        }}>
                             <ProfilImage alt='Logo' height='60px' width='60px' src='/logo.png' />
                         </span>
                     </li>
@@ -82,7 +85,7 @@ export default function Header(props: IHeaderProps) {
                         {notificationShow && <NotificationsContainer />}
                     </li>
                     }
-                    {loggedUser !== undefined && <li>
+                    {loggedUser !== null && <li>
                         <div>
                             <a onClick={() => {
                                 dispatch(handleOpenBackgroundBlur(true))
@@ -92,7 +95,7 @@ export default function Header(props: IHeaderProps) {
                     </li>}
                     <li>
                         {
-                            loggedUser === null ?
+                            loggedUser !== null ?
                                 <Link href={"/profile"}>
                                     <a>
                                         <ProfilImage alt={"Profil Resmi"} height='40px' width='40px' src='/profilImage.png' />
