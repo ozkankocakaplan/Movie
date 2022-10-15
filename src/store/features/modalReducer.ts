@@ -1,5 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-
+export interface IDeleteModal {
+    text: string,
+    isOpen: boolean,
+    handleClose: () => void,
+    handleDelete: () => void
+}
 export const INITIAL_STATE = {
     backgroundBlur: false,
     loginModal: false,
@@ -9,8 +14,14 @@ export const INITIAL_STATE = {
     editListItemModal: false,
     addListModal: false,
     editListModal: false,
+    editDynamicListModal: false,
     editUserModal: false,
     siteInfoModal: false,
+    blockModal: false,
+    complaintModal: false,
+    rosetteInfoModal: false,
+    deleteModal: { text: '', isOpen: false, handleClose: function () { }, handleDelete: function () { } } as IDeleteModal,
+
 };
 export const modalSlice = createSlice({
     name: "modal",
@@ -45,6 +56,21 @@ export const modalSlice = createSlice({
         },
         handleOpenInfoSiteModal: (state, action) => {
             state.value.siteInfoModal = action.payload
+        },
+        handleDeleteModal: (state, action) => {
+            state.value.deleteModal = action.payload
+        },
+        handleOpenBlockModal: (state, action) => {
+            state.value.blockModal = action.payload
+        },
+        handleOpenComplaintModal: (state, action) => {
+            state.value.complaintModal = action.payload
+        },
+        handleOpenEditDynamicListModal: (state, action) => {
+            state.value.editDynamicListModal = action.payload
+        },
+        handleOpenRosetteModal: (state, action) => {
+            state.value.rosetteInfoModal = action.payload
         }
     }
 });
@@ -60,5 +86,10 @@ export const {
     handleOpenAddListModal,
     handleOpenEditListModal,
     handleOpenEditUserModal,
-    handleOpenInfoSiteModal
+    handleOpenInfoSiteModal,
+    handleDeleteModal,
+    handleOpenBlockModal,
+    handleOpenComplaintModal,
+    handleOpenEditDynamicListModal,
+    handleOpenRosetteModal
 } = modalSlice.actions;

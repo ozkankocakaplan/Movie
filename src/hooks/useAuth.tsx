@@ -1,14 +1,15 @@
 import { useRouter } from 'next/router';
 import React, { createContext, useContext, useMemo, useState } from 'react'
+import { UserModel } from '../types/Entites';
 import { useLocalStorage } from './useLocalStorage';
 
 interface IAuthContext {
-    user: { token: string },
+    user: UserModel,
     login: (data: any) => void,
     logout: () => void,
 }
 const state = {
-    user: { token: '' },
+    user: { token: '' } as UserModel,
     login: () => { },
     logout: () => { }
 }
@@ -17,7 +18,7 @@ export const AuthProvider = (props: { children: any }) => {
     const [user, setUser] = useLocalStorage("user", null);
     const router = useRouter();
 
-    const login = async (data: any) => {
+    const login = async (data: UserModel) => {
         setUser(data);
         router.reload();
     }

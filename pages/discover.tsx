@@ -10,9 +10,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Line from '../src/components/Line';
 import { FanArtCard } from '../src/components/Card';
 import { useAuth } from '../src/hooks/useAuth';
+import { Users } from '../src/types/Entites';
 export default function Discover() {
   const { user } = useAuth();
-  const [loggedUser, setLoggedUser] = useState({});
+  const [loggedUser, setLoggedUser] = useState({} as Users);
   useEffect(() => {
     setLoggedUser(user)
   }, [user])
@@ -88,11 +89,11 @@ export default function Discover() {
               <ReviewCard animeImgShow={true} />
               <ReviewCard animeImgShow={false} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
+                {/* <FanArtCard user={loggedUser} />
                 <FanArtCard user={loggedUser} />
                 <FanArtCard user={loggedUser} />
                 <FanArtCard user={loggedUser} />
-                <FanArtCard user={loggedUser} />
-                <FanArtCard user={loggedUser} />
+                <FanArtCard user={loggedUser} /> */}
               </div>
             </div>
             <div className={styles.discoverRight}>

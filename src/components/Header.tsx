@@ -7,11 +7,11 @@ import ProfilImage from './ProfilImage';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch, faUser, faBell, faEnvelope, faHome, faArchive, faComment, faWarning, faFilm, faCompass } from '@fortawesome/free-solid-svg-icons'
 import { useAuth } from '../hooks/useAuth';
-import { useRouter } from 'next/router';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { handleOpenBackgroundBlur, handleOpenInfoSiteModal, handleOpenLoginModal, handleOpenMessageModal } from '../store/features/modalReducer';
 import Link from 'next/link';
 import Line from './Line';
+import { RootState } from '../store';
 
 
 
@@ -21,19 +21,24 @@ interface IHeaderProps {
     notification?: 'show' | 'hide',
 }
 export default function Header(props: IHeaderProps) {
-
     const dispatch = useDispatch();
-
-    const router = useRouter();
     const { user } = useAuth();
     const [loggedUser, setLoggedUser] = useState({});
-
+    const userInfo = useSelector((x: RootState) => x.userReducer.value.user)
     const [searchShow, setSearchShow] = useState(false);
     const [notificationShow, setNotificationShow] = useState(false);
+
+    const [search, setSearch] = useState('');
 
     useEffect(() => {
         setLoggedUser(user);
     }, [user]);
+
+    const handleSearch = (e: string) => {
+
+    }
+
+
     return (
         <div className={styles.headerContainer} {...props}>
             <div className={styles["headerLeft"] + " " + styles["headerLeftContent"]}>
@@ -71,7 +76,10 @@ export default function Header(props: IHeaderProps) {
                         <a onClick={() => {
                             setSearchShow(!searchShow);
                         }}><FontAwesomeIcon size="xl" icon={faSearch} /></a>
-                        {searchShow && <input autoFocus type={"text"} className={styles.headerSearchText} />}
+                        {searchShow && <input autoFocus
+                            value={search}
+                            onChange={(e) => handleSearch(e.target.value)}
+                            type={"text"} className={styles.headerSearchText} />}
                         {searchShow && <div className={styles.headerSearchResultContainer}>
                             <SearchResultCard />
                             <SearchResultCard />
@@ -96,9 +104,9 @@ export default function Header(props: IHeaderProps) {
                     <li>
                         {
                             loggedUser !== null ?
-                                <Link href={"/profile"}>
+                                <Link href={"/" + userInfo.seoUrl}>
                                     <a>
-                                        <ProfilImage alt={"Profil Resmi"} height='40px' width='40px' src='/profilImage.png' />
+                                        <ProfilImage alt={userInfo.nameSurname} height='40px' width='40px' src='/profilImage.png' />
                                     </a>
                                 </Link> :
                                 <a onClick={() => {

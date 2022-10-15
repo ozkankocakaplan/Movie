@@ -1,8 +1,15 @@
+import React, { memo } from 'react'
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store';
+import { FanArt, Users } from '../types/Entites';
+
 import styles from '../../styles/Home.module.css';
-const ReviewCard = (props: { user: {} }) => {
+import { baseUrl, deleteFanArt } from '../utils/api';
+import { IDeleteModal, handleDeleteModal, handleOpenBackgroundBlur } from '../store/features/modalReducer';
+const ReviewCard = (props: { user: Users }) => {
+  const userInfo = useSelector((x: RootState) => x.userReducer.value.user);
   const CardImg = () => {
     return (
       <img className={styles.cardImage + " " + styles.userSelected} src='http://localhost:3000/profileFavori.png' />
@@ -24,7 +31,7 @@ const ReviewCard = (props: { user: {} }) => {
         <div className={styles.listOptions}>
           <div className={styles.listOptionsLeft}>
             {
-              props.user !== null && Object.keys(props.user).length !== 0 &&
+              props.user.id === userInfo.id && Object.keys(props.user).length !== 0 &&
               <div className={styles.listOptionsLeft}>
                 <div className={styles.addListButon}>
                   <FontAwesomeIcon color='rgba(255,255,255,0.20)' icon={faEdit} />
@@ -47,10 +54,12 @@ const ReviewCard = (props: { user: {} }) => {
     </div>
   )
 }
-const FanArtCard = (props: { user: {} }) => {
-  const CardImg = () => {
+const FanArtCard = (props: { user: Users, entity: FanArt }) => {
+  const dispatch = useDispatch();
+  const userInfo = useSelector((x: RootState) => x.userReducer.value.user);
+  const CardImg = (props: { img: string, alt: string }) => {
     return (
-      <img className={styles.cardImage + " " + styles.userSelected} src='http://localhost:3000/profileFavori.png' />
+      <img alt={props.alt} className={styles.cardImage + " " + styles.userSelected} src={baseUrl + props.img} />
     )
   }
   return (
@@ -60,7 +69,7 @@ const FanArtCard = (props: { user: {} }) => {
       <div className={styles.listCard2} >
         <div className={styles.sliderContainer}>
           <div className={styles.sliderImages}>
-            <CardImg />
+            <CardImg alt={props.entity.description} img={props.entity.image} />
             <div className={styles.fanArtView + " " + styles.userSelected}>
               fan art’ı görüntülemek için tıkla
             </div>
@@ -69,9 +78,36 @@ const FanArtCard = (props: { user: {} }) => {
         <div className={styles.listOptions}>
           <div className={styles.listOptionsLeft}>
             {
-              props.user !== null && Object.keys(props.user).length !== 0 &&
+              props.user.id === userInfo.id &&
               <div className={styles.listOptionsLeft}>
-                <div className={styles.changeListButon}>
+                <div onClick={() => {
+                  dispatch(handleOpenBackgroundBlur(true));
+                  var deleteModals = {
+                    text: "Silmek istiyor musunuz ?", isOpen: true,
+                    handleDelete: async () => {
+                      await deleteFanArt(props.entity.id);
+                      dispatch(handleOpenBackgroundBlur(false));
+                      var deleteModals = {
+                        text: "",
+                        isOpen: false,
+                        handleDelete() { },
+                        handleClose() { },
+                      } as IDeleteModal;
+                      dispatch(handleDeleteModal(deleteModals))
+                    },
+                    handleClose: () => {
+                      dispatch(handleOpenBackgroundBlur(false));
+                      var deleteModals = {
+                        text: "",
+                        isOpen: false,
+                        handleDelete() { },
+                        handleClose() { },
+                      } as IDeleteModal;
+                      dispatch(handleDeleteModal(deleteModals))
+                    },
+                  } as IDeleteModal;
+                  dispatch(handleDeleteModal(deleteModals))
+                }} className={styles.changeListButon}>
                   <FontAwesomeIcon color='rgba(255,255,255,0.20)' icon={faTrash} />
                 </div>
               </div>
@@ -79,14 +115,16 @@ const FanArtCard = (props: { user: {} }) => {
           </div>
           <div className={styles.listOptionsRight + " " + styles.topWatchBorder}>
             <span className={styles.userSelected + " " + styles.statusDateText}>
-              {new Date().toLocaleDateString()}
+              {new Date(props.entity.createTime).toLocaleDateString()}
             </span>
           </div>
         </div>
       </div>
       <div className={styles.bottomBorder}></div>
       <div className={styles.rightBorder}></div>
-    </div>
+    </div >
   )
 }
-export { ReviewCard, FanArtCard };
+const MemoFanArtCard = React.memo(FanArtCard);
+const MemoReviewCard = React.memo(ReviewCard);
+export { ReviewCard, FanArtCard, MemoFanArtCard, MemoReviewCard };

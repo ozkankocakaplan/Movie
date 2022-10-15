@@ -11,9 +11,9 @@ interface IButonProps extends React.HTMLAttributes<HTMLDivElement> {
     width?: string,
     marginright?: string,
 }
-export const BorderButon = (props: { name: string }) => {
+export const BorderButon = (props: IButonProps) => {
     return (
-        <div className={styles.borderButon}>
+        <div {...props} className={styles.borderButon}>
             {props.name}
         </div>
     )

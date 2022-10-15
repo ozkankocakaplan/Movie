@@ -205,8 +205,8 @@ const MoviesPage = () => {
           className={styles.childrenMangaText + " " + styles.userSelected}>{
             type === "Anime" ? "Anime" : "Manga"
           }</div>}
-        <img
-          src='http://localhost:3000/children.png' />
+        {/* <img
+          src='http://localhost:3000/children.png' /> */}
       </div>
 
     </div>
