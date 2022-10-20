@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Anime, AnimeAndMangaModels, AnimeList, ComplaintList, FanArt, Manga, MangaList, UserBlockList, UserEmailVertification, UserList, UserListContents, UserModel, Users } from '../types/Entites';
+import { Anime, AnimeAndMangaModels, AnimeList, AnimeModels, Comments, ComplaintList, ContentNotification, FanArt, HomeSlider, Like, Manga, MangaList, Notification, Ratings, Review, Type, UserBlockList, UserEmailVertification, UserList, UserListContents, UserModel, Users } from '../types/Entites';
 import ServiceResponse from '../types/ServiceResponse';
 export const baseUrl = "http://192.168.2.175:37323";
 export default function api() {
@@ -34,8 +34,8 @@ export const getUser = async () => {
 export const getUserBySeoUrl = async (seoUrl: string) => {
     return await api().get<ServiceResponse<UserModel>>("/getUserBySeoUrl/" + seoUrl);
 }
-export const putUserInfo = async (nameSurname: string, username: string) => {
-    return await api().put("/updateUserInfo/" + nameSurname + "/" + username);
+export const putUserInfo = async (nameSurname: string, username: string, about: string) => {
+    return await api().put("/updateUserInfo/" + nameSurname + "/" + username + "/" + about);
 }
 export const putEmailChange = async (email: string, code: string) => {
     return await api().put("/updateEmailChange/" + email + "/" + code);
@@ -96,4 +96,55 @@ export const deleteUserListContent = async (id: number) => {
 }
 export const postUserListContent = async (entity: UserListContents) => {
     return await api().post<ServiceResponse<UserListContents>>("/deleteUserListContent", entity);
+}
+export const putUserImg = async (formData: FormData) => {
+    return await api().put<ServiceResponse<Users>>("/updateImage", formData);
+}
+export const getNotifications = async () => {
+    return await api().get<ServiceResponse<Notification>>("/getNotifications");
+}
+export const getAnime = async (seoUrl: string) => {
+    return await api().get<ServiceResponse<AnimeModels>>("/getAnime/" + seoUrl);
+}
+export const postLike = async (entity: Like) => {
+    return await api().post<ServiceResponse<Like>>("/addLike", entity);
+}
+export const getLike = async (contentID: number, type: Type) => {
+    return await api().get<ServiceResponse<Like>>("/getLike/" + contentID + "/" + type);
+}
+export const deleteLike = async (contentID: number, type: Type) => {
+    return await api().delete<ServiceResponse<Like>>("/deleteLike/" + contentID + "/" + type);
+}
+export const postContentNotification = async (entity: ContentNotification) => {
+    return await api().post<ServiceResponse<ContentNotification>>("/addContentNotification", entity);
+}
+export const deleteContentNotification = async (id: number) => {
+    return await api().delete<ServiceResponse<ContentNotification>>("/deleteContentNotification/" + id);
+}
+export const postRating = async (entity: Ratings) => {
+    return await api().post<ServiceResponse<Ratings>>("/addRating", entity);
+}
+export const putRating = async (entity: Ratings) => {
+    return await api().put<ServiceResponse<Ratings>>("/updateRating", entity);
+}
+export const postReviews = async (entity: Review) => {
+    return await api().post<ServiceResponse<Review>>("/addReviews", entity);
+}
+export const putReviews = async (entity: Review) => {
+    return await api().put<ServiceResponse<Review>>("/updateReviews", entity);
+}
+export const deleteReview = async (id: number) => {
+    return await api().delete<ServiceResponse<Review>>("/deleteReview/" + id);
+}
+export const getComments = async (contentID: number, type: Type) => {
+    return await api().get<ServiceResponse<Comments>>("/getComments/" + contentID + "/" + type);
+}
+export const postComment = async (entity: Comments) => {
+    return await api().post<ServiceResponse<Comments>>("/addComment", entity);
+}
+export const deleteComment = async (commentID: number, type: Type) => {
+    return await api().delete("/deleteComment/" + commentID + "/" + type);
+}
+export const getHomeSliders = async () => {
+    return await api().get<ServiceResponse<HomeSlider>>("/getHomeSliders");
 }

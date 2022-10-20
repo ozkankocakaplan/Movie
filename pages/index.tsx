@@ -2,13 +2,19 @@ import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import Image from 'next/image'
 import Link from 'next/link'
-import { useRef, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import Header from '../src/components/Header'
 import Line from '../src/components/Line'
+import Loading from '../src/components/Loading'
 import Movie from '../src/components/Movie'
+import { RootState } from '../src/store'
 import { handleOpenBackgroundBlur } from '../src/store/features/modalReducer'
+import { setSelectedIndex } from '../src/store/features/sliderReducer'
+import { HomeSlider } from '../src/types/Entites'
+import { baseUrl } from '../src/utils/api'
 import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => {
@@ -214,17 +220,37 @@ const MoviesPage = () => {
   )
 }
 const HomeSlider = (props: { children: React.ReactNode }) => {
-  const SliderDescription = () => {
+  const dispatch = useDispatch();
+  const { sliders, selectedIndex } = useSelector((x: RootState) => x.sliderReducer);
+  const time = 6000;
+  useEffect(() => {
+    const timeOut = setTimeout(() => {
+      dispatch(setSelectedIndex((selectedIndex + 1) === sliders.length ? 0 : selectedIndex + 1));
+    }, time);
+
+    return () => {
+      clearTimeout(timeOut);
+    }
+  }, [selectedIndex])
+
+
+  const SliderDescription = (entity: HomeSlider) => {
     return (
       <div className={styles.homeSliderDescription}>
         <div className={styles.homeSliderDescriptionContainer}>
           <div className={styles.homeSliderDescriptionTitle}>
-            <h2>Shingeki no Kyojin</h2>
+            <h2>{entity.sliderTitle}</h2>
           </div>
-          <span><img src="/playButons.png" className={styles.playButons} /></span>
+          <span>
+            <a href={entity.url}>
+              <img src="/playButons.png" className={styles.playButons} />
+            </a>
+          </span>
         </div>
         <div className={styles.homeSliderDescriptionContent}>
-          Yüzyıllar evvel insanoğlu devler tarafından yok olmanın eşiğine getirilmiştir. Devler tıpkı anlatılagelmiş hikayelerdeki gibi, uzun, zekadan yoksun görünen, insanları yiyen ve de en kötüsü bunu beslenmek için değil zevk için yapan varlıklardır.
+          {
+            entity.description
+          }
         </div>
       </div>
     )
@@ -232,20 +258,35 @@ const HomeSlider = (props: { children: React.ReactNode }) => {
   const SliderButons = () => {
     return (
       <div className={styles.sliderButonsContainer}>
-        <div className={styles.sliderButons}></div>
-        <div className={styles.sliderButons}></div>
-        <div className={styles.sliderButons}></div>
-        <div className={styles.sliderButons}></div>
-        <div className={styles.sliderButons}></div>
+        {
+          sliders !== null && sliders.length !== 0 &&
+          sliders.map((item, index) => {
+            return <div onClick={() => {
+              dispatch(setSelectedIndex(index));
+            }} key={item.id} className={styles.sliderButons}></div>
+          })
+        }
+
       </div>
     )
   }
+  const image = sliders != undefined && sliders.length !== 0 ? baseUrl + sliders[selectedIndex].image : "";
   return (
-    <div className={styles.homeBg} style={{
-      background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15)), linear-gradient(90.16deg, rgba(0, 0, 0, 0.5) 50.68%, rgba(0, 0, 0, 0) 70.09%),url("http://localhost:3000/bgImage.png")',
-    }}>
+    <div className={styles.homeBg}>
+      <Image
+        placeholder='blur'
+        layout="fill"
+        style={{
+          background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15)), linear-gradient(90.16deg, rgba(0, 0, 0, 0.5) 50.68%, rgba(0, 0, 0, 0) 70.09%),url(' + image + ')',
+        }}
+        className={styles.homeBg}
+        src={""}
+      />
       {props.children}
-      <SliderDescription />
+      {
+        sliders !== null && sliders.length !== 0 &&
+        <SliderDescription {...sliders[selectedIndex]} />
+      }
       <SliderButons />
     </div >
   )

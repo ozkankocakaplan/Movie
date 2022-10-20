@@ -7,6 +7,7 @@ export type MenuList = "Anime" | "Manga";
 interface IButonProps extends React.HTMLAttributes<HTMLDivElement> {
     name?: string,
     isactive?: string,
+    color?: string,
     icon?: IconProp,
     width?: string,
     marginright?: string,
@@ -26,7 +27,7 @@ const MenuButon = (props: IButonProps) => {
         }} className={props.isactive === "T" ?
             styles.menuButon + " " + styles.butonButonShadown : styles.menuButon}>
             {
-                props.icon !== undefined ? <FontAwesomeIcon icon={props.icon} /> : props.name
+                props.icon !== undefined ? <FontAwesomeIcon color={props.color} icon={props.icon} /> : props.name
             }
         </div>
     )

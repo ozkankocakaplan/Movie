@@ -79,7 +79,6 @@
 }
 
 .headerNotificationRightCol {
-  margin-top: 10px;
   padding: 10px;
   display: flex;
   flex: 1;
@@ -823,6 +822,7 @@
   padding: 10px 10px;
   margin-bottom: 10px;
   border-radius: 7px;
+  resize: none;
 }
 
 .smallInput {
@@ -1334,6 +1334,7 @@
 .movieNotification {
   position: relative;
   left: 10px;
+  cursor: pointer;
 }
 
 .movieInfoSummaryContainer {
@@ -1455,13 +1456,9 @@
 
 .seasonMusicBody {
   display: flex;
-  flex-wrap: wrap;
   flex-direction: column;
-  justify-content: space-between;
+  row-gap: 5px;
   flex: 1;
-  overflow-y: scroll;
-  max-height: 450px;
-  text-overflow: ellipsis;
 }
 
 .seasonMusicBody::-webkit-scrollbar {
@@ -1497,10 +1494,28 @@
   align-items: center;
   width: 100%;
   letter-spacing: 1px;
+  cursor: pointer;
   font-size: 12.5px;
   padding: 5px;
   color: rgba(255, 255, 255, 0.55);
 }
+
+.seasonsMusicContainer {
+
+  flex-direction: column;
+  max-height: 200px;
+
+}
+
+.musicContainerOverflowY {
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.musicContainerOverflowY ::-webkit-scrollbar {
+  width: 0 !important;
+}
+
 
 .episdeCardname {
   text-overflow: ellipsis;
@@ -1532,6 +1547,7 @@
   color: rgba(255, 255, 255, 0.50);
   letter-spacing: 1px;
   margin-right: 5px;
+  cursor: pointer;
 }
 
 .discoverContainer {
@@ -1651,14 +1667,22 @@
 }
 
 .fanArtBody {
-  justify-content: center;
-  align-items: center;
-  display: flex;
+  align-items: flex-start;
   flex-direction: row;
   color: rgba(255, 255, 255, 0.50);
   font-size: 13px;
   padding-left: 10px;
   text-align: justify;
+  height: 114px;
+  max-height: 114px;
+  overflow-y: scroll;
+  display: flex;
+  flex: 1;
+
+}
+
+.fanArtBody::-webkit-scrollbar {
+  width: 0;
 }
 
 .fanArtRight {
@@ -1849,6 +1873,11 @@
   letter-spacing: 1px;
   margin-bottom: 10px;
   cursor: pointer;
+}
+
+.listButonsActive {
+  background-color: rgba(255, 255, 255, 0.65);
+  color: #1c1c1c;
 }
 
 .profileHeaderContainer {
@@ -2163,7 +2192,12 @@
   font-size: 14px;
   line-height: 24px;
   color: rgba(255, 255, 255, 0.45);
+  max-height: 140px;
+  overflow-y: scroll;
+}
 
+.reviewView::-webkit-scrollbar {
+  width: 0;
 }
 
 .addListContainer {
@@ -2308,40 +2342,15 @@
   color: #fff;
 }
 
-.custom-file-input {
-  color: transparent;
+.p-Image {
+
+  top: 167px;
+  margin-left: 0px;
+  color: #666666;
 }
 
-.custom-file-input::-webkit-file-upload-button {
-  visibility: hidden;
-}
-
-.custom-file-input::after {
-  content: '';
-  position: absolute;
-  background: transparent;
-  z-index: 20;
-  top: 0px;
-  border-radius: 3px;
-  padding: 5px 8px;
-  height: 166px;
-  width: 166px;
-  outline: none;
-  white-space: nowrap;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 10pt;
-  border-radius: 100%;
-}
-
-.custom-file-input:hover::before {}
-
-.custom-file-input:active {
-  outline: 0;
-}
-
-.custom-file-input:active::before {
-  background: transparent;
+.file-upload {
+  display: none;
 }
 
 .siteInfoModalContainer {
@@ -2845,8 +2854,83 @@
   line-height: 20px;
 }
 
+.aboutModalContainer {
+  display: flex;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 20px;
+}
+
+.aboutModalBody {
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 20px;
+  font-size: 13px;
+  max-height: 300px;
+  overflow-y: scroll;
+}
+.aboutModalBody::-webkit-scrollbar{
+  width: 0;
+}
+
 .standartModalContainer {
   display: flex;
   color: rgba(255, 255, 255, 0.75);
   line-height: 20px;
+}
+
+.animeListContainer {
+  max-height: 250px;
+  overflow-y: scroll;
+  ;
+}
+
+.animeListContainer::-webkit-scrollbar {
+  width: 0;
+}
+
+.commentsContainer {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+
+}
+
+.commentsBody {
+  display: flex;
+  height: 80%;
+  padding: 10px;
+  max-height: 600px;
+  flex-direction: column;
+  overflow-y: scroll;
+}
+
+.commentsBody::-webkit-scrollbar {
+  width: 0;
+}
+
+.commentsText {
+  height: 20%;
+  padding: 10px;
+}
+
+.statussContainer {
+  display: flex;
+  flex: 1;
+}
+
+.commentsCard {
+  height: 150px;
+}
+
+.commentsContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.commentTextInput textarea {
+  height: 85px !important;
 }

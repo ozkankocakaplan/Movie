@@ -50,7 +50,8 @@ export enum NotificationType {
     Rosette = 3,
     Anime = 4,
     Manga = 5,
-    UserWarning = 6
+    UserWarning = 6,
+    Review = 7
 }
 
 export interface Anime extends BaseEntity {
@@ -63,9 +64,7 @@ export interface Anime extends BaseEntity {
     showTime: string;
     status: Status;
     videoType: VideoType;
-    views: number;
-    like: number;
-    arrangement: string;
+    siteRating: string;
     seoUrl: string;
 }
 export interface AnimeEpisodes extends BaseEntity {
@@ -79,13 +78,15 @@ export interface AnimeList extends BaseEntity {
     animeID: number;
     episodeID: number;
     animeStatus: AnimeStatus;
+    anime: Anime;
+    animeEpisode: AnimeEpisodes;
 }
 export interface AnimeOfTheWeek extends BaseEntity {
     animeID: number;
     userID: number;
     description: string;
 }
-export interface AnimeRating extends BaseEntity {
+export interface Ratings extends BaseEntity {
     userID: number;
     animeID: number;
     rating: number;
@@ -123,6 +124,7 @@ export interface Comments extends BaseEntity {
     comment: string;
     isSpoiler: boolean;
     type: Type;
+    users: Users
 }
 export interface ComplaintList extends BaseEntity {
     complainantID: number;
@@ -176,6 +178,7 @@ export interface Like extends BaseEntity {
     type: Type;
     userID: number;
     contentID: number;
+    episodeID: number;
 }
 
 export interface Manga extends BaseEntity {
@@ -218,9 +221,10 @@ export interface Notification extends BaseEntity {
 }
 
 export interface Review extends BaseEntity {
-    animeID: number;
+    contentID: number;
     userID: number;
     message: string;
+    type: Type;
 }
 
 export interface Rosette extends BaseEntity {
@@ -282,6 +286,7 @@ export interface Users extends BaseEntity {
     isBanned: boolean;
     seoUrl: string;
     roleType: RoleType;
+    about: string;
 }
 export interface UserModel extends Users {
     token: string;
@@ -344,7 +349,7 @@ export interface UserFullModels {
     userListModels: UserListModels[];
     rosettes: UserRosette[];
     fanArts: FanArt[];
-    reviews: Review[];
+    reviews: ReviewsModels[];
     animeLists: AnimeList[];
     mangaLists: MangaList[];
     userLists: UserList[];
@@ -374,4 +379,31 @@ export interface AnimeAndMangaModels extends BaseEntity {
     animeSeasons: AnimeSeason[];
     animeEpisodes: AnimeEpisodes[];
     mangaEpisodes: MangaEpisodes[];
+}
+export interface ContentNotification extends BaseEntity {
+    userID: number;
+    contentID: number;
+    type: Type;
+    user: Users;
+}
+export interface AnimeModels {
+    anime: Anime;
+    manga: Manga;
+    like: Like;
+    animeRating: Ratings;
+    contentNotification: ContentNotification;
+    categories: CategoryType[];
+    episodes: Episodes[];
+    animeSeasons: AnimeSeason[];
+    animeSeasonMusics: AnimeSeasonMusic[];
+    animeEpisodes: AnimeEpisodes[];
+    animeLists: AnimeList[];
+    rating: number;
+    arrangement: number;
+    likeCount: number;
+    viewsCount: number;
+}
+export interface ReviewsModels extends Review {
+    anime: Anime;
+    manga: Manga;
 }

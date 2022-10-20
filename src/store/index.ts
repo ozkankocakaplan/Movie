@@ -1,14 +1,22 @@
 import {
     configureStore, combineReducers, getDefaultMiddleware,
 } from '@reduxjs/toolkit'
+import { animeReducer } from './features/animeReducer';
+import { commentReducer } from './features/commentsReducer';
 import { listReducer } from './features/listReducer';
 import { modalReducer } from './features/modalReducer'
+import { notificationReducer } from './features/notificationReducer';
+import { sliderReducer } from './features/sliderReducer';
 import { userReducer } from './features/userReducer';
 
 const rootReducers = combineReducers({
     modalReducer,
     userReducer,
-    listReducer
+    listReducer,
+    notificationReducer,
+    animeReducer,
+    commentReducer,
+    sliderReducer
 });
 const customizedMiddleware = getDefaultMiddleware({
     serializableCheck: false

@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { MemoFanArtCard, MemoReviewCard } from '../src/components/Card';
 import { useAuth } from '../src/hooks/useAuth';
 import { RootState } from '../src/store';
-import { handleOpenAddListItemModal, handleOpenAddListModal, handleOpenBackgroundBlur, handleOpenBlockModal, handleOpenComplaintModal, handleOpenEditDynamicListModal, handleOpenEditListItemModal, handleOpenEditListModal, handleOpenEditUserModal, handleOpenRosetteModal } from '../src/store/features/modalReducer';
+import { handleOpenAboutModal, handleOpenAddListItemModal, handleOpenAddListModal, handleOpenBackgroundBlur, handleOpenBlockModal, handleOpenComplaintModal, handleOpenEditDynamicListModal, handleOpenEditListItemModal, handleOpenEditListModal, handleOpenEditUserModal, handleOpenRosetteModal } from '../src/store/features/modalReducer';
 import { Anime, AnimeList, AnimeListModels, AnimeStatus, Manga, MangaList, MangaListModels, MangaStatus, Rosette, Type, UserFullModels, UserList, UserListModels, Users } from '../src/types/Entites';
 
 import LoadingScreen from '../src/components/LoadingScreen';
@@ -60,7 +60,7 @@ export default function Profile(props: { serviceResponse: ServiceResponse<UserFu
         setLoading(false);
       }, 100);
     }
-  }, [user, userInfo]);
+  }, [user]);
   const loadBlockInfo = async () => {
     await getUserBlockList(userInfo.id, props.serviceResponse.entity.user.id).then((res) => {
       var check = res.data.list.find((y) => y.blockID === userInfo.id && y.isBlocked == true)
@@ -134,7 +134,10 @@ export default function Profile(props: { serviceResponse: ServiceResponse<UserFu
               }
               {
                 userInfo.id !== userProfile.user.id && <>
-                  <div className={styles.optionsIcon}><FontAwesomeIcon icon={faAddressCard} /></div>
+                  <div onClick={() => {
+                    dispatch(handleOpenBackgroundBlur(true));
+                    dispatch(handleOpenAboutModal(true));
+                  }} className={styles.optionsIcon}><FontAwesomeIcon icon={faAddressCard} /></div>
                   <div className={styles.optionsIcon}><FontAwesomeIcon icon={faEnvelope} /></div>
                   <div onClick={() => {
                     dispatch(handleOpenBackgroundBlur(true))
@@ -173,7 +176,7 @@ export default function Profile(props: { serviceResponse: ServiceResponse<UserFu
                     }
                     {
                       userProfile.reviews.map((item) => {
-                        return <MemoReviewCard key={item.id} user={userProfile.user} />
+                        return <MemoReviewCard item={item} key={item.id} user={userProfile.user} />
                       })
                     }
                   </div>
@@ -185,28 +188,34 @@ export default function Profile(props: { serviceResponse: ServiceResponse<UserFu
     }
     return (
       <LoadingScreen loading={loading}>
-        <div className={styles.pageContainer}>
-          <div className={styles.profileHeaderContainer}>
-            <div className={styles.profileHeader}>
-              <div className={styles.userImg}>
-                <Link href={"/"}>
-                  <a>
-                    <img src='http://localhost:3000/profilePhoto.png' />
-                  </a>
-                </Link>
+
+        {
+          userProfile !== null && Object.keys(userProfile).length !== 0 &&
+          <div className={styles.pageContainer}>
+            <div className={styles.profileHeaderContainer}>
+              <div className={styles.profileHeader}>
+                <div className={styles.userImg}>
+                  <Link href={"/"}>
+                    <a>
+                      {
+                        userProfile.user.image != null && userProfile.user.image.length !== 0 ?
+                          <img src={baseUrl + userProfile.user.image} />
+                          : <img src={"http://localhost:3000/logo.png"} />
+                      }
+
+                    </a>
+                  </Link>
+                </div>
               </div>
             </div>
-          </div>
-
-          {
-            userProfile !== null && Object.keys(userProfile).length !== 0 &&
             <div className={styles.profileContainer}>
               <LeftContent />
               <MiddleContent />
               <RightContent />
             </div>
-          }
-        </div>
+          </div>
+        }
+
       </LoadingScreen>
     )
   }
@@ -288,15 +297,22 @@ const Slider = (props: { user: Users, entity?: Array<UserListModels>, userList?:
       <div className={styles.leftBorder}></div>
       <div className={styles.listCard}>
         <div className={styles.sliderContainer}>
-          {props.data.length !== 0 || props.entity && <div className={styles.sliderLeft}>
-            <div style={{ padding: '5px', cursor: 'pointer' }} onClick={sliderBack}> <FontAwesomeIcon icon={faAngleLeft} color={"rgba(255,255,255,0.3)"} /></div>
-          </div>}
+          {
+            props.listType === 'STATIC' ?
+              props.data.length !== 0 || props.entity && <div className={styles.sliderLeft}>
+                <div style={{ padding: '5px', cursor: 'pointer' }} onClick={sliderBack}> <FontAwesomeIcon icon={faAngleLeft} color={"rgba(255,255,255,0.3)"} /></div>
+              </div> :
+              props.data.length !== 0 || props.entity?.length !== 0 && <div className={styles.sliderLeft}>
+                <div style={{ padding: '5px', cursor: 'pointer' }} onClick={sliderBack}> <FontAwesomeIcon icon={faAngleLeft} color={"rgba(255,255,255,0.3)"} /></div>
+              </div>
+          }
           <div ref={scrollRef} className={styles.sliderImages}>
             {
               props.listType === 'STATIC' ?
                 props.listName === "İzledim" || props.listName === "İzliyorum" || props.listName === "İzleyeceğim" ?
                   props.data.map((item) => {
                     var entity = item as AnimeListModels;
+
                     return <CardImg {...entity} key={entity.anime.id} />
                   })
                   :
@@ -319,11 +335,18 @@ const Slider = (props: { user: Users, entity?: Array<UserListModels>, userList?:
                 })
             }
           </div>
-          {props.data.length !== 0 || props.entity && <div className={styles.sliderRight}>
-            <div style={{ padding: '5px', cursor: 'pointer' }} onClick={sliderNext}>
-              <FontAwesomeIcon icon={faAngleRight} color={"rgba(255,255,255,0.3)"} />
-            </div>
-          </div>}
+          {
+            props.listType === 'STATIC' ?
+              props.data.length !== 0 || props.entity && <div className={styles.sliderRight}>
+                <div style={{ padding: '5px', cursor: 'pointer' }} onClick={sliderNext}>
+                  <FontAwesomeIcon icon={faAngleRight} color={"rgba(255,255,255,0.3)"} />
+                </div>
+              </div> :
+              props.data.length !== 0 || props.entity?.length != 0 && <div className={styles.sliderRight}>
+                <div style={{ padding: '5px', cursor: 'pointer' }} onClick={sliderNext}>
+                  <FontAwesomeIcon icon={faAngleRight} color={"rgba(255,255,255,0.3)"} />
+                </div>
+              </div>}
         </div>
         <div className={styles.listOptions}>
           <div className={styles.listOptionsLeft}>

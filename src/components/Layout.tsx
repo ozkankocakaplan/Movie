@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { RootState } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faAngleLeft, faAngleRight, faAngleUp, faClose, faPaperPlane, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { IDeleteModal, handleDeleteModal, handleOpenAddListItemModal, handleOpenBackgroundBlur, handleOpenEditListItemModal, handleOpenEditListModal, handleOpenEditUserModal, handleOpenInfoSiteModal, handleOpenLoginModal, handleOpenMessageModal, handleOpenRegisterModal, handleOpenBlockModal, handleOpenComplaintModal, handleOpenEditDynamicListModal, handleOpenRosetteModal } from '../store/features/modalReducer';
-import { deleteAnimeList, deleteMangaList, deleteUserBlockList, deleteUserList, deleteUserListContent, getSearchAnime, getSearchAnimeAndManga, getUser, getUserBySeoUrl, postAddUser, postAgainUserEmailVertification, postAnimeList, postAnimeLists, postComplaintList, postLogin, postMangaList, postMangaLists, postUserBlockList, postUserList, postUserListContent, postUserListContents, putEmailChange, putPassword, putUserInfo, putUserList } from '../utils/api';
-import { Anime, AnimeAndMangaModels, AnimeEpisodes, AnimeList, AnimeListModels, AnimeStatus, ComplaintList, MangaList, MangaListModels, MangaStatus, Type, UserBlockList, UserEmailVertification, UserFullModels, UserList, UserListContents, UserModel, Users } from '../types/Entites';
+import { faAngleDown, faAngleLeft, faAngleRight, faAngleUp, faCamera, faClose, faPaperPlane, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { IDeleteModal, handleDeleteModal, handleOpenAddListItemModal, handleOpenBackgroundBlur, handleOpenEditListItemModal, handleOpenEditListModal, handleOpenEditUserModal, handleOpenInfoSiteModal, handleOpenLoginModal, handleOpenMessageModal, handleOpenRegisterModal, handleOpenBlockModal, handleOpenComplaintModal, handleOpenEditDynamicListModal, handleOpenRosetteModal, handleOpenAddReviews, handleOpenEditReviews, handleOpenAboutModal } from '../store/features/modalReducer';
+import { baseUrl, deleteAnimeList, deleteMangaList, deleteUserBlockList, deleteUserList, deleteUserListContent, getHomeSliders, getNotifications, getSearchAnime, getSearchAnimeAndManga, getUser, getUserBySeoUrl, postAddUser, postAgainUserEmailVertification, postAnimeList, postAnimeLists, postComplaintList, postLogin, postMangaList, postMangaLists, postReviews, postUserBlockList, postUserList, postUserListContent, postUserListContents, putEmailChange, putPassword, putReviews, putUserImg, putUserInfo, putUserList } from '../utils/api';
+import { Anime, AnimeAndMangaModels, AnimeEpisodes, AnimeList, AnimeListModels, AnimeStatus, ComplaintList, MangaList, MangaListModels, MangaStatus, Review, Type, UserBlockList, UserEmailVertification, UserFullModels, UserList, UserListContents, UserModel, Users } from '../types/Entites';
 import { useAuth } from '../hooks/useAuth';
 import { BorderButon } from './Buton';
 import { setIsUserBlock, setUser, setViewUser } from '../store/features/userReducer';
@@ -22,6 +22,8 @@ import ServiceResponse from '../types/ServiceResponse';
 import Loading from './Loading';
 import "react-datepicker/dist/react-datepicker.css";
 import { setSearchListResult, setSelectedAnimeEpisode, setSelectedAnimeEpisodes, setSelectedMangaEpisode, setSelectedMangaEpisodes, setselectedUserListContent, setSelectedUserListContents } from '../store/features/listReducer';
+import { setNotifications } from '../store/features/notificationReducer';
+import { setSliders } from '../store/features/sliderReducer';
 
 interface ILayoutProps {
     children: React.ReactNode
@@ -44,12 +46,16 @@ export default function Layout(props: ILayoutProps) {
         blockModal,
         complaintModal,
         editDynamicListModal,
-        rosetteInfoModal
+        rosetteInfoModal,
+        addReviews,
+        editReviews,
+        aboutModal
 
     } = useSelector((state: RootState) => state.modalReducer.value)
     useEffect(() => {
         if (user !== null) {
             loadUser();
+            loadNotifications();
         }
         if (backgroundBlur) {
             document.body.style.overflow = 'hidden';
@@ -62,16 +68,31 @@ export default function Layout(props: ILayoutProps) {
         await getUser()
             .then((res) => {
                 if (res.data.isSuccessful) {
-                    dispatch(setUser(res.data.entity))
+                    dispatch(setUser(res.data.entity));
                 }
             }).catch((er) => {
                 console.log(er)
             })
+        await getHomeSliders().then((res) => {
+            dispatch(setSliders(res.data.list));
+        }).catch((er) => {
+            console.log(er);
+        });
+    }
+    const loadNotifications = async () => {
+        await getNotifications().then((res) => {
+            dispatch(setNotifications(res.data.list));
+        }).catch((er) => {
+            console.log(er)
+        })
     }
     return (
         <div>
             {backgroundBlur && <div className={styles.filterBlurBackground}></div>}
             {props.children}
+            {aboutModal && <UserAboutModal />}
+            {editReviews && <EditReviewsModal />}
+            {addReviews && <AddReviewsModal />}
             {rosetteInfoModal && <RosetteInfoModal />}
             {editDynamicListModal && <EditListDynamicItemModal />}
             {complaintModal && <ComplaintModal />}
@@ -105,8 +126,93 @@ const RosetteInfoModal = () => {
         </Modal>
     )
 }
+const AddReviewsModal = () => {
+    const dispatch = useDispatch();
+    const { user } = useSelector((x: RootState) => x.userReducer.value);
+    const { animeModels } = useSelector((x: RootState) => x.animeReducer);
+    const [form, setForm] = useState<Review>({ userID: user.id, contentID: animeModels.anime.id, message: '', type: Type.Anime } as Review);
+    const [isSuccess, setIsSuccess] = useState(false);
+    const saveButon = async () => {
+        await postReviews(form).then((res) => {
+            if (res.data.isSuccessful) {
+                setIsSuccess(true);
+                console.log(res.data);
+            }
+        });
+    }
+    return (
+        <Modal width={600} onClick={() => {
+            dispatch(handleOpenBackgroundBlur(false))
+            setIsSuccess(false);
+            dispatch(handleOpenAddReviews(false));
 
-
+        }}>
+            {!isSuccess ? <div style={{ marginLeft: '10px', marginRight: '10px', }}>
+                <div className={styles.registerCol}>
+                    <div className={styles.registerLeftCol} style={{ flex: 1 }}>
+                        <textarea
+                            value={form.message}
+                            onChange={(e) => setForm({ ...form, message: e.target.value })}
+                            style={{ color: 'rgba(255, 255, 255, 0.50)' }}
+                            placeholder='Eleştiri' className={styles["pr"] + " " + styles.registerInput + " " + styles.smallInput}
+                            rows={4}></textarea>
+                    </div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+                    <BorderButon onClick={saveButon} name='Kaydet' />
+                </div>
+            </div>
+                : <div style={{ marginLeft: '10px', marginRight: '10px', textAlign: 'center', paddingBottom: '20px', color: 'rgba(255, 255, 255, 0.50)' }}>
+                    Eleştiriniz oluşturulmuştur.
+                </div>
+            }
+        </Modal>
+    )
+}
+const EditReviewsModal = () => {
+    const dispatch = useDispatch();
+    const userInfo = useSelector((x: RootState) => x.userReducer.value.viewUser);
+    const reviews = useSelector((x: RootState) => x.animeReducer.selectedReview);
+    const [isSuccess, setIsSuccess] = useState(false);
+    const [form, setForm] = useState<Review>({ ...reviews });
+    const saveButon = async () => {
+        await putReviews(form).then((res) => {
+            if (res.data.isSuccessful) {
+                setIsSuccess(true);
+                dispatch(setViewUser({ ...userInfo, reviews: userInfo.reviews.map((item) => item.id === res.data.entity.id ? { ...item, message: res.data.entity.message } : item) }));
+            }
+        });
+    }
+    return (
+        <Modal width={600} onClick={() => {
+            setIsSuccess(false);
+            dispatch(handleOpenBackgroundBlur(false));
+            dispatch(handleOpenEditReviews(false));
+        }}>
+            {
+                !isSuccess ? <div style={{ marginLeft: '10px', marginRight: '10px' }}>
+                    <div className={styles.registerCol}>
+                        <div className={styles.registerLeftCol} style={{ flex: 1 }}>
+                            <textarea
+                                value={form.message}
+                                onChange={(e) => setForm({ ...form, message: e.target.value })}
+                                style={{ color: 'rgba(255, 255, 255, 0.50)' }}
+                                placeholder='Eleştiri' className={styles["pr"] + " " + styles.registerInput + " " + styles.smallInput}
+                                rows={4}></textarea>
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+                        <BorderButon onClick={saveButon} name='Kaydet' />
+                    </div>
+                </div>
+                    :
+                    <div style={{ marginLeft: '10px', marginRight: '10px', textAlign: 'center', paddingBottom: '20px', color: 'rgba(255, 255, 255, 0.50)' }}>
+                        Eleştiriniz kaydedilmiştir.
+                    </div>
+            }
+        </Modal>
+    )
+}
 
 
 const SiteInfoModal = () => {
@@ -318,6 +424,7 @@ const EditUserModal = () => {
     const [userName, setUserName] = useState('');
     const [email, setEmail] = useState('');
     const [code, setCode] = useState('');
+    const [about, setAbout] = useState('');
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
 
@@ -330,11 +437,13 @@ const EditUserModal = () => {
     const [emailResult, setEmailResult] = useState<ServiceResponse<Users>>({} as ServiceResponse<Users>);
 
     const [vertificationResult, setVertificationResult] = useState<ServiceResponse<UserEmailVertification | Users>>({} as ServiceResponse<UserEmailVertification | Users>);
-
+    var fileUploadRef = useRef<HTMLInputElement>(null);
     useEffect(() => {
         setNameSurname(userInfo.nameSurname);
         setUserName(userInfo.userName);
         setEmail(userInfo.email);
+        setSelectedUser(baseUrl + userInfo.image);
+        setAbout(userInfo.about != null ? userInfo.about : '');
     }, [userInfo])
 
     const saveUserInfoButon = async () => {
@@ -343,12 +452,12 @@ const EditUserModal = () => {
         setVertificationResult({} as ServiceResponse<UserEmailVertification | Users>);
         if (nameSurname.length !== 0 && userName.length !== 0 && email.length !== 0) {
             setCheckUserInfo(false);
-            if (nameSurname !== userInfo.nameSurname && userName !== userInfo.nameSurname) {
-                await putUserInfo(nameSurname, userName)
+            if (nameSurname !== userInfo.nameSurname || userName !== userInfo.nameSurname || about !== userInfo.about) {
+                await putUserInfo(nameSurname, userName, about)
                     .then((res) => {
                         setUserInfoResult(res.data)
                     }).catch((er) => {
-
+                        console.log(er);
                     })
             }
             if (email !== userInfo.email && code.length !== 0) {
@@ -404,17 +513,28 @@ const EditUserModal = () => {
         }}>
             <div style={{ margin: '10px', padding: '10px' }}>
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
-                    <div style={{ height: '166px', width: '166px', borderRadius: '100%' }}>
+                    <div style={{ height: '166px', width: '166px', borderRadius: '100%', display: 'flex' }}>
                         {
                             selectedUser.length !== 0 ? <img src={selectedUser} height={166} width={166} />
-                                : <img src='http://localhost:3000/profilePhoto.png' height={166} width={166} />
+                                : <img src='http://localhost:3000/profilePhoto.png' style={{ borderRadius: '100%' }} height={166} width={166} />
                         }
-
-                        <input onChange={(e) => {
-                            if (e.target.files != undefined) {
-                                setSelectedUser(URL.createObjectURL(e.target.files[0]).toString())
-                            }
-                        }} type={"file"} className={styles["custom-file-input"]} />
+                        <div onClick={() => fileUploadRef.current?.click()} className={styles["p-Image"]}>
+                            <FontAwesomeIcon icon={faCamera} />
+                            <input
+                                onChange={async (e) => {
+                                    if (e.target.files != undefined) {
+                                        setSelectedUser(URL.createObjectURL(e.target.files[0]).toString());
+                                        var form = new FormData();
+                                        form.append("file", e.target.files[0] as any);
+                                        await putUserImg(form).then((res) => {
+                                            console.log(res.data);
+                                        }).catch((er) => {
+                                            console.log(er)
+                                        });
+                                    }
+                                }}
+                                ref={fileUploadRef} className={styles["file-upload"]} type="file" accept="image/*" />
+                        </div>
                     </div>
                 </div>
                 <div style={{ marginBottom: '10px' }}>
@@ -445,6 +565,18 @@ const EditUserModal = () => {
                             value={code}
                             onChange={(e) => setCode(e.target.value)}
                             placeholder='Onay kodu' type={"text"} className={styles.registerInput + " " + styles.smallInput} />
+                    </div>
+                </div>
+                <div className={styles.registerCol}>
+                    <div className={styles.registerLeftCol} style={{ flex: 1 }}>
+                        <textarea
+                            style={{ color: 'rgba(255, 255, 255, 0.50)' }}
+                            value={about}
+                            onChange={(e) => setAbout(e.target.value)}
+                            placeholder='Hakkımda' className={styles["pr"] + " " + styles.registerInput + " " + styles.smallInput}
+                            rows={4}></textarea>
+
+
                     </div>
                 </div>
                 {
@@ -1012,13 +1144,15 @@ const EditStaticListCard = (props: { animelist?: AnimeListModels, mangaList?: Ma
     const convertArrayAnime = () => {
         var animeList = Array<AnimeList>();
         props.animelist?.animeEpisodes.map(item => {
-            animeList.push({
-                id: props.animelist?.animeList.id,
-                animeID: item.animeID,
-                userID: user.id,
-                episodeID: item.id,
-                animeStatus: props.animelist?.animeList.animeStatus
-            } as AnimeList);
+            if (props.animelist?.animeList.animeEpisode.id === item.id) {
+                animeList.push({
+                    id: props.animelist?.animeList.id,
+                    animeID: item.animeID,
+                    userID: user.id,
+                    episodeID: item.id,
+                    animeStatus: props.animelist?.animeList.animeStatus
+                } as AnimeList);
+            }
         })
         return animeList;
     }
@@ -1717,6 +1851,28 @@ const ComplaintModal = () => {
                 {!isSuccess && <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
                     <BorderButon onClick={saveButon} name='Gönder' />
                 </div>}
+            </div>
+        </Modal>
+    )
+}
+const UserAboutModal = () => {
+    const dispatch = useDispatch();
+    const userView = useSelector((x: RootState) => x.userReducer.value.viewUser);
+    return (
+        <Modal
+            onClick={() => {
+                dispatch(handleOpenBackgroundBlur(false));
+                dispatch(handleOpenAboutModal(false));
+            }}
+            width={500} >
+            <div style={{ margin: '10px' }}>
+                <div className={styles.aboutModalContainer}><label>Hakkında</label></div>
+                <div style={{ marginTop: '10px', marginBottom: '20px' }}>
+                    <Line />
+                </div>
+                <div className={styles.aboutModalBody}>
+                    {userView.user.about}
+                </div>
             </div>
         </Modal>
     )

@@ -12,6 +12,8 @@ import { handleOpenBackgroundBlur, handleOpenInfoSiteModal, handleOpenLoginModal
 import Link from 'next/link';
 import Line from './Line';
 import { RootState } from '../store';
+import { getNotifications } from '../utils/api';
+import { Notification, NotificationType } from '../types/Entites';
 
 
 
@@ -29,7 +31,6 @@ export default function Header(props: IHeaderProps) {
     const [notificationShow, setNotificationShow] = useState(false);
 
     const [search, setSearch] = useState('');
-
     useEffect(() => {
         setLoggedUser(user);
     }, [user]);
@@ -37,8 +38,6 @@ export default function Header(props: IHeaderProps) {
     const handleSearch = (e: string) => {
 
     }
-
-
     return (
         <div className={styles.headerContainer} {...props}>
             <div className={styles["headerLeft"] + " " + styles["headerLeftContent"]}>
@@ -138,6 +137,8 @@ const SearchResultCard = () => {
     )
 }
 export const NotificationsContainer = () => {
+    const [selectedTabs, setSelectedTabs] = useState<number>(1);
+    const notifications = useSelector((x: RootState) => x.notificationReducer.notifications);
     return (
         <div className={styles.headerNotificationContainer}>
             <div className={styles.headerLeftNotificationTitle}>
@@ -149,34 +150,71 @@ export const NotificationsContainer = () => {
             <div style={{ display: 'flex', flex: 1, flexDirection: 'row' }}>
                 <div className={styles.headerNotificationLeftCol}>
                     <div className={styles.headerNotificationIconContainer}>
-                        <div className={styles.headerNotificationIcons}>
+                        <div onClick={() => setSelectedTabs(1)} className={styles.headerNotificationIcons}>
                             <FontAwesomeIcon size={"lg"} icon={faComment} />
                         </div>
                         <div className={styles.headerNotificatonIconLine}></div>
                     </div>
                     <div className={styles.headerNotificationIconContainer}>
-                        <div className={styles.headerNotificationIcons}>
+                        <div onClick={() => setSelectedTabs(2)} className={styles.headerNotificationIcons}>
                             <FontAwesomeIcon size={"lg"} icon={faWarning} />
                         </div>
                         <div className={styles.headerNotificatonIconLine}></div>
                     </div>
                     <div className={styles.headerNotificationIconContainer}>
-                        <div className={styles.headerNotificationIcons}>
+                        <div onClick={() => setSelectedTabs(3)} className={styles.headerNotificationIcons}>
                             <FontAwesomeIcon size={"lg"} icon={faFilm} />
                         </div>
                         <div className={styles.headerNotificatonIconLine}></div>
                     </div>
                     <div className={styles.headerNotificationIconContainer}>
-                        <div className={styles.headerNotificationIcons}>
+                        <div onClick={() => setSelectedTabs(4)} className={styles.headerNotificationIcons}>
                             <FontAwesomeIcon size={"lg"} icon={faBell} />
                         </div>
                         <div className={styles.headerNotificatonIconLine}></div>
                     </div>
                 </div>
                 <div className={styles.headerNotificationRightCol}>
-
+                    {
+                        selectedTabs === 1 && notifications.filter((x) => x.notificationType === NotificationType.Comments).map((item) => {
+                            return <NotificatonCard key={item.id} notificationMessage={item.notificationMessage} />
+                        })
+                    }
+                    {
+                        selectedTabs === 2 && notifications.filter((x) => x.notificationType === NotificationType.UserWarning).map((item) => {
+                            return <NotificatonCard key={item.id} notificationMessage={item.notificationMessage} />
+                        })
+                    }
+                    {
+                        selectedTabs === 3 && notifications.filter((x) => x.notificationType === NotificationType.Review).map((item) => {
+                            return <NotificatonCard key={item.id} notificationMessage={item.notificationMessage} />
+                        })
+                    }
+                    {
+                        selectedTabs === 4 && notifications.filter((x) => x.notificationType === NotificationType.Anime || x.notificationType === NotificationType.Manga).map((item) => {
+                            return <NotificatonCard key={item.id} notificationMessage={item.notificationMessage} />
+                        })
+                    }
                 </div>
             </div>
+        </div>
+    )
+}
+interface INotificationCard extends React.HTMLAttributes<HTMLDivElement> {
+    notificationMessage: string
+}
+export const NotificatonCard = (props: INotificationCard) => {
+    return (
+        <div {...props} className={styles.userSelected} style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            background: '#181818',
+            flex: 1,
+            padding: '0px 5px',
+            height: '45px', fontSize: '15px', color: 'rgba(255,255,255,0.5)'
+        }}>
+            {props.notificationMessage}
         </div>
     )
 }
