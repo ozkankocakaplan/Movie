@@ -171,7 +171,7 @@ export default function Profile(props: { serviceResponse: ServiceResponse<UserFu
                   <div>
                     {
                       userProfile.fanArts.map((item) => {
-                        return <MemoFanArtCard entity={item} key={item.id} user={userProfile.user} />
+                        return <MemoFanArtCard entity={item} key={item.id} />
                       })
                     }
                     {

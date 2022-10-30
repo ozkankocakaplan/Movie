@@ -1,15 +1,20 @@
+import "react-datepicker/dist/react-datepicker.css";
 import React, { useEffect, useRef, useState } from 'react'
 import { RootState } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleLeft, faAngleRight, faAngleUp, faCamera, faClose, faPaperPlane, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { IDeleteModal, handleDeleteModal, handleOpenAddListItemModal, handleOpenBackgroundBlur, handleOpenEditListItemModal, handleOpenEditListModal, handleOpenEditUserModal, handleOpenInfoSiteModal, handleOpenLoginModal, handleOpenMessageModal, handleOpenRegisterModal, handleOpenBlockModal, handleOpenComplaintModal, handleOpenEditDynamicListModal, handleOpenRosetteModal, handleOpenAddReviews, handleOpenEditReviews, handleOpenAboutModal } from '../store/features/modalReducer';
-import { baseUrl, deleteAnimeList, deleteMangaList, deleteUserBlockList, deleteUserList, deleteUserListContent, getHomeSliders, getNotifications, getSearchAnime, getSearchAnimeAndManga, getUser, getUserBySeoUrl, postAddUser, postAgainUserEmailVertification, postAnimeList, postAnimeLists, postComplaintList, postLogin, postMangaList, postMangaLists, postReviews, postUserBlockList, postUserList, postUserListContent, postUserListContents, putEmailChange, putPassword, putReviews, putUserImg, putUserInfo, putUserList } from '../utils/api';
-import { Anime, AnimeAndMangaModels, AnimeEpisodes, AnimeList, AnimeListModels, AnimeStatus, ComplaintList, MangaList, MangaListModels, MangaStatus, Review, Type, UserBlockList, UserEmailVertification, UserFullModels, UserList, UserListContents, UserModel, Users } from '../types/Entites';
+import { IDeleteModal, handleDeleteModal, handleOpenAddListItemModal, handleOpenBackgroundBlur, handleOpenEditListItemModal, handleOpenEditListModal, handleOpenEditUserModal, handleOpenInfoSiteModal, handleOpenLoginModal, handleOpenMessageModal, handleOpenRegisterModal, handleOpenBlockModal, handleOpenComplaintModal, handleOpenEditDynamicListModal, handleOpenRosetteModal, handleOpenAddReviews, handleOpenEditReviews, handleOpenAboutModal, handleOpenContentComplaintModal } from '../store/features/modalReducer';
+import { baseUrl, deleteAnimeList, deleteMangaList, deleteUserBlockList, deleteUserList, deleteUserListContent, getHomeSliders, getMessages, getNotifications, getSearchAnime, getSearchAnimeAndManga, getUser, getUserBySeoUrl, postAddUser, postAgainUserEmailVertification, postAnimeList, postAnimeLists, postComplaintList, postContentComplaint, postLogin, postMangaList, postMangaLists, postReviews, postUserBlockList, postUserList, postUserListContent, postUserListContents, putEmailChange, putPassword, putReviews, putUserImg, putUserInfo, putUserList } from '../utils/api';
+import { Anime, AnimeAndMangaModels, AnimeEpisodes, AnimeList, AnimeListModels, AnimeStatus, ComplaintList, ContentComplaint, MangaList, MangaListModels, MangaStatus, Review, Type, UserBlockList, UserEmailVertification, UserFullModels, UserList, UserListContents, UserMessage, UserMessageModel, UserModel, Users } from '../types/Entites';
 import { useAuth } from '../hooks/useAuth';
 import { BorderButon } from './Buton';
-import { setIsUserBlock, setUser, setViewUser } from '../store/features/userReducer';
+import { setIsUserBlock, setMessageUsers, setSignalR, setUser, setViewUser } from '../store/features/userReducer';
 
+import { setSearchListResult, setSelectedAnimeEpisode, setSelectedAnimeEpisodes, setSelectedMangaEpisode, setSelectedMangaEpisodes, setselectedUserListContent, setSelectedUserListContents } from '../store/features/listReducer';
+import { setNotifications } from '../store/features/notificationReducer';
+import { setSliders } from '../store/features/sliderReducer';
+import { HubConnectionBuilder, HttpTransportType, LogLevel } from '@aspnet/signalr';
 
 import Line from './Line';
 import DatePicker from "react-datepicker";
@@ -20,17 +25,13 @@ import ReadMore from './ReadMore';
 import Link from 'next/link';
 import ServiceResponse from '../types/ServiceResponse';
 import Loading from './Loading';
-import "react-datepicker/dist/react-datepicker.css";
-import { setSearchListResult, setSelectedAnimeEpisode, setSelectedAnimeEpisodes, setSelectedMangaEpisode, setSelectedMangaEpisodes, setselectedUserListContent, setSelectedUserListContents } from '../store/features/listReducer';
-import { setNotifications } from '../store/features/notificationReducer';
-import { setSliders } from '../store/features/sliderReducer';
 
 interface ILayoutProps {
     children: React.ReactNode
 }
 export default function Layout(props: ILayoutProps) {
     const dispatch = useDispatch();
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const {
         backgroundBlur,
         loginModal,
@@ -49,14 +50,19 @@ export default function Layout(props: ILayoutProps) {
         rosetteInfoModal,
         addReviews,
         editReviews,
-        aboutModal
+        aboutModal,
+        contentComplaintModal
 
-    } = useSelector((state: RootState) => state.modalReducer.value)
+    } = useSelector((state: RootState) => state.modalReducer.value);
     useEffect(() => {
         if (user !== null) {
             loadUser();
             loadNotifications();
+            setupSignalR();
         }
+        loadHomeSlider();
+    }, []);
+    useEffect(() => {
         if (backgroundBlur) {
             document.body.style.overflow = 'hidden';
         }
@@ -64,6 +70,27 @@ export default function Layout(props: ILayoutProps) {
             document.body.style.overflow = 'auto';
         }
     }, [backgroundBlur])
+
+    const setupSignalR = async () => {
+        var connection = new HubConnectionBuilder()
+            .withUrl(baseUrl + "/userHub", {
+                accessTokenFactory() {
+                    return user.token
+                },
+                skipNegotiation: true,
+                transport: HttpTransportType.WebSockets
+            })
+            .configureLogging(LogLevel.None)
+            .build();
+        await connection.start().then((res) => {
+            connection.invoke("connect");
+        }).catch((er) => {
+            console.log(er)
+        });
+
+        dispatch(setSignalR(connection));
+
+    }
     const loadUser = async () => {
         await getUser()
             .then((res) => {
@@ -71,8 +98,10 @@ export default function Layout(props: ILayoutProps) {
                     dispatch(setUser(res.data.entity));
                 }
             }).catch((er) => {
-                console.log(er)
+                logout();
             })
+    }
+    const loadHomeSlider = async () => {
         await getHomeSliders().then((res) => {
             dispatch(setSliders(res.data.list));
         }).catch((er) => {
@@ -90,6 +119,7 @@ export default function Layout(props: ILayoutProps) {
         <div>
             {backgroundBlur && <div className={styles.filterBlurBackground}></div>}
             {props.children}
+            {contentComplaintModal && <ContentComplaintModal />}
             {aboutModal && <UserAboutModal />}
             {editReviews && <EditReviewsModal />}
             {addReviews && <AddReviewsModal />}
@@ -129,8 +159,8 @@ const RosetteInfoModal = () => {
 const AddReviewsModal = () => {
     const dispatch = useDispatch();
     const { user } = useSelector((x: RootState) => x.userReducer.value);
-    const { animeModels } = useSelector((x: RootState) => x.animeReducer);
-    const [form, setForm] = useState<Review>({ userID: user.id, contentID: animeModels.anime.id, message: '', type: Type.Anime } as Review);
+    const { animeModel } = useSelector((x: RootState) => x.animeReducer);
+    const [form, setForm] = useState<Review>({ userID: user.id, contentID: animeModel.anime.id, message: '', type: Type.Anime } as Review);
     const [isSuccess, setIsSuccess] = useState(false);
     const saveButon = async () => {
         await postReviews(form).then((res) => {
@@ -358,11 +388,11 @@ const SiteInfoModal = () => {
         return (
             <div className={styles.announcementsCard}>
                 <div className={styles.announcementImg + " " + styles.userSelected}>
-                    <div className={styles.announcementTitleContainer}>
-                        <div>{props.title}</div>
-                        <div className={styles.announcementDateTitle}>{props.date}</div>
-                    </div>
                     <img className={styles.siteInfoImg2} src={props.imageSrc} />
+                </div>
+                <div className={styles.announcementTitleContainer}>
+                    <div>{props.title}</div>
+                    <div className={styles.announcementDateTitle}>{props.date}</div>
                 </div>
                 <div className={styles.announcementBody + " " + styles.userSelected}>
                     <ReadMore>
@@ -386,30 +416,31 @@ const SiteInfoModal = () => {
                     {steps === 3 && <Contact />}
                     {steps === 4 && <Downloands />}
                 </div>
-                <div className={styles.siteInfoModalFooter}>
-                    <div className={styles.footerNextBackContainer}>
-                        <div>
-                            {steps != 1 && <FontAwesomeIcon onClick={() => {
-                                if (steps != 1) {
-                                    setSteps(steps - 1);
-                                }
-                            }} icon={faAngleLeft} />}
-                        </div>
-                        <div>
-                            {steps !== 3 && <FontAwesomeIcon onClick={() => {
-                                if (steps != 3) {
-                                    setSteps(steps + 1);
-                                }
-                            }} icon={faAngleRight} />}
-                        </div>
 
+            </div>
+            <div className={styles.siteInfoModalFooter}>
+                <div className={styles.footerNextBackContainer}>
+                    <div>
+                        {steps != 1 && <FontAwesomeIcon onClick={() => {
+                            if (steps != 1) {
+                                setSteps(steps - 1);
+                            }
+                        }} icon={faAngleLeft} />}
                     </div>
-                    <div className={styles.siteInfoModalFooterButonContainer}>
-                        <div className={styles.siteInfoModalFooterButon + " " + styles.userSelected + " " + (steps === 1 ? styles.footerButonActive : undefined)}>Duyurular</div>
-                        <div className={styles.siteInfoModalFooterButon + " " + styles.userSelected + " " + (steps === 2 ? styles.footerButonActive : undefined)}>Hakkında</div>
-                        <div className={styles.siteInfoModalFooterButon + " " + styles.userSelected + " " + (steps === 3 ? styles.footerButonActive : undefined)}>İletişim</div>
-                        {/* <div className={styles.siteInfoModalFooterButon + " " + styles.userSelected + " " + (steps === 4 ? styles.footerButonActive : undefined)}>İndirmeler</div> */}
+                    <div>
+                        {steps !== 3 && <FontAwesomeIcon onClick={() => {
+                            if (steps != 3) {
+                                setSteps(steps + 1);
+                            }
+                        }} icon={faAngleRight} />}
                     </div>
+
+                </div>
+                <div className={styles.siteInfoModalFooterButonContainer}>
+                    <div className={styles.siteInfoModalFooterButon + " " + styles.userSelected + " " + (steps === 1 ? styles.footerButonActive : undefined)}>Duyurular</div>
+                    <div className={styles.siteInfoModalFooterButon + " " + styles.userSelected + " " + (steps === 2 ? styles.footerButonActive : undefined)}>Hakkında</div>
+                    <div className={styles.siteInfoModalFooterButon + " " + styles.userSelected + " " + (steps === 3 ? styles.footerButonActive : undefined)}>İletişim</div>
+                    {/* <div className={styles.siteInfoModalFooterButon + " " + styles.userSelected + " " + (steps === 4 ? styles.footerButonActive : undefined)}>İndirmeler</div> */}
                 </div>
             </div>
         </Modal>
@@ -1639,6 +1670,39 @@ const RegisterModal = () => {
 
 const MessageModal = () => {
     const dispatch = useDispatch();
+    const [loading, setLoading] = useState(true);
+    const { messageUser, user, signalR } = useSelector((x: RootState) => x.userReducer.value);
+    const [selectedMessage, setSelectedMessage] = useState({} as UserMessageModel);
+    const [messageText, setMessageText] = useState('');
+    var ref = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        loadGetMessages();
+    }, []);
+    const loadGetMessages = async () => {
+
+        await getMessages().then((res) => {
+            dispatch(setMessageUsers(res.data.list));
+        }).catch((er) => {
+            console.log(er);
+        });
+        setTimeout(() => {
+            setLoading(false);
+        }, 300);
+
+    }
+    const sendButon = () => {
+        if (signalR !== undefined && Object.keys(signalR).length !== 0 && messageText.length != 0) {
+            signalR.invoke("sendUserMessage", { senderID: user.id, receiverID: selectedMessage.id, message: messageText } as UserMessage);
+            signalR.on("messageSent", (data: UserMessage) => {
+                [...selectedMessage.userMessages] = [...selectedMessage.userMessages, data];
+                dispatch(setMessageUsers(selectedMessage));
+            });
+            setMessageText('');
+            setTimeout(() => {
+                ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' });
+            }, 100);
+        }
+    }
     return (
         <div className={styles.messageModal}>
             <div className={styles.messageContainer}>
@@ -1650,66 +1714,81 @@ const MessageModal = () => {
                         <FontAwesomeIcon fontSize={22} icon={faClose} color="#fff" />
                     </div>
                 </div>
-                <div className={styles.messageBody}>
-                    <div className={styles.messageUsers}>
-                        <div className={styles.searchContainer}>
-                            <input placeholder='Kişi ara' type={"text"} className={styles.defaultSearch} />
-                        </div>
-                        <UserCard />
-                        <UserCard />
-                        <UserCard />
-                        <UserCard />
-                        <UserCard />
-                        <UserCard />
-                        <UserCard />
-                        <UserCard />
-                        <UserCard />
-                        <UserCard />
-                        <UserCard />
-                    </div>
-                    <div className={styles.messageMainContainer}>
-                        <div className={styles.messageOptions}>
-                            <div className={styles.messageUserName}>Özkan Kocakaplan</div>
-                        </div>
-                        <div className={styles.messageContent}>
-                            <div className={styles.messages}>
-                                <MessageCard whoIsSender='RECEIVED' />
-                                <MessageCard whoIsSender='RECEIVED' />
-                                <MessageCard whoIsSender='SENDER' />
-                                <MessageCard whoIsSender='RECEIVED' />
-                                <MessageCard whoIsSender='RECEIVED' />
-                                <MessageCard whoIsSender='SENDER' />
-                                <MessageCard whoIsSender='RECEIVED' />
-                                <MessageCard whoIsSender='RECEIVED' />
-                                <MessageCard whoIsSender='SENDER' />
+                {
+                    !loading ?
+                        <div className={styles.messageBody}>
+                            <div className={styles.messageUsers}>
+                                <div className={styles.searchContainer}>
+                                    <input placeholder='Kişi ara' type={"text"} className={styles.defaultSearch} />
+                                </div>
+                                {
+                                    messageUser.map((item) => {
+                                        return <UserCard handleClick={() => {
+                                            setSelectedMessage(item);
+                                            setTimeout(() => {
+                                                ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' });
+                                            }, 100);
+                                        }} key={item.id} item={item} />
+                                    })
+                                }
+                            </div>
+                            <div className={styles.messageMainContainer}>
+                                {
+                                    Object.keys(selectedMessage).length !== 0 ?
+                                        <div className={styles.selectedMessageContainer}>
+                                            <div className={styles.messageOptions}>
+                                                <div className={styles.messageUserName}>{selectedMessage.userName}</div>
+                                            </div>
+                                            <div ref={ref} className={styles.messageContent}>
+                                                <div className={styles.messages}>
+                                                    {
+                                                        messageUser.filter((y) => y.id === selectedMessage.id)[0].userMessages.map((item) => {
+                                                            return <MessageCard key={item.id} entity={item} whoIsSender={user.id === item.senderID ? 'SENDER' : 'RECEIVED'} />
+                                                        })
+                                                    }
+
+                                                </div>
+                                            </div>
+                                            <div className={styles.sendTextInputContainer}>
+                                                <textarea
+                                                    value={messageText}
+                                                    onChange={(e) => setMessageText(e.target.value)}
+                                                    onKeyUp={(e) => {
+                                                        if (e.key === "Enter") {
+                                                            sendButon();
+                                                        }
+                                                    }} placeholder='Mesaj yazınız'></textarea>
+                                                <div onClick={sendButon} className={styles.sendButon}>
+                                                    <FontAwesomeIcon icon={faPaperPlane} color="#fff" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        :
+                                        null
+                                }
                             </div>
                         </div>
-                        <div className={styles.sendTextInputContainer}>
-                            <textarea placeholder='Mesaj yazınız'></textarea>
-                            <div className={styles.sendButon}>
-                                <FontAwesomeIcon icon={faPaperPlane} color="#fff" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                        :
+                        <Loading />
+                }
             </div>
         </div>
     )
 }
-const UserCard = () => {
+const UserCard = (props: { item: UserMessageModel, handleClick: () => void }) => {
     return (
-        <div className={styles.messageUserCard}>
+        <div onClick={props.handleClick} className={styles.messageUserCard}>
             <div>
                 <img className={styles.messageUserCardImg} src="http://localhost:3000/logo.png" />
             </div>
             <div className={styles.messageUserCardInfo}>
-                <a>Özkan Kocaplan</a>
-                <div className={styles.messageSummary}>naber nasılsın</div>
+                <a>{props.item.userName}</a>
+                <div className={styles.messageSummary}>{props.item.userMessages[props.item.userMessages.length - 1].message}</div>
             </div>
         </div>
     )
 }
-const MessageCard = (props: { whoIsSender: 'SENDER' | 'RECEIVED' }) => {
+const MessageCard = (props: { whoIsSender: 'SENDER' | 'RECEIVED', entity: UserMessage }) => {
     return (
         props.whoIsSender === "RECEIVED" ?
             <div className={styles.messageCard}>
@@ -1720,10 +1799,10 @@ const MessageCard = (props: { whoIsSender: 'SENDER' | 'RECEIVED' }) => {
                 </div>
                 <div className={styles.messageCardContent}>
                     <div className={styles.messageHeaderInfo}>
-                        <span>{new Date().toLocaleDateString().substring(0, 16)}</span>
+                        <span>{new Date(props.entity.createTime).toLocaleString().substring(0, 16)}</span>
                     </div>
                     <div className={styles.message}>
-                        aaasdasdasdaaaasdasdasdaaaasdasdasdaaaasdasdasdaaaasdasdasdaaaasdasdasdaaaasdasdasda
+                        {props.entity.message}
                     </div>
                 </div>
             </div>
@@ -1736,10 +1815,10 @@ const MessageCard = (props: { whoIsSender: 'SENDER' | 'RECEIVED' }) => {
                 </div>
                 <div className={styles.messageCardContentRight}>
                     <div className={styles.messageHeaderInfoRight}>
-                        <span>{new Date().toLocaleDateString().substring(0, 16)}</span>
+                        <span>{new Date(props.entity.createTime).toLocaleString().substring(0, 16)}</span>
                     </div>
                     <div className={styles.messageRight}>
-                        aaasdasdasdaaaasdasdasdaaaasdasdasdaaaasdasdasdaaaasdasdasdaaaasdasdasdaaaasdasdasda
+                        {props.entity.message}
                     </div>
                 </div>
             </div>
@@ -1830,6 +1909,43 @@ const ComplaintModal = () => {
     const close = () => {
         dispatch(handleOpenBackgroundBlur(false));
         dispatch(handleOpenComplaintModal(false))
+    }
+    return (
+        <Modal width={500} onClick={close}>
+            <div style={{ margin: '10px' }}>
+                {!isSuccess ? <div>
+                    <div className={styles.standartModalContainer}><label>Şikayetinizi yazınız</label></div>
+                    <textarea
+                        onChange={(e) => setDescription(e.target.value)}
+                        className={styles.complaintTextInput}></textarea>
+                </div>
+                    : <div>
+                        <div className={styles.deleteModalContainer}><label>Şikayetiniz iletilmiştir</label></div>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+                            <BorderButon onClick={close} name='Kapat' />
+                        </div>
+                    </div>
+                }
+
+                {!isSuccess && <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+                    <BorderButon onClick={saveButon} name='Gönder' />
+                </div>}
+            </div>
+        </Modal>
+    )
+}
+const ContentComplaintModal = () => {
+    const dispatch = useDispatch();
+    const { user, contentComplaint } = useSelector((x: RootState) => x.userReducer.value);
+    const [description, setDescription] = useState('');
+    const [isSuccess, setIsSuccess] = useState(false);
+    const saveButon = async () => {
+        await postContentComplaint({ message: description, userID: user.id, contentID: contentComplaint.contentID, type: contentComplaint.type, complaintType: contentComplaint.complaintType } as ContentComplaint);
+        setIsSuccess(true);
+    }
+    const close = () => {
+        dispatch(handleOpenBackgroundBlur(false));
+        dispatch(handleOpenContentComplaintModal(false))
     }
     return (
         <Modal width={500} onClick={close}>

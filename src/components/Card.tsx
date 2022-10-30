@@ -1,24 +1,46 @@
-import React, { memo, useEffect } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import { faComment, faEdit, faThumbsUp, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { Comments, FanArt, Like, Review, ReviewsModels, Type, UserFullModels, Users } from '../types/Entites';
+import { Comments, ComplaintType, ContentComplaint, FanArt, Like, Review, ReviewsModels, Type, UserFullModels, Users } from '../types/Entites';
 
 import styles from '../../styles/Home.module.css';
 import { baseUrl, deleteComment, deleteFanArt, deleteLike, deleteReview, getLike, postLike } from '../utils/api';
-import { IDeleteModal, handleDeleteModal, handleOpenBackgroundBlur, handleOpenEditReviews } from '../store/features/modalReducer';
+import { IDeleteModal, handleDeleteModal, handleOpenBackgroundBlur, handleOpenEditReviews, handleOpenComplaintModal, handleOpenContentComplaintModal } from '../store/features/modalReducer';
 import { setSelectedReview } from '../store/features/animeReducer';
-import { setViewUser } from '../store/features/userReducer';
+import { setContentComplaint, setViewUser } from '../store/features/userReducer';
 import { setCommentLike, setCommentLikes, setComments } from '../store/features/commentsReducer';
-const ReviewCard = (props: { user: Users, item: ReviewsModels }) => {
+import Line from './Line';
+const ReviewCard = (props: { user: Users, item: any, handleDataChange?: (data: any) => void }) => {
   const dispatch = useDispatch();
   const userInfo = useSelector((x: RootState) => x.userReducer.value.user);
   const viewUser = useSelector((x: RootState) => x.userReducer.value.viewUser);
+  const [commentView, setCommentView] = useState(false);
+  console.log(props.item)
   const CardImg = (props: { image: string }) => {
     return (
       <img className={styles.cardImage + " " + styles.userSelected} src={props.image} />
     )
+  }
+  const likeButon = async () => {
+    var likes = props.item.likes as Array<Like>;
+    var check = likes.find((y) => y.contentID === props.item.id);
+    if (check === undefined) {
+      await postLike({ contentID: props.item.id, userID: userInfo.id, type: Type.Review } as Like).then((res) => {
+        console.log(res.data)
+        if (res.data.entity != null) {
+          dispatch(setCommentLike(res.data.entity));
+        }
+      }).catch((er) => {
+        console.log(er);
+      });
+
+    }
+    else {
+      await deleteLike(props.item.id, Type.Review);
+      dispatch(setCommentLikes(likes.filter((y) => y.id !== check?.id)))
+    }
   }
   return (
     <div>
@@ -28,11 +50,54 @@ const ReviewCard = (props: { user: Users, item: ReviewsModels }) => {
         <div className={styles.sliderContainer}>
           <div className={styles.sliderImages}>
             {props.item.type === Type.Anime ? <CardImg image={baseUrl + props.item.anime.img} /> : <CardImg image={baseUrl + props.item.manga.image} />}
-            <div className={styles.reviewView + " " + styles.userSelected}>
-              {props.item.message}
+            <div style={{ flex: 1, display: 'flex' }} className={styles.userSelected + " " + styles.fdirectionColumn}>
+              <div className={styles.reviewView + " " + styles.userSelected}>
+                {props.item.message ? props.item.message : props.item.description}
+              </div>
+            </div>
+            <div className={styles.options}>
+              <div onClick={() => {
+                dispatch(handleOpenBackgroundBlur(true));
+                dispatch(setContentComplaint({ contentID: props.item.id, type: Type.Review, complaintType: ComplaintType.Content } as ContentComplaint));
+                dispatch(handleOpenContentComplaintModal(true));
+              }} className={styles.fanArtIconButons}>
+                <FontAwesomeIcon fontSize={15} color='rgba(255, 255, 255, 0.50)' icon={faWarning} />
+              </div>
+              <div onClick={() => setCommentView(!commentView)} className={styles.fanArtIconButons}>
+                <FontAwesomeIcon fontSize={15}
+                  color={props.item.likes.find((y: any) => y.contentID === props.item.id) === undefined ? 'rgba(255, 255, 255, 0.50)' : 'rgb(253, 188, 11)'}
+                  icon={faThumbsUp} />
+              </div>
+              <div onClick={likeButon} className={styles.fanArtIconButons}>
+                <FontAwesomeIcon fontSize={15}
+                  color={'rgb(253, 188, 11)'}
+                  icon={faThumbsUp} />
+              </div>
+              {/* {props.user.id === props.item.userID && <div className={styles.fanArtIconButons}>
+                <FontAwesomeIcon fontSize={15} color='rgba(255, 255, 255, 0.50)' icon={faTrash} />
+              </div>} */}
             </div>
           </div>
         </div>
+        {commentView && <div className={styles.discoverCommentContainer}>
+          {
+            props.item.comments !== null && props.item.comments.length !== 0 &&
+            props.item.comments.map((item: Comments) => {
+              return <div key={item.id} className={styles.discoverComment + " " + styles.userSelected}>
+                <div className={styles.commentUser}>
+                  {item.users.userName}
+                </div>
+                <Line />
+                <div>
+                  {
+                    item.comment
+                  }
+                </div>
+              </div>
+            })
+          }
+        </div>}
+
         <div className={styles.listOptions}>
           <div className={styles.listOptionsLeft}>
             {
@@ -90,20 +155,46 @@ const ReviewCard = (props: { user: Users, item: ReviewsModels }) => {
             </span>
           </div>
         </div>
+
       </div>
       <div className={styles.bottomBorder}></div>
       <div className={styles.rightBorder}></div>
     </div>
   )
 }
-const FanArtCard = (props: { user: Users, entity: FanArt }) => {
+const FanArtCard = (props: { entity: any, handleDataChange?: (data: any) => void }) => {
   const dispatch = useDispatch();
   const userInfo = useSelector((x: RootState) => x.userReducer.value.user);
   const viewUser = useSelector((x: RootState) => x.userReducer.value.viewUser);
+  const [commentView, setCommentView] = useState(false);
   const CardImg = (props: { img: string, alt: string }) => {
     return (
       <img alt={props.alt} className={styles.cardImage + " " + styles.userSelected} src={baseUrl + props.img} />
     )
+  }
+  const likeButon = async () => {
+    var likes = props.entity.likes as Array<Like>;
+    var check = likes.find((y) => y.contentID === props.entity.id);
+    if (check === undefined) {
+      await postLike({ contentID: props.entity.id, userID: userInfo.id, type: Type.FanArt } as Like).then((res) => {
+        if (res.data.entity != null) {
+          if (props.handleDataChange) {
+            props.entity.likes = [...props.entity.likes, res.data.entity];
+            props.handleDataChange(props.entity);
+          }
+        }
+      }).catch((er) => {
+        console.log(er);
+      });
+
+    }
+    else {
+      await deleteLike(props.entity.id, Type.FanArt);
+      if (props.handleDataChange) {
+        props.entity.likes = props.entity.likes.filter((y: any) => y.contentID !== props.entity.id && y.type === Type.FanArt);
+        props.handleDataChange(props.entity);
+      }
+    }
   }
   return (
     <div>
@@ -112,16 +203,58 @@ const FanArtCard = (props: { user: Users, entity: FanArt }) => {
       <div className={styles.listCard2} >
         <div className={styles.sliderContainer}>
           <div className={styles.sliderImages}>
-            <CardImg alt={props.entity.description} img={props.entity.image} />
+            <CardImg alt={props.entity.description} img={props.entity.users.image} />
             <div className={styles.fanArtView + " " + styles.userSelected}>
               fan art’ı görüntülemek için tıkla
             </div>
+            <div className={styles.options}>
+              <div
+                onClick={() => {
+                  dispatch(setContentComplaint({ contentID: props.entity.id, type: Type.FanArt, complaintType: ComplaintType.Content } as ContentComplaint));
+                  dispatch(handleOpenBackgroundBlur(true));
+                  dispatch(handleOpenContentComplaintModal(true));
+                }}
+                className={styles.fanArtIconButons}>
+                <FontAwesomeIcon fontSize={15} color='rgba(255, 255, 255, 0.50)' icon={faWarning} />
+              </div>
+              <div
+                className={styles.fanArtIconButons}>
+                <FontAwesomeIcon fontSize={15} color='rgba(255, 255, 255, 0.50)' icon={faComment} />
+              </div>
+
+              <div onClick={likeButon} className={styles.fanArtIconButons}>
+                <FontAwesomeIcon fontSize={15}
+                  color={props.entity.likes !== undefined && props.entity.likes.find((y: any) => y.contentID === props.entity.id) === undefined ? 'rgba(255, 255, 255, 0.50)' : 'rgb(253, 188, 11)'}
+                  icon={faThumbsUp} />
+              </div>
+              {/* {userInfo != null && userInfo.id !== props.entity.userID && props.entity && <div className={styles.fanArtIconButons}>
+                <FontAwesomeIcon fontSize={15} color='rgba(255, 255, 255, 0.50)' icon={faTrash} />
+              </div>} */}
+            </div>
           </div>
+          {commentView && <div className={styles.discoverCommentContainer}>
+            {
+              props.entity.comments !== null && props.entity.comments.length !== 0 &&
+              props.entity.comments.map((item: Comments) => {
+                return <div key={item.id} className={styles.discoverComment + " " + styles.userSelected}>
+                  <div className={styles.commentUser}>
+                    {item.users.userName}
+                  </div>
+                  <Line />
+                  <div>
+                    {
+                      item.comment
+                    }
+                  </div>
+                </div>
+              })
+            }
+          </div>}
         </div>
         <div className={styles.listOptions}>
           <div className={styles.listOptionsLeft}>
             {
-              props.user.id === userInfo.id &&
+              props.entity.userID === userInfo.id &&
               <div className={styles.listOptionsLeft}>
                 <div onClick={() => {
                   dispatch(handleOpenBackgroundBlur(true));
@@ -242,6 +375,7 @@ const CommentCard = (props: { item: Comments }) => {
     </div>
   )
 }
+
 const MemoFanArtCard = React.memo(FanArtCard);
 const MemoReviewCard = React.memo(ReviewCard);
 const MemoCommentCard = React.memo(ReviewCard);

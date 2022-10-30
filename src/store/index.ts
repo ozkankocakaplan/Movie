@@ -4,6 +4,7 @@ import {
 import { animeReducer } from './features/animeReducer';
 import { commentReducer } from './features/commentsReducer';
 import { listReducer } from './features/listReducer';
+import { mangaReducer } from './features/mangaReducer';
 import { modalReducer } from './features/modalReducer'
 import { notificationReducer } from './features/notificationReducer';
 import { sliderReducer } from './features/sliderReducer';
@@ -16,7 +17,8 @@ const rootReducers = combineReducers({
     notificationReducer,
     animeReducer,
     commentReducer,
-    sliderReducer
+    sliderReducer,
+    mangaReducer
 });
 const customizedMiddleware = getDefaultMiddleware({
     serializableCheck: false

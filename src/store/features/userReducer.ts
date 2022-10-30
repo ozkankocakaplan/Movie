@@ -1,11 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { Rosette, UserFullModels, Users } from "../../types/Entites";
-
+import { ContentComplaint, Rosette, UserFullModels, UserMessageModel, Users } from "../../types/Entites";
+import { HubConnection } from '@aspnet/signalr';
 export const INITIAL_STATE = {
     user: {} as Users,
     viewUser: {} as UserFullModels,
     isUserBlock: false,
-    selectedRosette: {} as Rosette
+    selectedRosette: {} as Rosette,
+    contentComplaint: {} as ContentComplaint,
+    messageUser: [] as Array<UserMessageModel>,
+    signalR: {} as HubConnection
 };
 export const userSlice = createSlice({
     name: 'user',
@@ -22,6 +25,15 @@ export const userSlice = createSlice({
         },
         setSelectedRosette: (state, action) => {
             state.value.selectedRosette = action.payload;
+        },
+        setContentComplaint: (state, action) => {
+            state.value.contentComplaint = action.payload;
+        },
+        setMessageUsers: (state, action) => {
+            state.value.messageUser = action.payload;
+        },
+        setSignalR: (state, action) => {
+            state.value.signalR = action.payload
         }
     }
 });
@@ -30,5 +42,8 @@ export const {
     setUser,
     setViewUser,
     setIsUserBlock,
-    setSelectedRosette
+    setSelectedRosette,
+    setContentComplaint,
+    setMessageUsers,
+    setSignalR
 } = userSlice.actions;

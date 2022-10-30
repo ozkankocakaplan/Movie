@@ -451,7 +451,7 @@
 .childrenContainer {
   position: relative;
   margin-left: 41%;
-  top: 170px;
+  top: 84px;
   z-index: 200;
   display: flex;
   justify-content: center;
@@ -962,10 +962,19 @@
   display: flex;
 }
 
+.selectedMessageContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+}
+
 .messageContainer {
   width: 750px;
   border-radius: 7px;
   height: 600px;
+  display: flex;
+  flex-direction: column;
   background-color: #161616;
   -webkit-box-shadow: -1px 2px 5px 0px rgba(0, 0, 0, 0.75);
   -moz-box-shadow: -1px 2px 5px 0px rgba(0, 0, 0, 0.75);
@@ -1099,7 +1108,6 @@
 
 .messageHeader {
   display: flex;
-  flex: 1;
   justify-content: flex-end;
 }
 
@@ -1214,7 +1222,6 @@
   font-size: 13px;
   line-height: 20px;
   max-width: 350px;
-  max-height: 30px;
   overflow: hidden;
   inline-size: 350px;
   text-overflow: ellipsis;
@@ -2018,7 +2025,7 @@
 
 .cardImage {
   cursor: pointer;
-  height: 141px;
+  height: 114px;
   width: 114px;
   margin-right: 10px;
   opacity: .4;
@@ -2077,6 +2084,10 @@
   flex: 1;
 }
 
+.fdirectionColumn {
+  flex-direction: column;
+}
+
 .sliderImages::-webkit-scrollbar {
   height: 0;
 }
@@ -2100,7 +2111,7 @@
 }
 
 .topWatchBorder {
-  width: 80%;
+  width: 78%;
   display: flex;
   height: 40px;
   justify-content: flex-end;
@@ -2188,6 +2199,7 @@
   background-color: #111111;
   display: flex;
   flex: 1;
+  padding: 10px;
   font-weight: 400;
   font-size: 14px;
   line-height: 24px;
@@ -2354,9 +2366,15 @@
 }
 
 .siteInfoModalContainer {
+  height: 500px;
+  overflow-y: scroll;
   margin: 10px;
   display: flex;
   flex-direction: column;
+}
+
+.siteInfoModalContainer::-webkit-scrollbar {
+  width: 0;
 }
 
 .siteInfoModalBody {
@@ -2420,12 +2438,14 @@
 .announcementImg, .announcementBody {
   display: flex;
   flex: 1;
+  margin-bottom: 20px;
   justify-content: flex-start;
   align-items: flex-end;
   color: rgba(255, 255, 255, 0.75);
 }
 
 .announcementBody {
+  margin-top: -39px;
   padding: 5px 10px;
   text-align: justify;
   display: flex;
@@ -2609,9 +2629,9 @@
 .announcementTitleContainer {
   width: 330px;
   justify-content: space-between;
-  position: absolute;
+  position: relative;
+  top: -45px;
   display: flex;
-  margin-bottom: 5px;
   margin-left: 10px;
   color: rgba(255, 255, 255, 0.75);
 }
@@ -2653,46 +2673,6 @@
 }
 
 
-
-
-@media screen and (max-width:1024px) {
-  .rightMenuContainer {
-    display: none;
-  }
-
-  .archiveMovieCoverImg {
-    margin-right: 0px;
-  }
-
-  .pageContainer:nth-child(1) {
-    min-height: calc(50vh);
-  }
-
-  .profileHeaderContainer {
-    height: inherit !important;
-  }
-
-  .profileContainer {
-    height: inherit !important;
-    flex-direction: column-reverse;
-  }
-
-  .profile {
-    width: 100% !important;
-  }
-
-  .profileMiddle {
-    display: none !important;
-  }
-
-  .listHeader {
-    width: 100%;
-  }
-
-  .homeBg {
-    height: 50%;
-  }
-}
 
 .favoriSelected {
   height: 37px;
@@ -2845,6 +2825,27 @@
   color: rgba(255, 255, 255, 0.25);
 }
 
+.leftImage {
+  float: left;
+  width: 100px;
+  margin-right: 10px;
+  height: 130px !important;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 10px;
+  align-items: flex-end;
+}
+
+.weekAnimeFooter {
+  display: flex;
+  color: rgba(255, 255, 255, 0.50);
+  justify-content: space-between;
+}
+
 .deleteModalContainer {
   display: flex;
   justify-content: center;
@@ -2869,7 +2870,8 @@
   max-height: 300px;
   overflow-y: scroll;
 }
-.aboutModalBody::-webkit-scrollbar{
+
+.aboutModalBody::-webkit-scrollbar {
   width: 0;
 }
 
@@ -2931,6 +2933,147 @@
   flex: 1;
 }
 
+.headerSuffleButon {}
+
+.commentUser {
+  display: flex;
+  font-size: 12px;
+}
+
+.discoverCommentContainer {
+  max-height: 300px;
+  overflow-y: scroll;
+}
+
+.discoverCommentContainer::-webkit-scrollbar {
+  width: 0;
+}
+
+.discoverComment {
+  margin-left: 22.3%;
+  width: 70.7%;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  background-color: #111111;
+  display: flex;
+  padding: 10px;
+  font-weight: 400;
+  flex-direction: column;
+  font-size: 14px;
+  line-height: 24px;
+  color: rgba(255, 255, 255, 0.45);
+  max-height: 140px;
+}
+
 .commentTextInput textarea {
   height: 85px !important;
+}
+
+@media screen and (max-width:1024px) {
+  .rightMenuContainer {
+    display: none;
+  }
+
+  .archiveMovieCoverImg {
+    margin-right: 0px;
+  }
+
+  .pageContainer:nth-child(1) {
+    min-height: calc(50vh);
+  }
+
+  .profileHeaderContainer {
+    height: inherit !important;
+  }
+
+  .profileContainer {
+    height: inherit !important;
+    flex-direction: column-reverse;
+  }
+
+  .profile {
+    width: 100% !important;
+  }
+
+  .profileMiddle {
+    display: none !important;
+  }
+
+  .listHeader {
+    width: 100%;
+  }
+
+  .homeBg {
+    height: 50%;
+  }
+
+  .discoverLeft {
+    flex-direction: row;
+  }
+
+  .discoverDivider {
+    display: none;
+  }
+
+  .discoverContainer {
+    flex-direction: column;
+    max-height: inherit !important;
+  }
+
+  .archiveContainer {
+    padding-bottom: 20px;
+  }
+
+  .discoverReview {
+    height: 150px;
+  }
+
+  .discoverContainer img {
+    height: 100px;
+    width: 100px;
+  }
+
+  .fanArtBody img {
+    max-height: 100%;
+    min-height: 110px;
+    width: 80px;
+  }
+
+  .discoverFanArt img {
+    height: 100px;
+    width: 100px;
+  }
+
+  .discoverFanArt {
+    height: 150px;
+  }
+
+  .rightMenuContainer {
+    display: none;
+  }
+
+  .discoverSearchContainer {
+    display: none;
+  }
+
+  .headerSearchText {
+    width: 100%;
+  }
+
+  .headerSuffleButon {
+    display: none;
+  }
+
+  .menuButon {
+    width: 100% !important;
+  }
+
+  .top100Card {
+    width: 100%;
+    flex: inherit;
+  }
+
+  .top100Img {
+    height: 100%;
+  }
 }

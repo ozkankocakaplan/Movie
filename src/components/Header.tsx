@@ -12,8 +12,10 @@ import { handleOpenBackgroundBlur, handleOpenInfoSiteModal, handleOpenLoginModal
 import Link from 'next/link';
 import Line from './Line';
 import { RootState } from '../store';
-import { getNotifications } from '../utils/api';
-import { Notification, NotificationType } from '../types/Entites';
+import { baseUrl, getNotifications, getSearchAnimeAndManga } from '../utils/api';
+import { AnimeAndMangaModels, Notification, NotificationType, Type, VideoType } from '../types/Entites';
+import Loading from './Loading';
+import { useRouter } from 'next/router';
 
 
 
@@ -31,11 +33,23 @@ export default function Header(props: IHeaderProps) {
     const [notificationShow, setNotificationShow] = useState(false);
 
     const [search, setSearch] = useState('');
+    const [searchResult, setSearchResult] = useState<Array<AnimeAndMangaModels>>([]);
+    const [searchLoading, setSearchLoading] = useState(false);
     useEffect(() => {
         setLoggedUser(user);
     }, [user]);
 
-    const handleSearch = (e: string) => {
+    const handleSearch = async (e: string) => {
+        setSearch(e);
+        if (e.length >= 1) {
+            setSearchLoading(true);
+            await getSearchAnimeAndManga(e).then((res) => {
+                setSearchResult(res.data.list);
+            }).catch((er) => {
+                console.log(er);
+            });
+            setSearchLoading(false);
+        }
 
     }
     return (
@@ -80,11 +94,13 @@ export default function Header(props: IHeaderProps) {
                             onChange={(e) => handleSearch(e.target.value)}
                             type={"text"} className={styles.headerSearchText} />}
                         {searchShow && <div className={styles.headerSearchResultContainer}>
-                            <SearchResultCard />
-                            <SearchResultCard />
-                            <SearchResultCard />
-                            <SearchResultCard />
-                            <SearchResultCard />
+                            {
+                                searchLoading ? <Loading />
+                                    :
+                                    searchResult.map((item) => {
+                                        return <SearchResultCard key={item.id} entity={item} />
+                                    })
+                            }
                         </div>}
                     </li>}
                     {props.notification && <li style={{ position: 'relative', zIndex: 15 }}>
@@ -119,19 +135,27 @@ export default function Header(props: IHeaderProps) {
         </div >
     )
 }
-const SearchResultCard = () => {
+const SearchResultCard = (props: { entity: AnimeAndMangaModels }) => {
+    var navigate = useRouter();
     return (
         <div className={styles.searchResultCard}>
-            <div className={styles.searchResultImg}>
-                <img src='http://localhost:3000/movieCover.png' />
+            <div style={{ cursor: 'pointer' }} onClick={() => {
+                if (props.entity.type === Type.Anime) {
+                    navigate.push("/anime/" + props.entity.url)
+                }
+                else {
+                    navigate.push("/manga/" + props.entity.url);
+                }
+            }} className={styles.searchResultImg}>
+                <img src={baseUrl + props.entity.img} />
             </div>
             <div className={styles.searchResultContent}>
-                <div className={styles.searchContentButon}>Toplam Gönderi:85</div>
-                <div className={styles.searchContentButon}>Tür: Dizi</div>
-                <div className={styles.searchContentButon}>Eleştiri: 85</div>
-                <div className={styles.searchContentButon}>Sıralama: 85</div>
-                <div className={styles.searchContentButon}>Fan Art: 85</div>
-                <div className={styles.searchContentButon}>Beğeni: 85</div>
+                <div className={styles.searchContentButon}>Toplam Gönderi: {props.entity.fanArtCount + props.entity.reviewsCount}</div>
+                {props.entity.type === Type.Anime && <div className={styles.searchContentButon}>Tür: {props.entity.videoType == VideoType.AnimeSeries ? " Dizi" : "Film"}</div>}
+                <div className={styles.searchContentButon}>Eleştiri: {props.entity.reviewsCount}</div>
+                <div className={styles.searchContentButon}>Sıralama: {props.entity.arrangement}</div>
+                <div className={styles.searchContentButon}>Fan Art: {props.entity.fanArtCount}</div>
+                <div className={styles.searchContentButon}>Beğeni: {props.entity.like}</div>
             </div>
         </div>
     )

@@ -13,10 +13,10 @@ import Loading from '../../src/components/Loading'
 import LoadingScreen from '../../src/components/LoadingScreen'
 import MenuContainer from '../../src/components/MenuContainer'
 import StarRating from '../../src/components/StarRating'
-import { useAuth } from '../../src/hooks/useAuth'
+
 import { RootState } from '../../src/store'
-import { setAnimeModels, setSelectedEpisode, setSelectedEpisodes } from '../../src/store/features/animeReducer'
-import { setComment, setComments } from '../../src/store/features/commentsReducer'
+import { setAnimeModel, setSelectedEpisode, setSelectedEpisodes } from '../../src/store/features/animeReducer'
+import { setComments } from '../../src/store/features/commentsReducer'
 import { handleOpenAddReviews, handleOpenBackgroundBlur } from '../../src/store/features/modalReducer'
 import { AnimeModels, VideoType, Status, AnimeSeason, AnimeEpisodes, ContentNotification, Type, Like, Ratings, AnimeList, AnimeStatus, Comments } from '../../src/types/Entites'
 import { deleteAnimeList, deleteContentNotification, deleteLike, getAnime, getComments, postAnimeList, postComment, postContentNotification, postLike, postRating, putRating } from '../../src/utils/api'
@@ -40,17 +40,22 @@ export default function Details() {
 
     const user = useSelector((x: RootState) => x.userReducer.value.user);
 
-    const { animeModels, selectedEpisodes, selectedEpisode } = useSelector((x: RootState) => x.animeReducer);
+    const { animeModel, selectedEpisodes, selectedEpisode } = useSelector((x: RootState) => x.animeReducer);
 
 
     useEffect(() => {
+        window.onpageshow = function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        };
         loadAnime();
     }, [url])
     const loadAnime = async () => {
         if (url != undefined) {
             await getAnime(url?.toString()).then((res) => {
                 if (res.data.entity != null) {
-                    dispatch(setAnimeModels(res.data.entity));
+                    dispatch(setAnimeModel(res.data.entity));
                     if (res.data.entity.animeRating != null) {
                         setRating(res.data.entity.animeRating.rating);
                     }
@@ -66,7 +71,6 @@ export default function Details() {
         setTimeout(() => {
             setLoading(false);
         }, 400);
-
     }
 
 
@@ -75,49 +79,49 @@ export default function Details() {
             <div style={{ display: 'flex', flex: 1, flexDirection: 'row' }}>
                 <div className={styles.detailsBody}>
                     <div className={styles.detailsHeader}>
-                        <h2>{animeModels.anime.animeName}</h2>
+                        <h2>{animeModel.anime.animeName}</h2>
                         <div
                             onClick={async () => {
-                                if (animeModels.contentNotification === null) {
-                                    await postContentNotification({ userID: user.id, contentID: animeModels.anime.id, type: Type.Anime } as ContentNotification).then((res) => {
-                                        dispatch(setAnimeModels({ ...animeModels, contentNotification: res.data.entity } as AnimeModels));
+                                if (animeModel.contentNotification === null) {
+                                    await postContentNotification({ userID: user.id, contentID: animeModel.anime.id, type: Type.Anime } as ContentNotification).then((res) => {
+                                        dispatch(setAnimeModel({ ...animeModel, contentNotification: res.data.entity } as AnimeModels));
                                     })
                                 }
                                 else {
-                                    await deleteContentNotification(animeModels.contentNotification.id).then((res) => {
+                                    await deleteContentNotification(animeModel.contentNotification.id).then((res) => {
                                         if (res.data.isSuccessful) {
-                                            dispatch(setAnimeModels({ ...animeModels, contentNotification: res.data.entity } as AnimeModels));
+                                            dispatch(setAnimeModel({ ...animeModel, contentNotification: res.data.entity } as AnimeModels));
                                         }
                                     })
                                 }
                             }}
                             className={styles.movieNotification}>
-                            <FontAwesomeIcon fontSize="20px" icon={faBell} color={animeModels.contentNotification === null ? "rgba(255,255,255,0.5)" : "rgb(253, 188, 11)"} />
+                            <FontAwesomeIcon fontSize="20px" icon={faBell} color={animeModel.contentNotification === null ? "rgba(255,255,255,0.5)" : "rgb(253, 188, 11)"} />
                         </div>
                     </div>
                     <Divider />
                     <div className={styles.movieInfoSummaryContainer}>
                         {
-                            animeModels.categories !== undefined &&
-                            animeModels.categories.map((item) => {
+                            animeModel.categories !== undefined &&
+                            animeModel.categories.map((item) => {
                                 return <Info key={item.id} name={item.categories.name} />
                             })
                         }
-                        <Info name={'Mal: ' + animeModels.anime.malRating} />
-                        <Info name={'Bölümler: ' + animeModels.animeEpisodes.length} />
-                        <Info name={"Yaş Sınırı: " + animeModels.anime.ageLimit} />
-                        <Info name={'Beğeni: ' + animeModels.likeCount} />
-                        <Info name={'Site: ' + animeModels.anime.siteRating} />
-                        <Info name={'Çıkış: ' + animeModels.anime.showTime} />
-                        <Info name={animeModels.anime.videoType === VideoType.AnimeSeries ? "Tür: Film" : "Tür: Dizi"} />
-                        <Info name={'Sıralama: ' + animeModels.arrangement} />
-                        <Info name={'Sezon Sayısı: ' + animeModels.anime.seasonCount} />
-                        <Info name={'İzlenme: ' + animeModels.viewsCount} />
-                        <Info name={animeModels.anime.status === Status.Continues ? "Durumu: Devam Ediyor" : "Durumu: Bitti"} />
+                        <Info name={'Mal: ' + animeModel.anime.malRating} />
+                        <Info name={'Bölümler: ' + animeModel.animeEpisodes.length} />
+                        <Info name={"Yaş Sınırı: " + animeModel.anime.ageLimit} />
+                        <Info name={'Beğeni: ' + animeModel.likeCount} />
+                        <Info name={'Site: ' + animeModel.anime.siteRating} />
+                        <Info name={'Çıkış: ' + animeModel.anime.showTime} />
+                        <Info name={animeModel.anime.videoType === VideoType.AnimeSeries ? "Tür: Dizi" : "Tür: Film"} />
+                        <Info name={'Sıralama: ' + animeModel.arrangement} />
+                        <Info name={'Sezon Sayısı: ' + animeModel.anime.seasonCount} />
+                        <Info name={'İzlenme: ' + animeModel.viewsCount} />
+                        <Info name={animeModel.anime.status === Status.Continues ? "Durumu: Devam Ediyor" : "Durumu: Bitti"} />
                     </div>
                     <Divider />
                     <div className={styles.movieSummary}>
-                        {animeModels.anime.animeDescription}
+                        {animeModel.anime.animeDescription}
                     </div>
                 </div>
                 <div>
@@ -128,12 +132,12 @@ export default function Details() {
     }
     const addAnimeList = async (type: AnimeStatus) => {
         if (selectedEpisode !== null && Object.keys(selectedEpisode).length !== 0) {
-            var check = animeModels.animeLists.find((y) => y.animeID == animeModels.anime.id && y.episodeID == selectedEpisode.id);
+            var check = animeModel.animeLists.find((y) => y.animeID == animeModel.anime.id && y.episodeID == selectedEpisode.id);
             if (!check) {
-                await postAnimeList({ userID: user.id, animeID: animeModels.anime.id, episodeID: selectedEpisode.id, animeStatus: type } as AnimeList).then((res) => {
-                    dispatch(setAnimeModels({
-                        ...animeModels,
-                        animeLists: [...animeModels.animeLists, res.data.entity]
+                await postAnimeList({ userID: user.id, animeID: animeModel.anime.id, episodeID: selectedEpisode.id, animeStatus: type } as AnimeList).then((res) => {
+                    dispatch(setAnimeModel({
+                        ...animeModel,
+                        animeLists: [...animeModel.animeLists, res.data.entity]
                     } as AnimeModels));
                 });
             }
@@ -151,7 +155,7 @@ export default function Details() {
     return (
         <LoadingScreen loading={loading}>
             {
-                animeModels.anime != null &&
+                animeModel.anime != null &&
                 <div className={styles.archiveBackground}>
                     <Header
                         search={'show'}
@@ -163,27 +167,27 @@ export default function Details() {
                                 <div className={styles.leftMenuContainer} >
                                     <MenuButon marginright='10px' onClick={() => setSelectedMenu('Anime')} isactive={selectedMenu == "Anime" ? "T" : "F"} name='Anime' />
                                     <MenuButon marginright='10px' onClick={() => {
-                                        if (animeModels.manga != null) {
-                                            router.push("/manga/" + animeModels.manga.seoUrl);
+                                        if (animeModel.manga != null) {
+                                            router.push("/manga/" + animeModel.manga.seoUrl);
                                         }
                                     }} name='Manga' />
                                     <MenuButon
 
                                         width='50px'
-                                        color={animeModels.like === null ? "rgba(255,255,255,0.5)" : "rgb(253, 188, 11)"}
+                                        color={animeModel.like === null ? "rgba(255,255,255,0.5)" : "rgb(253, 188, 11)"}
                                         marginright='10px' onClick={async () => {
 
-                                            if (animeModels.like === null) {
-                                                await postLike({ userID: user.id, contentID: animeModels.anime.id, type: Type.Anime, episodeID: 0 } as Like).then((res) => {
+                                            if (animeModel.like === null) {
+                                                await postLike({ userID: user.id, contentID: animeModel.anime.id, type: Type.Anime, episodeID: 0 } as Like).then((res) => {
                                                     if (res.data.isSuccessful) {
-                                                        dispatch(setAnimeModels({ ...animeModels, like: res.data.entity } as AnimeModels));
+                                                        dispatch(setAnimeModel({ ...animeModel, like: res.data.entity } as AnimeModels));
                                                     }
                                                 })
                                             }
                                             else {
-                                                await deleteLike(animeModels.anime.id, Type.Anime).then((res) => {
+                                                await deleteLike(animeModel.anime.id, Type.Anime).then((res) => {
                                                     if (res.data.isSuccessful) {
-                                                        dispatch(setAnimeModels({ ...animeModels, like: null as any } as AnimeModels));
+                                                        dispatch(setAnimeModel({ ...animeModel, like: null as any } as AnimeModels));
                                                     }
                                                 })
                                             }
@@ -207,21 +211,21 @@ export default function Details() {
                                         type='dropdown' icon={faAngleDown} name='Puanla'>
                                         <div style={{ display: 'flex', flex: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
                                             <StarRating rating={rating} handleRating={async (val: number) => {
-                                                if (animeModels.animeRating === null) {
-                                                    await postRating({ userID: user.id, animeID: animeModels.anime.id, rating: val } as Ratings).then((res) => {
-                                                        dispatch(setAnimeModels({ ...animeModels, animeRating: null as any } as AnimeModels));
+                                                if (animeModel.animeRating === null) {
+                                                    await postRating({ userID: user.id, animeID: animeModel.anime.id, rating: val } as Ratings).then((res) => {
+                                                        dispatch(setAnimeModel({ ...animeModel, animeRating: null as any } as AnimeModels));
                                                     });
                                                 }
                                                 else {
-                                                    await putRating({ ...animeModels.animeRating, rating: val } as Ratings).then((res) => {
-                                                        dispatch(setAnimeModels({ ...animeModels, animeRating: res.data.entity } as AnimeModels));
+                                                    await putRating({ ...animeModel.animeRating, rating: val } as Ratings).then((res) => {
+                                                        dispatch(setAnimeModel({ ...animeModel, animeRating: res.data.entity } as AnimeModels));
                                                     });
                                                 }
                                                 setRating(val);
                                             }} />
                                         </div>
                                     </DownButon>
-                                    {Object.keys(selectedEpisode).length !== 0 && <DownButon
+                                    {selectedEpisode !== undefined && Object.keys(selectedEpisode).length !== 0 && <DownButon
                                         onClick={() => {
                                             if (listPanelShow === "hide") {
                                                 setListPanelShow('show')
@@ -234,13 +238,13 @@ export default function Details() {
                                         <div className={styles.animeListContainer}>
                                             <div onClick={() => {
                                                 addAnimeList(AnimeStatus.IWatched);
-                                            }} className={styles.listButons + " " + styles.userSelected + " " + (Object.keys(selectedEpisode).length !== 0 && animeModels.animeLists.find((y) => y.animeID === animeModels.anime.id && y.episodeID === selectedEpisode.id && y.animeStatus === AnimeStatus.IWatched) !== undefined && styles.listButonsActive)}>İzledim</div>
+                                            }} className={styles.listButons + " " + styles.userSelected + " " + (Object.keys(selectedEpisode).length !== 0 && animeModel.animeLists.find((y) => y.animeID === animeModel.anime.id && y.episodeID === selectedEpisode.id && y.animeStatus === AnimeStatus.IWatched) !== undefined && styles.listButonsActive)}>İzledim</div>
                                             <div onClick={() => {
                                                 addAnimeList(AnimeStatus.IWillWatch);
-                                            }} className={styles.listButons + " " + styles.userSelected + " " + (Object.keys(selectedEpisode).length !== 0 && animeModels.animeLists.find((y) => y.animeID === animeModels.anime.id && y.episodeID === selectedEpisode.id && y.animeStatus === AnimeStatus.IWillWatch) !== undefined && styles.listButonsActive)}>İzleyeceğim</div>
+                                            }} className={styles.listButons + " " + styles.userSelected + " " + (Object.keys(selectedEpisode).length !== 0 && animeModel.animeLists.find((y) => y.animeID === animeModel.anime.id && y.episodeID === selectedEpisode.id && y.animeStatus === AnimeStatus.IWillWatch) !== undefined && styles.listButonsActive)}>İzleyeceğim</div>
                                             <div onClick={() => {
                                                 addAnimeList(AnimeStatus.Watching);
-                                            }} className={styles.listButons + " " + styles.userSelected + " " + (Object.keys(selectedEpisode).length !== 0 && animeModels.animeLists.find((y) => y.animeID === animeModels.anime.id && y.episodeID === selectedEpisode.id && y.animeStatus === AnimeStatus.Watching) !== undefined && styles.listButonsActive)}>İzliyorum</div>
+                                            }} className={styles.listButons + " " + styles.userSelected + " " + (Object.keys(selectedEpisode).length !== 0 && animeModel.animeLists.find((y) => y.animeID === animeModel.anime.id && y.episodeID === selectedEpisode.id && y.animeStatus === AnimeStatus.Watching) !== undefined && styles.listButonsActive)}>İzliyorum</div>
                                         </div>
                                     </DownButon>}
                                     {selectedEpisodes.length !== 0 && <DownButon onClick={() => {
@@ -272,7 +276,7 @@ export default function Details() {
                             <div className={styles.detailsContainer}>
                                 <div className={styles.detailsLeft}>
                                     {selectedTab === "DETAIL" && <Detail />}
-                                    {selectedTab === "COMMENTS" && <Comments type={Type.Anime} contentID={animeModels.anime.id} />}
+                                    {selectedTab === "COMMENTS" && <Comments type={Type.Anime} contentID={animeModel.anime.id} />}
                                     {selectedTab === "STATUS" && <Statuss />}
                                     <div style={{
                                         marginTop: '15px', marginBottom: '15px',
@@ -399,7 +403,7 @@ const VerticalDivider = () => {
         <div style={{ height: '100%', width: '2px', backgroundColor: 'rgba(255,255,255,0.50)' }}></div>
     )
 }
-const Info = (props: { name: string }) => {
+export const Info = (props: { name: string }) => {
     return (
         <div className={styles.movieInfoSummary}>
             {props.name}
@@ -430,16 +434,16 @@ const Images = () => {
 }
 const Episodes = () => {
     const dispatch = useDispatch();
-    const { animeModels } = useSelector((x: RootState) => x.animeReducer)
+    const { animeModel } = useSelector((x: RootState) => x.animeReducer)
     const [selectedSeasons, setSelectedSeasons] = useState<AnimeSeason>({} as AnimeSeason);
     const [selectedEpisodes, setSelectedAnimeEpisodes] = useState<AnimeEpisodes>({} as AnimeEpisodes);
     useEffect(() => {
-        var firstSeasons = animeModels.animeSeasons[0];
+        var firstSeasons = animeModel.animeSeasons[0];
         setSelectedSeasons(firstSeasons);
-        var firstEpisode = animeModels.animeEpisodes[0];
+        var firstEpisode = animeModel.animeEpisodes[0];
         dispatch(setSelectedEpisode(firstEpisode));
         setSelectedAnimeEpisodes(firstEpisode);
-        dispatch(setSelectedEpisodes(animeModels.episodes.filter((y) => y.episodeID == firstEpisode.id)))
+        dispatch(setSelectedEpisodes(animeModel.episodes.filter((y) => y.episodeID == firstEpisode.id)))
     }, [])
 
     const SeasonButon = (props: { name: string, handleSelected?: () => void }) => {
@@ -463,8 +467,8 @@ const Episodes = () => {
                     <div>
                         <div className={styles.seasonContainer}>
                             {
-                                animeModels.animeSeasons !== null &&
-                                animeModels.animeSeasons.map((item) => {
+                                animeModel.animeSeasons !== null &&
+                                animeModel.animeSeasons.map((item) => {
                                     return <SeasonButon handleSelected={() => {
                                         setSelectedSeasons(item);
                                     }} key={item.id} name={item.seasonName} />
@@ -474,12 +478,12 @@ const Episodes = () => {
                     </div>
                     <div className={styles.episodesBody}>
                         {
-                            animeModels.animeEpisodes !== null &&
-                            animeModels.animeEpisodes.filter((y) => y.seasonID === selectedSeasons.id).map((item) => {
+                            animeModel.animeEpisodes !== null &&
+                            animeModel.animeEpisodes.filter((y) => y.seasonID === selectedSeasons.id).map((item) => {
                                 return <EpisodeCard onClick={() => {
                                     dispatch(setSelectedEpisode(item));
                                     setSelectedAnimeEpisodes(item);
-                                    dispatch(setSelectedEpisodes(animeModels.episodes.filter((y) => y.episodeID == item.id)))
+                                    dispatch(setSelectedEpisodes(animeModel.episodes.filter((y) => y.episodeID == item.id)))
                                 }} key={item.id} name={item.episodeName} />
                             })
                         }
@@ -490,8 +494,8 @@ const Episodes = () => {
                         <div style={{ marginBottom: '10px' }}><SeasonButon name={selectedSeasons.seasonName + ' Müzikleri'} /></div>
                         <div className={styles.seasonsMusicContainer + " " + styles.musicContainerOverflowY}>
                             {
-                                animeModels.animeSeasonMusics !== null &&
-                                animeModels.animeSeasonMusics.map((item) => {
+                                animeModel.animeSeasonMusics !== null &&
+                                animeModel.animeSeasonMusics.map((item) => {
                                     return <SeasonMusicCard key={item.id} name={item.musicName} />
                                 })
                             }

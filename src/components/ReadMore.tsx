@@ -10,7 +10,7 @@ export default function ReadMore(props: { children: string }) {
         <p>
             {isReadMore && text ? text.slice(0, 280) : text}
             <span onClick={toggleReadMore} className="read-or-hide">
-                {isReadMore ? "..." : " show less"}
+                {isReadMore && text.length > 280 ? "..." : ""}
             </span>
         </p>
     )

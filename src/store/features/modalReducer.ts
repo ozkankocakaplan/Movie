@@ -24,6 +24,7 @@ export const INITIAL_STATE = {
     editReviews: false,
     deleteModal: { text: '', isOpen: false, handleClose: function () { }, handleDelete: function () { } } as IDeleteModal,
     aboutModal: false,
+    contentComplaintModal: false
 
 };
 export const modalSlice = createSlice({
@@ -83,6 +84,9 @@ export const modalSlice = createSlice({
         },
         handleOpenAboutModal: (state, action) => {
             state.value.aboutModal = action.payload
+        },
+        handleOpenContentComplaintModal: (state, action) => {
+            state.value.contentComplaintModal = action.payload
         }
     }
 });
@@ -106,5 +110,6 @@ export const {
     handleOpenRosetteModal,
     handleOpenAddReviews,
     handleOpenEditReviews,
-    handleOpenAboutModal
+    handleOpenAboutModal,
+    handleOpenContentComplaintModal
 } = modalSlice.actions;

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Anime, AnimeAndMangaModels, AnimeList, AnimeModels, Comments, ComplaintList, ContentNotification, FanArt, HomeSlider, Like, Manga, MangaList, Notification, Ratings, Review, Type, UserBlockList, UserEmailVertification, UserList, UserListContents, UserModel, Users } from '../types/Entites';
+import { Anime, AnimeAndMangaModels, AnimeList, AnimeModels, Categories, Comments, ComplaintList, ContentComplaint, ContentNotification, DiscoverModels, FanArt, HomeSlider, Like, Manga, MangaList, MangaModels, Notification, Ratings, Review, Type, UserBlockList, UserEmailVertification, UserList, UserListContents, UserMessageModel, UserModel, Users } from '../types/Entites';
 import ServiceResponse from '../types/ServiceResponse';
 export const baseUrl = "http://192.168.2.175:37323";
 export default function api() {
@@ -147,4 +147,22 @@ export const deleteComment = async (commentID: number, type: Type) => {
 }
 export const getHomeSliders = async () => {
     return await api().get<ServiceResponse<HomeSlider>>("/getHomeSliders");
+}
+export const getAnimes = async () => {
+    return await api().get<ServiceResponse<AnimeModels>>("/getAnimes");
+}
+export const getMangas = async () => {
+    return await api().get<ServiceResponse<MangaModels>>("/getMangas");
+}
+export const getCategories = async () => {
+    return await api().get<ServiceResponse<Categories>>("/getCategories");
+}
+export const getDiscovers = async (type: number) => {
+    return await api().get<ServiceResponse<DiscoverModels>>("/getDiscovers/" + type);
+}
+export const postContentComplaint = async (entity: ContentComplaint) => {
+    return await api().post<ServiceResponse<ContentComplaint>>("/addContentComplaint", entity);
+}
+export const getMessages = async () => {
+    return await api().get<ServiceResponse<UserMessageModel>>("/getMessages");
 }
