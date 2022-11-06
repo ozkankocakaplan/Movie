@@ -8,7 +8,8 @@ export const INITIAL_STATE = {
     selectedRosette: {} as Rosette,
     contentComplaint: {} as ContentComplaint,
     messageUser: [] as Array<UserMessageModel>,
-    signalR: {} as HubConnection
+    signalR: {} as HubConnection,
+    selectedImage: '' as string
 };
 export const userSlice = createSlice({
     name: 'user',
@@ -32,8 +33,14 @@ export const userSlice = createSlice({
         setMessageUsers: (state, action) => {
             state.value.messageUser = action.payload;
         },
+        setMessageUser: (state, action) => {
+            state.value.messageUser = [...state.value.messageUser, action.payload];
+        },
         setSignalR: (state, action) => {
             state.value.signalR = action.payload
+        },
+        setSelectedImage: (state, action) => {
+            state.value.selectedImage = action.payload
         }
     }
 });
@@ -45,5 +52,7 @@ export const {
     setSelectedRosette,
     setContentComplaint,
     setMessageUsers,
-    setSignalR
+    setSignalR,
+    setMessageUser,
+    setSelectedImage
 } = userSlice.actions;

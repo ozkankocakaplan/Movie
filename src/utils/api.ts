@@ -154,6 +154,9 @@ export const getAnimes = async () => {
 export const getMangas = async () => {
     return await api().get<ServiceResponse<MangaModels>>("/getMangas");
 }
+export const getManga = async (url: string) => {
+    return await api().get<ServiceResponse<MangaModels>>("/getManga/" + url);
+}
 export const getCategories = async () => {
     return await api().get<ServiceResponse<Categories>>("/getCategories");
 }
@@ -165,4 +168,7 @@ export const postContentComplaint = async (entity: ContentComplaint) => {
 }
 export const getMessages = async () => {
     return await api().get<ServiceResponse<UserMessageModel>>("/getMessages");
+}
+export const getSearchUser = async (message: string) => {
+    return await api().get<ServiceResponse<UserMessageModel>>("/getSearchUser/" + message);
 }

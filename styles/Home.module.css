@@ -485,6 +485,10 @@
   margin-right: 20px;
 }
 
+.heightInherit {
+  height: inherit !important;
+}
+
 .menuContainer {
   height: 33px;
   display: flex;
@@ -1284,7 +1288,7 @@
 
 .detailsContainer {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex: 1;
   border-radius: 0px 0px 7px 7px;
   max-height: 750px;
@@ -1292,6 +1296,38 @@
   justify-content: center;
   background: #141414;
   overflow-x: auto;
+}
+
+.detailsMangaContainer {
+  flex-direction: column;
+  border-radius: 0px 0px 7px 7px;
+  height: 95%;
+  padding: 10px;
+  justify-content: center;
+  background: #141414;
+
+}
+
+.detailsMangaContainer ::-webkit-scrollbar {
+  width: 0;
+}
+
+.detailsContent {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+}
+
+.mangaContentImages {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.mangaContentImage {
+  height: calc(100vh);
+  width: 100%;
 }
 
 .detailsContainer::-webkit-scrollbar {
@@ -1391,12 +1427,35 @@
   margin-top: 30px;
   margin-bottom: 30px;
   display: flex;
-  height: 300px;
   flex: 1;
   justify-content: center;
   align-items: center;
-  background-color: red;
-  padding: 10px;
+
+}
+
+.imageShowContainer {
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background-color: #14141495;
+  position: fixed;
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.imgShowBody {
+  width: 80%;
+  margin-top: 40px;
+}
+
+.imgShow {
+  z-index: 3000;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .detailsImagesContainer img {
@@ -1466,6 +1525,8 @@
   flex-direction: column;
   row-gap: 5px;
   flex: 1;
+  max-height: 300px;
+  overflow-y: scroll;
 }
 
 .seasonMusicBody::-webkit-scrollbar {
@@ -1507,21 +1568,7 @@
   color: rgba(255, 255, 255, 0.55);
 }
 
-.seasonsMusicContainer {
 
-  flex-direction: column;
-  max-height: 200px;
-
-}
-
-.musicContainerOverflowY {
-  overflow-y: scroll;
-  overflow-x: hidden;
-}
-
-.musicContainerOverflowY ::-webkit-scrollbar {
-  width: 0 !important;
-}
 
 
 .episdeCardname {
@@ -1876,7 +1923,7 @@
   align-items: center;
   padding: 5px 10px;
   color: rgba(255, 255, 255, 0.65);
-  font-size: 13px;
+  font-size: 66%;
   letter-spacing: 1px;
   margin-bottom: 10px;
   cursor: pointer;
@@ -2969,6 +3016,12 @@
   height: 85px !important;
 }
 
+.verticalDivider {
+  height: 100%;
+  width: 2px;
+  background-color: rgba(255, 255, 255, 0.50)
+}
+
 @media screen and (max-width:1024px) {
   .rightMenuContainer {
     display: none;
@@ -3075,5 +3128,17 @@
 
   .top100Img {
     height: 100%;
+  }
+
+  .detailsContent {
+    flex-direction: column;
+  }
+
+  .verticalDivider {
+    display: none;
+  }
+
+  .mangaContentImage {
+    height: 100% !important;
   }
 }

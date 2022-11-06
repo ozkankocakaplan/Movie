@@ -1,9 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { MangaFilter, MangaModels } from "../../types/Entites";
+import { MangaEpisodes, MangaFilter, MangaModels } from "../../types/Entites";
 
 const INITIAL_STATE = {
+    mangaModel: {} as MangaModels,
     mangaModels: [] as Array<MangaModels>,
     selectedMangaModel: {} as MangaModels,
+    selectedEpisodes: [] as Array<MangaEpisodes>,
+    selectedEpisode: {} as MangaEpisodes,
     mangaFilter: { category: { id: 0 }, point: 1, order: null, type: 0 } as MangaFilter
 }
 const mangaSlice = createSlice({
@@ -18,12 +21,24 @@ const mangaSlice = createSlice({
         },
         setMangaFilter: (state, action) => {
             state.mangaFilter = action.payload;
-        }
+        },
+        setMangaModel: (state, action) => {
+            state.mangaModel = action.payload
+        },
+        setSelectedEpisodes: (state, action) => {
+            state.selectedEpisodes = action.payload;
+        },
+        setSelectedEpisode: (state, action) => {
+            state.selectedEpisode = action.payload;
+        },
     }
 });
 export const mangaReducer = mangaSlice.reducer;
 export const {
     setMangaModels,
     setSelectedMangaModel,
-    setMangaFilter
+    setMangaFilter,
+    setMangaModel,
+    setSelectedEpisodes,
+    setSelectedEpisode
 } = mangaSlice.actions;

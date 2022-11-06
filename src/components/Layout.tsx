@@ -5,11 +5,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleLeft, faAngleRight, faAngleUp, faCamera, faClose, faPaperPlane, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { IDeleteModal, handleDeleteModal, handleOpenAddListItemModal, handleOpenBackgroundBlur, handleOpenEditListItemModal, handleOpenEditListModal, handleOpenEditUserModal, handleOpenInfoSiteModal, handleOpenLoginModal, handleOpenMessageModal, handleOpenRegisterModal, handleOpenBlockModal, handleOpenComplaintModal, handleOpenEditDynamicListModal, handleOpenRosetteModal, handleOpenAddReviews, handleOpenEditReviews, handleOpenAboutModal, handleOpenContentComplaintModal } from '../store/features/modalReducer';
-import { baseUrl, deleteAnimeList, deleteMangaList, deleteUserBlockList, deleteUserList, deleteUserListContent, getHomeSliders, getMessages, getNotifications, getSearchAnime, getSearchAnimeAndManga, getUser, getUserBySeoUrl, postAddUser, postAgainUserEmailVertification, postAnimeList, postAnimeLists, postComplaintList, postContentComplaint, postLogin, postMangaList, postMangaLists, postReviews, postUserBlockList, postUserList, postUserListContent, postUserListContents, putEmailChange, putPassword, putReviews, putUserImg, putUserInfo, putUserList } from '../utils/api';
+import { baseUrl, deleteAnimeList, deleteMangaList, deleteUserBlockList, deleteUserList, deleteUserListContent, getHomeSliders, getMessages, getNotifications, getSearchAnime, getSearchAnimeAndManga, getSearchUser, getUser, getUserBySeoUrl, postAddUser, postAgainUserEmailVertification, postAnimeList, postAnimeLists, postComplaintList, postContentComplaint, postLogin, postMangaList, postMangaLists, postReviews, postUserBlockList, postUserList, postUserListContent, postUserListContents, putEmailChange, putPassword, putReviews, putUserImg, putUserInfo, putUserList } from '../utils/api';
 import { Anime, AnimeAndMangaModels, AnimeEpisodes, AnimeList, AnimeListModels, AnimeStatus, ComplaintList, ContentComplaint, MangaList, MangaListModels, MangaStatus, Review, Type, UserBlockList, UserEmailVertification, UserFullModels, UserList, UserListContents, UserMessage, UserMessageModel, UserModel, Users } from '../types/Entites';
 import { useAuth } from '../hooks/useAuth';
 import { BorderButon } from './Buton';
-import { setIsUserBlock, setMessageUsers, setSignalR, setUser, setViewUser } from '../store/features/userReducer';
+import { setIsUserBlock, setMessageUser, setMessageUsers, setSelectedImage, setSignalR, setUser, setViewUser } from '../store/features/userReducer';
 
 import { setSearchListResult, setSelectedAnimeEpisode, setSelectedAnimeEpisodes, setSelectedMangaEpisode, setSelectedMangaEpisodes, setselectedUserListContent, setSelectedUserListContents } from '../store/features/listReducer';
 import { setNotifications } from '../store/features/notificationReducer';
@@ -32,6 +32,8 @@ interface ILayoutProps {
 export default function Layout(props: ILayoutProps) {
     const dispatch = useDispatch();
     const { user, logout } = useAuth();
+    const [signalRConnect, setSignalRConnect] = useState(false);
+    const selectedImg = useSelector((x: RootState) => x.userReducer.value.selectedImage);
     const {
         backgroundBlur,
         loginModal,
@@ -72,23 +74,28 @@ export default function Layout(props: ILayoutProps) {
     }, [backgroundBlur])
 
     const setupSignalR = async () => {
-        var connection = new HubConnectionBuilder()
-            .withUrl(baseUrl + "/userHub", {
-                accessTokenFactory() {
-                    return user.token
-                },
-                skipNegotiation: true,
-                transport: HttpTransportType.WebSockets
-            })
-            .configureLogging(LogLevel.None)
-            .build();
-        await connection.start().then((res) => {
-            connection.invoke("connect");
-        }).catch((er) => {
-            console.log(er)
-        });
+        if (!signalRConnect) {
+            setSignalRConnect(true);
+            var connection = new HubConnectionBuilder()
+                .withUrl(baseUrl + "/userHub", {
+                    accessTokenFactory() {
+                        return user.token
+                    },
+                    skipNegotiation: true,
+                    transport: HttpTransportType.WebSockets
+                })
+                .configureLogging(LogLevel.None)
+                .build();
+            await connection.start().then((res) => {
+                connection.on("getID", data => {
+                    console.log(data);
+                })
+            }).catch((er) => {
+                setSignalRConnect(false);
+            });
 
-        dispatch(setSignalR(connection));
+            dispatch(setSignalR(connection));
+        }
 
     }
     const loadUser = async () => {
@@ -118,6 +125,7 @@ export default function Layout(props: ILayoutProps) {
     return (
         <div>
             {backgroundBlur && <div className={styles.filterBlurBackground}></div>}
+            {selectedImg.length !== 0 && <SelectedImageShow />}
             {props.children}
             {contentComplaintModal && <ContentComplaintModal />}
             {aboutModal && <UserAboutModal />}
@@ -137,6 +145,20 @@ export default function Layout(props: ILayoutProps) {
             {loginModal && <LoginModal />}
             {registerModal && <RegisterModal />}
             {messageModal && <MessageModal />}
+        </div>
+    )
+}
+
+const SelectedImageShow = () => {
+    const dispatch = useDispatch();
+    const selectedImg = useSelector((x: RootState) => x.userReducer.value.selectedImage);
+    return (
+        <div onClick={() => dispatch(setSelectedImage(''))} className={styles.imageShowContainer}>
+            <div className={styles.imgShowBody}>
+                <div className={styles.imgShow}>
+                    <img src={baseUrl + selectedImg} />
+                </div>
+            </div>
         </div>
     )
 }
@@ -1674,12 +1696,13 @@ const MessageModal = () => {
     const { messageUser, user, signalR } = useSelector((x: RootState) => x.userReducer.value);
     const [selectedMessage, setSelectedMessage] = useState({} as UserMessageModel);
     const [messageText, setMessageText] = useState('');
+    const [searchUser, setSearchUser] = useState('');
+    const [searchResult, setSearchResult] = useState<Array<UserMessageModel>>([]);
     var ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
         loadGetMessages();
     }, []);
     const loadGetMessages = async () => {
-
         await getMessages().then((res) => {
             dispatch(setMessageUsers(res.data.list));
         }).catch((er) => {
@@ -1690,17 +1713,37 @@ const MessageModal = () => {
         }, 300);
 
     }
+
     const sendButon = () => {
+        var check = messageUser.find((y) => y.id === selectedMessage.id);
+        if (!check) {
+
+            dispatch(setMessageUsers([...messageUser, selectedMessage]));
+        }
         if (signalR !== undefined && Object.keys(signalR).length !== 0 && messageText.length != 0) {
-            signalR.invoke("sendUserMessage", { senderID: user.id, receiverID: selectedMessage.id, message: messageText } as UserMessage);
+            var message = { senderID: user.id, receiverID: selectedMessage.id, message: messageText } as UserMessage;
+            signalR.invoke("sendUserMessage", message);
             signalR.on("messageSent", (data: UserMessage) => {
-                [...selectedMessage.userMessages] = [...selectedMessage.userMessages, data];
-                dispatch(setMessageUsers(selectedMessage));
+                console.log(data);
+                dispatch(setMessageUsers(messageUser.map((i) => i.id === selectedMessage.id ? { ...i, userMessages: [...i.userMessages, data] } : i)));
             });
             setMessageText('');
             setTimeout(() => {
                 ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' });
             }, 100);
+        }
+    }
+    const handleSearchUser = async (e: string) => {
+        setSearchUser(e);
+        if (e.length >= 2) {
+            await getSearchUser(e).then((res) => {
+                setSearchResult(res.data.list);
+            }).catch((er) => {
+                console.log(er)
+            })
+        }
+        else {
+            setSearchResult([]);
         }
     }
     return (
@@ -1719,9 +1762,23 @@ const MessageModal = () => {
                         <div className={styles.messageBody}>
                             <div className={styles.messageUsers}>
                                 <div className={styles.searchContainer}>
-                                    <input placeholder='Kişi ara' type={"text"} className={styles.defaultSearch} />
+                                    <input placeholder='Kişi ara' value={searchUser} onChange={(e) => handleSearchUser(e.target.value)} type={"text"} className={styles.defaultSearch} />
                                 </div>
                                 {
+                                    searchResult.length != 0 &&
+                                    searchResult.map((item) => {
+                                        return <UserCard handleClick={() => {
+                                            setSearchResult([]);
+                                            setSearchUser('');
+                                            setSelectedMessage(item);
+                                            setTimeout(() => {
+                                                ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' });
+                                            }, 100);
+                                        }} key={item.id} item={item} />
+                                    })
+                                }
+                                {
+                                    messageUser !== undefined && messageUser.length !== 0 &&
                                     messageUser.map((item) => {
                                         return <UserCard handleClick={() => {
                                             setSelectedMessage(item);
@@ -1742,6 +1799,7 @@ const MessageModal = () => {
                                             <div ref={ref} className={styles.messageContent}>
                                                 <div className={styles.messages}>
                                                     {
+                                                        messageUser !== undefined && messageUser.length !== 0 &&
                                                         messageUser.filter((y) => y.id === selectedMessage.id)[0].userMessages.map((item) => {
                                                             return <MessageCard key={item.id} entity={item} whoIsSender={user.id === item.senderID ? 'SENDER' : 'RECEIVED'} />
                                                         })
@@ -1783,7 +1841,7 @@ const UserCard = (props: { item: UserMessageModel, handleClick: () => void }) =>
             </div>
             <div className={styles.messageUserCardInfo}>
                 <a>{props.item.userName}</a>
-                <div className={styles.messageSummary}>{props.item.userMessages[props.item.userMessages.length - 1].message}</div>
+                <div className={styles.messageSummary}>{props.item.userMessages.length === 0 ? "Yeni mesaj atınız" : props.item.userMessages[props.item.userMessages.length - 1].message}</div>
             </div>
         </div>
     )

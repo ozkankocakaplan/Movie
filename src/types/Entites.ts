@@ -77,12 +77,12 @@ export interface Anime extends BaseEntity {
     img: string;
     animeName: string;
     animeDescription: string;
-    malRating: string;
     ageLimit: string;
     seasonCount: number;
     showTime: string;
     status: Status;
     videoType: VideoType;
+    malRating: string;
     siteRating: string;
     seoUrl: string;
 }
@@ -109,6 +109,7 @@ export interface Ratings extends BaseEntity {
     userID: number;
     animeID: number;
     rating: number;
+    type: Type;
 }
 export interface AnimeSeason extends BaseEntity {
     seasonName: string;
@@ -210,6 +211,8 @@ export interface Manga extends BaseEntity {
     ageLimit: string;
     status: Status;
     seoUrl: string;
+    malRating: string;
+    siteRating: string;
 }
 
 export interface MangaEpisodeContent extends BaseEntity {
@@ -422,10 +425,12 @@ export interface AnimeModels {
     animeSeasonMusics: AnimeSeasonMusic[];
     animeEpisodes: AnimeEpisodes[];
     animeLists: AnimeList[];
+    animeImages: AnimeImages[];
     rating: number;
     arrangement: number;
     likeCount: number;
     viewsCount: number;
+
 }
 export interface ReviewsModels extends Review {
     anime: Anime;
@@ -434,6 +439,7 @@ export interface ReviewsModels extends Review {
     comments: Comments[];
 }
 export interface MangaModels {
+    anime: Anime;
     manga: Manga;
     like: Like;
     mangaRating: Ratings;
@@ -441,6 +447,8 @@ export interface MangaModels {
     categories: CategoryType[];
     mangaEpisodes: MangaEpisodes[];
     mangaEpisodeContents: MangaEpisodeContent[];
+    mangaImages: MangaImages[];
+    mangaLists: MangaList[];
     rating: number;
     arrangement: number;
     likeCount: number;
@@ -478,4 +486,12 @@ export interface UserMessage extends BaseEntity {
 }
 export interface UserMessageModel extends Users {
     userMessages: UserMessage[];
+}
+export interface AnimeImages extends BaseEntity {
+    animeID: number;
+    img: string | null;
+}
+export interface MangaImages extends BaseEntity {
+    mangaID: number;
+    img: string | null;
 }

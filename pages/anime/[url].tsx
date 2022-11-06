@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { AxiosError } from 'axios'
 import { useRouter } from 'next/router'
 import React, { HTMLAttributes, useEffect, useState } from 'react'
+import ReactPlayer from 'react-player'
 import { useDispatch, useSelector } from 'react-redux'
 import MenuButon, { MenuList } from '../../src/components/Buton'
 import { CommentCard } from '../../src/components/Card'
@@ -18,8 +19,9 @@ import { RootState } from '../../src/store'
 import { setAnimeModel, setSelectedEpisode, setSelectedEpisodes } from '../../src/store/features/animeReducer'
 import { setComments } from '../../src/store/features/commentsReducer'
 import { handleOpenAddReviews, handleOpenBackgroundBlur } from '../../src/store/features/modalReducer'
-import { AnimeModels, VideoType, Status, AnimeSeason, AnimeEpisodes, ContentNotification, Type, Like, Ratings, AnimeList, AnimeStatus, Comments } from '../../src/types/Entites'
-import { deleteAnimeList, deleteContentNotification, deleteLike, getAnime, getComments, postAnimeList, postComment, postContentNotification, postLike, postRating, putRating } from '../../src/utils/api'
+import { setSelectedImage } from '../../src/store/features/userReducer'
+import { AnimeModels, VideoType, Status, AnimeSeason, AnimeEpisodes, ContentNotification, Type, Like, Ratings, AnimeList, AnimeStatus, Comments, AnimeImages } from '../../src/types/Entites'
+import { baseUrl, deleteAnimeList, deleteContentNotification, deleteLike, getAnime, getComments, postAnimeList, postComment, postContentNotification, postLike, postRating, putRating } from '../../src/utils/api'
 import styles from '../../styles/Home.module.css'
 type TABS = "DETAIL" | "COMMENTS" | "STATUS";
 export default function Details() {
@@ -212,12 +214,12 @@ export default function Details() {
                                         <div style={{ display: 'flex', flex: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
                                             <StarRating rating={rating} handleRating={async (val: number) => {
                                                 if (animeModel.animeRating === null) {
-                                                    await postRating({ userID: user.id, animeID: animeModel.anime.id, rating: val } as Ratings).then((res) => {
+                                                    await postRating({ userID: user.id, animeID: animeModel.anime.id, rating: val, type: Type.Anime } as Ratings).then((res) => {
                                                         dispatch(setAnimeModel({ ...animeModel, animeRating: null as any } as AnimeModels));
                                                     });
                                                 }
                                                 else {
-                                                    await putRating({ ...animeModel.animeRating, rating: val } as Ratings).then((res) => {
+                                                    await putRating({ ...animeModel.animeRating, rating: val, type: Type.Anime } as Ratings).then((res) => {
                                                         dispatch(setAnimeModel({ ...animeModel, animeRating: res.data.entity } as AnimeModels));
                                                     });
                                                 }
@@ -259,7 +261,7 @@ export default function Details() {
                                         {
                                             selectedEpisodes.length !== 0 &&
                                             selectedEpisodes.map((item) => {
-                                                return <div onClick={() => {
+                                                return <div key={item.id} onClick={() => {
                                                     router.push(item.alternativeVideoDownloadUrl);
                                                 }} className={styles.listButons + " " + styles.userSelected}>{item.alternativeName}</div>
                                             })
@@ -370,11 +372,6 @@ const Statuss = () => {
         </div>
     )
 }
-
-
-
-
-
 interface IOptionButonProps extends HTMLAttributes<HTMLDivElement> { }
 const OptionButon = (props: IOptionButonProps) => {
     return (
@@ -411,24 +408,34 @@ export const Info = (props: { name: string }) => {
     )
 }
 const Images = () => {
+    const { animeModel } = useSelector((x: RootState) => x.animeReducer);
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const dispatch = useDispatch();
     return (
         <div className={styles.detailsBody}>
             <div className={styles.detailsHeader}>
                 <h2>Görseller</h2>
             </div>
             <Divider />
-            <div className={styles.detailsImagesContainer}>
-                <img src='http://localhost:3000/image1.png' />
-            </div>
-            <div className={styles.detailsImagesListContainer}>
-                <div className={styles.detailsImages}>
-                    <img src='http://localhost:3000/viewImage.png' />
-                    <img src='http://localhost:3000/viewImage.png' />
-                    <img src='http://localhost:3000/viewImage.png' />
-                    <img src='http://localhost:3000/viewImage.png' />
-                    <img src='http://localhost:3000/viewImage.png' />
+            {
+                animeModel.animeImages !== null && animeModel.animeImages.length !== 0 &&
+                <div>
+                    <div className={styles.detailsImagesContainer}>
+                        {
+                            <img onClick={() => dispatch(setSelectedImage(animeModel.animeImages[selectedIndex].img))} src={baseUrl + animeModel.animeImages[selectedIndex]?.img} />
+                        }
+                    </div>
+                    <div className={styles.detailsImagesListContainer}>
+                        <div className={styles.detailsImages}>
+                            {
+                                animeModel.animeImages.map((item, index) => {
+                                    return <img key={index} onClick={() => setSelectedIndex(index)} src={baseUrl + item.img} />
+                                })
+                            }
+                        </div>
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     )
 }
@@ -437,6 +444,7 @@ const Episodes = () => {
     const { animeModel } = useSelector((x: RootState) => x.animeReducer)
     const [selectedSeasons, setSelectedSeasons] = useState<AnimeSeason>({} as AnimeSeason);
     const [selectedEpisodes, setSelectedAnimeEpisodes] = useState<AnimeEpisodes>({} as AnimeEpisodes);
+
     useEffect(() => {
         var firstSeasons = animeModel.animeSeasons[0];
         setSelectedSeasons(firstSeasons);
@@ -460,7 +468,10 @@ const Episodes = () => {
             </div>
             <Divider />
             <div className={styles.detailsVideoPlayerContainer}>
-
+                {
+                    Object.keys(selectedEpisodes).length !== 0 &&
+                    <ReactPlayer url={animeModel.episodes.find((y) => y.episodeID === selectedEpisodes.id)?.alternativeVideoUrl} />
+                }
             </div>
             <div className={styles.detailsEpidoesContainer}>
                 <div className={styles.epidoseSeasons}>
@@ -495,7 +506,7 @@ const Episodes = () => {
                         <div className={styles.seasonsMusicContainer + " " + styles.musicContainerOverflowY}>
                             {
                                 animeModel.animeSeasonMusics !== null &&
-                                animeModel.animeSeasonMusics.map((item) => {
+                                animeModel.animeSeasonMusics.filter((y) => y.seasonID === selectedSeasons.id).map((item) => {
                                     return <SeasonMusicCard key={item.id} name={item.musicName} />
                                 })
                             }
@@ -511,7 +522,7 @@ interface IEpisodeCard extends React.HTMLAttributes<HTMLDivElement> {
 }
 const EpisodeCard = (props: IEpisodeCard) => {
     return (
-        <div {...props} className={styles.episode + " " + styles.episodeCardWith + " " + styles.userSelected}>
+        <div {...props} className={styles.episode + " " + styles.userSelected}>
             <div className={styles.episdeCardname}><a>{props.name}</a></div>
         </div>
     )
