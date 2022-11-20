@@ -266,6 +266,7 @@ export interface SocialMediaAccount extends BaseEntity {
     userID: number;
     gmailUrl: string;
     instagramUrl: string;
+    users: Users
 }
 
 export interface UserBlockList extends BaseEntity {
@@ -370,7 +371,7 @@ export interface UserFullModels {
     user: Users;
     userListModels: UserListModels[];
     rosettes: UserRosette[];
-    fanArts: FanArt[];
+    fanArts: FanArtModel[];
     reviews: ReviewsModels[];
     animeLists: AnimeList[];
     mangaLists: MangaList[];

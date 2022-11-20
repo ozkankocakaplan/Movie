@@ -1,4 +1,4 @@
-import { faAngleDown, faBell, faDownload, faEye, faEyeSlash, faPaperPlane, faThumbsUp } from '@fortawesome/free-solid-svg-icons'
+import { faAngleDown, faBell, faDownload, faEye, faEyeSlash, faFilter, faPaperPlane, faThumbsUp } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { AxiosError } from 'axios'
 import { useRouter } from 'next/router'
@@ -18,6 +18,7 @@ import StarRating from '../../src/components/StarRating'
 import { RootState } from '../../src/store'
 import { setAnimeModel, setSelectedEpisode, setSelectedEpisodes } from '../../src/store/features/animeReducer'
 import { setComments } from '../../src/store/features/commentsReducer'
+import { setMangaModel } from '../../src/store/features/mangaReducer'
 import { handleOpenAddReviews, handleOpenBackgroundBlur } from '../../src/store/features/modalReducer'
 import { setSelectedImage } from '../../src/store/features/userReducer'
 import { AnimeModels, VideoType, Status, AnimeSeason, AnimeEpisodes, ContentNotification, Type, Like, Ratings, AnimeList, AnimeStatus, Comments, AnimeImages } from '../../src/types/Entites'
@@ -54,6 +55,7 @@ export default function Details() {
         loadAnime();
     }, [url])
     const loadAnime = async () => {
+        dispatch(setMangaModel({}));
         if (url != undefined) {
             await getAnime(url?.toString()).then((res) => {
                 if (res.data.entity != null) {
@@ -194,6 +196,27 @@ export default function Details() {
                                                 })
                                             }
                                         }} icon={faThumbsUp} />
+                                    <MenuButon
+
+                                        width='50px'
+                                        color={"rgba(255,255,255,0.5)"}
+                                        marginright='10px' onClick={async () => {
+
+                                            if (animeModel.like === null) {
+                                                await postLike({ userID: user.id, contentID: animeModel.anime.id, type: Type.Anime, episodeID: 0 } as Like).then((res) => {
+                                                    if (res.data.isSuccessful) {
+                                                        dispatch(setAnimeModel({ ...animeModel, like: res.data.entity } as AnimeModels));
+                                                    }
+                                                })
+                                            }
+                                            else {
+                                                await deleteLike(animeModel.anime.id, Type.Anime).then((res) => {
+                                                    if (res.data.isSuccessful) {
+                                                        dispatch(setAnimeModel({ ...animeModel, like: null as any } as AnimeModels));
+                                                    }
+                                                })
+                                            }
+                                        }} icon={faFilter} />
                                 </div>
                                 <div className={styles.rightMenuContainer}>
                                     <DownButon onClick={() => {

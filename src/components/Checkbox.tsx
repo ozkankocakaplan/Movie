@@ -2,9 +2,12 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react'
 import styles from '../../styles/Home.module.css';
-export default function Checkbox(props: { selected: boolean }) {
+interface ICheckBoxProps extends React.HTMLAttributes<HTMLDivElement> {
+    selected: boolean
+}
+export default function Checkbox(props: ICheckBoxProps) {
     return (
-        <div className={styles.checkBox}>
+        <div {...props} className={styles.checkBox}>
             {
                 props.selected && <FontAwesomeIcon fontSize={12} color='#fff' icon={faCheck} />
             }

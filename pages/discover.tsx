@@ -7,18 +7,27 @@ import MenuContainer from '../src/components/MenuContainer';
 import styles from '../styles/Home.module.css';
 import Line from '../src/components/Line';
 
-import { faAngleDown, faAngleLeft, faAngleRight, faComment, faSearch, faShuffle, faThumbsUp, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faAngleLeft, faAngleRight, faComment, faFilter, faSearch, faShuffle, faThumbsUp, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../src/store';
-import { baseUrl, getCategories, getDiscovers } from '../src/utils/api';
-import { Categories, DiscoverModels, FanArt } from '../src/types/Entites';
+import { baseUrl, getCategories, getDiscovers, getSearchAnimeAndManga } from '../src/utils/api';
+import { AnimeAndMangaModels, AnimeModels, Categories, DiscoverModels, FanArt, MangaModels, Type } from '../src/types/Entites';
 import LoadingScreen from '../src/components/LoadingScreen';
 import { MemoFanArtCard, MemoReviewCard } from '../src/components/Card';
 import ReadMore from '../src/components/ReadMore';
+import { handleOpenAddReviews, handleOpenBackgroundBlur, handleOpenDiscoveryReviesModal } from '../src/store/features/modalReducer';
+import Loading from '../src/components/Loading';
+import { DiscoverSearchContainerCard, SearchResultCard } from '../src/components/SearchResultCard';
+import { setSelectedAnimeModel } from '../src/store/features/animeReducer';
+import { setSelectedMangaModel } from '../src/store/features/mangaReducer';
+import { setDiscoveryReview } from '../src/store/features/userReducer';
+import FilterModal from '../src/components/FilterModal';
 
 export default function Discover() {
-  const user = useSelector((x: RootState) => x.userReducer.value.user);
+  const dispatch = useDispatch();
+  const backgroundBlur = useSelector((x: RootState) => x.modalReducer.value.backgroundBlur);
+  const { user, discoveryReview } = useSelector((x: RootState) => x.userReducer.value);
   const [selectedMenu, setSelectedMenu] = useState<MenuList>("Anime");
   const [selectedTab, setSelectedTab] = useState<"Review" | "Fanart">("Review");
   const [animeList, setAnimeList] = useState<DiscoverModels>({} as DiscoverModels);
@@ -32,8 +41,17 @@ export default function Discover() {
   const [selectedAnimeWeekIndex, setSelectedAnimeWeekIndex] = useState(0);
   const [selectedMangaWeekIndex, setSelectedMangaWeekIndex] = useState(0);
 
+  const [searchResult, setSearchResult] = useState<Array<AnimeAndMangaModels>>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchShow, setSearchShow] = useState(false);
+
+  const [selectedSearchResult, setSelectedSearchResult] = useState<AnimeAndMangaModels>({} as AnimeAndMangaModels);
+  const [filterModalIsShow, setFilterModalIsShow] = useState(false);
+
   useEffect(() => {
     loadData();
+    setSearch('');
+    setSearchShow(false);
   }, [selectedMenu]);
   const loadData = async () => {
     setLoading(true);
@@ -74,6 +92,23 @@ export default function Discover() {
       </div>
     )
   }
+  const handleSearch = async (e: string) => {
+    setSearch(e);
+    if (e.length >= 1) {
+      setSearchShow(true);
+      setSearchLoading(true);
+      await getSearchAnimeAndManga(e).then((res) => {
+        setSearchResult(res.data.list);
+      }).catch((er) => {
+        console.log(er);
+      });
+      setSearchLoading(false);
+    } else {
+      setSearchLoading(false);
+      setSearchResult([]);
+      setSearchShow(false);
+    }
+  }
   return (
     <LoadingScreen loading={loading}>
       <div className={styles.archiveBackground}>
@@ -95,17 +130,44 @@ export default function Discover() {
                 <div className={styles.headerSuffleButon}>
                   <MenuButon width='45px' icon={faShuffle} />
                 </div>
+                <MenuButon id='shuffleButon' icon={faShuffle} />
+                <MenuButon id="headerFilterButon" onClick={() => setFilterModalIsShow(true)} marginright='0px' width='45px' icon={faFilter} />
                 <div className={styles.discoverSearchContainer}>
                   <div className={styles.searchIcon}>
                     <FontAwesomeIcon fontSize={14} icon={faSearch} color={"rgba(255,255,255,0.50)"} />
                   </div>
-                  <input type={"text"} value={search} onChange={(e) => {
-                    setSearch(e.target.value);
-                  }} />
+                  <input
+                    onFocus={() => {
+                      setSearchShow(true);
+                      dispatch(handleOpenBackgroundBlur(true));
+                    }} type={"text"} value={search} onChange={(e) => {
+                      handleSearch(e.target.value)
+                    }} />
+                  {searchShow && <div className={styles.discoverSearchResultContainer}>
+                    {
+                      searchLoading ? <Loading />
+                        :
+                        searchResult.map((item) => {
+                          return <DiscoverSearchContainerCard onClick={() => {
+                            setSearchShow(false);
+                            setSelectedSearchResult(item);
+                            dispatch(setDiscoveryReview(item));
+                            setSearch(item.name);
+                            dispatch(handleOpenBackgroundBlur(false));
+                          }} key={item.id} entity={item} />
+                        })
+                    }
+                  </div>}
                 </div>
               </div>
               <div className={styles.rightMenuContainer}>
-                <DownButon type="buton" icon={faAngleDown} name='Oluştur' />
+                <DownButon onClick={() => {
+                  if (Object.keys(discoveryReview).length !== 0) {
+                    setFilterModalIsShow(false);
+                    dispatch(handleOpenBackgroundBlur(true));
+                    dispatch(handleOpenDiscoveryReviesModal(true));
+                  }
+                }} type="buton" icon={faAngleDown} name='Oluştur' />
                 <DownButon type="buton" icon={faAngleDown} name='Tarih' />
                 <DownButon
                   show={categoryIsOpen} onClick={() => {
@@ -291,7 +353,92 @@ export default function Discover() {
             </div>
           </div>
         </div>
+        {filterModalIsShow && <FilterModal onClick={() => setFilterModalIsShow(false)}>
+          <div className={styles.discoverFilterSearchContainer}>
+
+            <div style={{ flex: 1, flexDirection: 'row', display: 'flex' }}>
+              <div className={styles.searchIcon}>
+                <FontAwesomeIcon fontSize={14} icon={faSearch} color={"rgba(255,255,255,0.50)"} />
+              </div>
+              <input
+                onFocus={() => {
+                  setSearchShow(true);
+                  dispatch(handleOpenBackgroundBlur(true));
+                }} type={"text"} value={search} onChange={(e) => {
+                  handleSearch(e.target.value)
+                }} />
+              <div className={styles.discoverFilterCreateButon} onClick={() => {
+                if (Object.keys(discoveryReview).length !== 0) {
+                  setFilterModalIsShow(false);
+                  dispatch(handleOpenBackgroundBlur(true));
+                  dispatch(handleOpenDiscoveryReviesModal(true));
+                }
+              }}>
+                Oluştur
+              </div>
+            </div>
+            {searchShow && <div className={styles.discoverFilterSearchResultContainer}>
+              {
+                searchLoading ? <Loading />
+                  :
+                  searchResult.map((item) => {
+                    return <DiscoverSearchContainerCard onClick={() => {
+                      setSearchShow(false);
+                      setSelectedSearchResult(item);
+                      dispatch(setDiscoveryReview(item));
+                      setSearch(item.name);
+                      dispatch(handleOpenBackgroundBlur(false));
+                    }} key={item.id} entity={item} />
+                  })
+              }
+            </div>}
+          </div>
+          <DownButon
+            show={categoryIsOpen} onClick={() => {
+              if (categoryIsOpen === "hide") {
+                setCategoryIsOpen('show')
+              }
+              else {
+                setCategoryIsOpen('hide')
+              }
+            }}
+            type="dropdown" icon={faAngleDown} name='Kategori'>
+            <div
+
+              className={styles.listButons + " " + styles.userSelected + " "}>Tümü</div>
+            {
+              categories.length !== 0 &&
+              categories.map((item) => {
+                return <div
+                  onClick={() => {
+
+                  }}
+                  key={item.id} className={styles.listButons + " " + styles.userSelected + " "}>{item.name}</div>
+              })
+            }
+          </DownButon>
+          <DownButon show={typeIsOpen} onClick={() => {
+            if (typeIsOpen === "hide") {
+              setTypeIsOpen('show')
+            }
+            else {
+              setTypeIsOpen('hide')
+            }
+          }} type="dropdown" icon={faAngleDown} name='Tür'>
+            <div onClick={() => {
+
+            }} className={styles.listButons + " " + styles.userSelected + " "}>Tümü</div>
+            <div onClick={() => {
+
+            }} className={styles.listButons + " " + styles.userSelected + " "}>Film</div>
+            <div onClick={() => {
+
+            }} className={styles.listButons + " " + styles.userSelected + " "}>Dizi</div>
+          </DownButon>
+          <DownButon type="buton" icon={faAngleDown} name='Popülerite' />
+          <DownButon type="buton" icon={faAngleDown} name='Tarih' />
+        </FilterModal>}
       </div>
-    </LoadingScreen>
+    </LoadingScreen >
   )
 }

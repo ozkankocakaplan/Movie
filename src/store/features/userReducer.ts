@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { ContentComplaint, Rosette, UserFullModels, UserMessageModel, Users } from "../../types/Entites";
+import { AnimeAndMangaModels, Announcement, ContentComplaint, Rosette, SocialMediaAccount, UserFullModels, UserMessageModel, Users } from "../../types/Entites";
 import { HubConnection } from '@aspnet/signalr';
 export const INITIAL_STATE = {
     user: {} as Users,
@@ -9,7 +9,10 @@ export const INITIAL_STATE = {
     contentComplaint: {} as ContentComplaint,
     messageUser: [] as Array<UserMessageModel>,
     signalR: {} as HubConnection,
-    selectedImage: '' as string
+    selectedImage: '' as string,
+    discoveryReview: {} as AnimeAndMangaModels,
+    announcement: {} as Announcement,
+    socialMediaAccounts: [] as Array<SocialMediaAccount>
 };
 export const userSlice = createSlice({
     name: 'user',
@@ -41,6 +44,15 @@ export const userSlice = createSlice({
         },
         setSelectedImage: (state, action) => {
             state.value.selectedImage = action.payload
+        },
+        setDiscoveryReview: (state, action) => {
+            state.value.discoveryReview = action.payload;
+        },
+        setAnnouncement: (state, action) => {
+            state.value.announcement = action.payload
+        },
+        setSocialMediaAccounts: (state, action) => {
+            state.value.socialMediaAccounts = action.payload
         }
     }
 });
@@ -54,5 +66,8 @@ export const {
     setMessageUsers,
     setSignalR,
     setMessageUser,
-    setSelectedImage
+    setSelectedImage,
+    setDiscoveryReview,
+    setAnnouncement,
+    setSocialMediaAccounts
 } = userSlice.actions;

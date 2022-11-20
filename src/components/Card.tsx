@@ -1,23 +1,23 @@
 import React, { memo, useEffect, useState } from 'react'
-import { faComment, faEdit, faThumbsUp, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faComment, faEdit, faPaperPlane, faThumbsUp, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { Comments, ComplaintType, ContentComplaint, FanArt, Like, Review, ReviewsModels, Type, UserFullModels, Users } from '../types/Entites';
+import { Comments, ComplaintType, ContentComplaint, FanArtModel, Like, ReviewsModels, Type, UserFullModels, Users } from '../types/Entites';
 
 import styles from '../../styles/Home.module.css';
 import { baseUrl, deleteComment, deleteFanArt, deleteLike, deleteReview, getLike, postLike } from '../utils/api';
-import { IDeleteModal, handleDeleteModal, handleOpenBackgroundBlur, handleOpenEditReviews, handleOpenComplaintModal, handleOpenContentComplaintModal } from '../store/features/modalReducer';
+import { IDeleteModal, handleDeleteModal, handleOpenBackgroundBlur, handleOpenEditReviews, handleOpenContentComplaintModal } from '../store/features/modalReducer';
 import { setSelectedReview } from '../store/features/animeReducer';
 import { setContentComplaint, setViewUser } from '../store/features/userReducer';
 import { setCommentLike, setCommentLikes, setComments } from '../store/features/commentsReducer';
 import Line from './Line';
+import SendComment from './SendComment';
 const ReviewCard = (props: { user: Users, item: any, handleDataChange?: (data: any) => void }) => {
   const dispatch = useDispatch();
   const userInfo = useSelector((x: RootState) => x.userReducer.value.user);
   const viewUser = useSelector((x: RootState) => x.userReducer.value.viewUser);
   const [commentView, setCommentView] = useState(false);
-  console.log(props.item)
   const CardImg = (props: { image: string }) => {
     return (
       <img className={styles.cardImage + " " + styles.userSelected} src={props.image} />
@@ -25,12 +25,18 @@ const ReviewCard = (props: { user: Users, item: any, handleDataChange?: (data: a
   }
   const likeButon = async () => {
     var likes = props.item.likes as Array<Like>;
-    var check = likes.find((y) => y.contentID === props.item.id);
+    var check = likes != null ? likes.find((y) => y.contentID === props.item.id) : undefined;
     if (check === undefined) {
       await postLike({ contentID: props.item.id, userID: userInfo.id, type: Type.Review } as Like).then((res) => {
-        console.log(res.data)
         if (res.data.entity != null) {
           dispatch(setCommentLike(res.data.entity));
+          if (props.handleDataChange) {
+            let entity = props.item as ReviewsModels;
+            props.handleDataChange({ ...entity, likes: [...entity.likes, res.data.entity] } as ReviewsModels)
+          }
+          else {
+            dispatch(setViewUser({ ...viewUser, reviews: viewUser.reviews.map(item => item.id == props.item.id ? { ...item, likes: [...item.likes, res.data.entity] } : item) } as UserFullModels));
+          }
         }
       }).catch((er) => {
         console.log(er);
@@ -39,6 +45,13 @@ const ReviewCard = (props: { user: Users, item: any, handleDataChange?: (data: a
     }
     else {
       await deleteLike(props.item.id, Type.Review);
+      if (props.handleDataChange) {
+        var entity = props.item as ReviewsModels;
+        props.handleDataChange({ ...entity, likes: entity.likes.filter((y) => y.id !== check?.id) } as ReviewsModels)
+      }
+      else {
+        dispatch(setViewUser({ ...viewUser, reviews: viewUser.reviews.map(item => item.id == props.item.id ? { ...item, likes: likes.filter((y) => y.id !== check?.id) } : item) } as UserFullModels));
+      }
       dispatch(setCommentLikes(likes.filter((y) => y.id !== check?.id)))
     }
   }
@@ -64,18 +77,13 @@ const ReviewCard = (props: { user: Users, item: any, handleDataChange?: (data: a
                 <FontAwesomeIcon fontSize={15} color='rgba(255, 255, 255, 0.50)' icon={faWarning} />
               </div>
               <div onClick={() => setCommentView(!commentView)} className={styles.fanArtIconButons}>
-                <FontAwesomeIcon fontSize={15}
-                  color={props.item.likes.find((y: any) => y.contentID === props.item.id) === undefined ? 'rgba(255, 255, 255, 0.50)' : 'rgb(253, 188, 11)'}
-                  icon={faThumbsUp} />
+                <FontAwesomeIcon fontSize={15} color='rgba(255, 255, 255, 0.50)' icon={faComment} />
               </div>
               <div onClick={likeButon} className={styles.fanArtIconButons}>
                 <FontAwesomeIcon fontSize={15}
-                  color={'rgb(253, 188, 11)'}
+                  color={props.item.likes !== undefined && props.item.likes !== null ? props.item.likes.find((y: any) => y.contentID === props.item.id) === undefined ? 'rgba(255, 255, 255, 0.50)' : 'rgb(253, 188, 11)' : 'rgba(255, 255, 255, 0.50)'}
                   icon={faThumbsUp} />
               </div>
-              {/* {props.user.id === props.item.userID && <div className={styles.fanArtIconButons}>
-                <FontAwesomeIcon fontSize={15} color='rgba(255, 255, 255, 0.50)' icon={faTrash} />
-              </div>} */}
             </div>
           </div>
         </div>
@@ -96,6 +104,14 @@ const ReviewCard = (props: { user: Users, item: any, handleDataChange?: (data: a
               </div>
             })
           }
+          <div className={styles.discoverComment + " " + styles.userSelected}>
+            <SendComment contentID={props.item.id} type={Type.Review} handleData={(data: any) => {
+              var entity = props.item as ReviewsModels;
+              if (props.handleDataChange) {
+                props.handleDataChange({ ...entity, comments: [...entity.comments, data] } as ReviewsModels)
+              }
+            }} />
+          </div>
         </div>}
 
         <div className={styles.listOptions}>
@@ -249,6 +265,14 @@ const FanArtCard = (props: { entity: any, handleDataChange?: (data: any) => void
                 </div>
               })
             }
+            <div className={styles.discoverComment + " " + styles.userSelected}>
+              <SendComment contentID={props.entity.id} type={Type.FanArt} handleData={(data: any) => {
+                var entity = props.entity as FanArtModel;
+                if (props.handleDataChange) {
+                  props.handleDataChange({ ...entity, comments: [...entity.comments, data] } as FanArtModel)
+                }
+              }} />
+            </div>
           </div>}
         </div>
         <div className={styles.listOptions}>
@@ -306,12 +330,15 @@ const FanArtCard = (props: { entity: any, handleDataChange?: (data: any) => void
   )
 }
 const CommentCard = (props: { item: Comments }) => {
+  console.log(props.item)
   const dispatch = useDispatch();
   const user = useSelector((x: RootState) => x.userReducer.value.user);
   const { commentLikes, comments } = useSelector((x: RootState) => x.commentReducer);
+  const [isSpoiler, setIsSpoiler] = useState(props.item.isSpoiler);
   useEffect(() => {
     loadLike();
-  }, [])
+    setIsSpoiler(props.item.isSpoiler);
+  }, [props.item])
   const loadLike = async () => {
     await getLike(props.item.id, Type.Comment).then((res) => {
       if (res.data.entity != null) {
@@ -343,13 +370,23 @@ const CommentCard = (props: { item: Comments }) => {
       <div className={styles.fanArtContainerImg}>
         <div className={styles.fanArtImg}>
           <div className={styles.shareUserName}><a>{props.item.users.userName}</a></div>
-          <img src={baseUrl + props.item.users.image} />
+          {
+            props.item.users.image !== null && props.item.users.image.length !== 0 ?
+              <img src={baseUrl + props.item.users.image} />
+              :
+              <img src={"http://localhost:3000/profilePhoto.png"} />
+          }
+
         </div>
         <div className={styles.ImgDivider}></div>
       </div>
       <div className={styles.fanArtBody}>
         {
-          props.item.comment
+          !isSpoiler ?
+            props.item.comment
+            :
+            <div onClick={() => setIsSpoiler(!isSpoiler)} className={styles.isSpoiler}>Spoiler alan görüntülemek için tıklayınız</div>
+
         }
       </div>
       <div className={styles.fanArtRight}>
@@ -357,7 +394,11 @@ const CommentCard = (props: { item: Comments }) => {
           <div className={styles.ImgDivider}></div>
         </div>
         <div>
-          <div className={styles.fanArtIconButons}>
+          <div onClick={() => {
+            dispatch(handleOpenBackgroundBlur(true));
+            dispatch(setContentComplaint({ contentID: props.item.id, type: Type.Comment, complaintType: ComplaintType.Content } as ContentComplaint));
+            dispatch(handleOpenContentComplaintModal(true));
+          }} className={styles.fanArtIconButons}>
             <FontAwesomeIcon fontSize={15} color='rgba(255, 255, 255, 0.50)' icon={faWarning} />
           </div>
           <div onClick={async () => {

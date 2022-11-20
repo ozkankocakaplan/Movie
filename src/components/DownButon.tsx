@@ -13,7 +13,7 @@ const DownButon = (props: IButonProps) => {
     return (<div>
         <div {...props} className={styles.downMenuButon}>
             {
-                props.icon !== undefined ? <span style={{ display: 'flex', flex: 1, justifyContent: 'space-around', flexDirection: 'row' }}>
+                props.icon !== undefined ? <span className={styles.dropdownContainer}>
                     {props.name}
                     {props.type === 'dropdown' && <FontAwesomeIcon icon={props.icon} />}
                 </span> : props.name

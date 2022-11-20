@@ -15,6 +15,7 @@ import MenuContainer from '../../src/components/MenuContainer'
 import StarRating from '../../src/components/StarRating'
 
 import { RootState } from '../../src/store'
+import { setAnimeModel } from '../../src/store/features/animeReducer'
 import { setComments } from '../../src/store/features/commentsReducer'
 import { setMangaModel, setSelectedEpisode } from '../../src/store/features/mangaReducer'
 import { handleOpenAddReviews, handleOpenBackgroundBlur } from '../../src/store/features/modalReducer'
@@ -52,6 +53,7 @@ export default function Details() {
         loadmanga();
     }, [url])
     const loadmanga = async () => {
+        dispatch(setAnimeModel({}));
         if (url != undefined) {
             await getManga(url as any).then((res) => {
                 if (res.data.entity != null) {

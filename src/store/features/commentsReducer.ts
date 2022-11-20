@@ -3,7 +3,7 @@ import { Comments, Like } from "../../types/Entites";
 
 export const INITIAL_STATE = {
     comments: [] as Array<Comments>,
-    commentLikes: [] as Array<Like>
+    commentLikes: [] as Array<Like>,
 }
 export const commentSlice = createSlice({
     name: 'commentSlice',
@@ -13,7 +13,6 @@ export const commentSlice = createSlice({
             state.comments = action.payload;
         },
         setComment: (state, action) => {
-            console.log(action);
             state.comments = [state.comments, action.payload];
         },
         setCommentLikes: (state, action) => {

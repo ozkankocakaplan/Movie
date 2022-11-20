@@ -16,6 +16,7 @@ import { baseUrl, getNotifications, getSearchAnimeAndManga } from '../utils/api'
 import { AnimeAndMangaModels, Notification, NotificationType, Type, VideoType } from '../types/Entites';
 import Loading from './Loading';
 import { useRouter } from 'next/router';
+import { SearchResultCard } from './SearchResultCard';
 
 
 
@@ -135,31 +136,7 @@ export default function Header(props: IHeaderProps) {
         </div >
     )
 }
-const SearchResultCard = (props: { entity: AnimeAndMangaModels }) => {
-    var navigate = useRouter();
-    return (
-        <div className={styles.searchResultCard}>
-            <div style={{ cursor: 'pointer' }} onClick={() => {
-                if (props.entity.type === Type.Anime) {
-                    navigate.push("/anime/" + props.entity.url)
-                }
-                else {
-                    navigate.push("/manga/" + props.entity.url);
-                }
-            }} className={styles.searchResultImg}>
-                <img src={baseUrl + props.entity.img} />
-            </div>
-            <div className={styles.searchResultContent}>
-                <div className={styles.searchContentButon}>Toplam Gönderi: {props.entity.fanArtCount + props.entity.reviewsCount}</div>
-                {props.entity.type === Type.Anime && <div className={styles.searchContentButon}>Tür: {props.entity.videoType == VideoType.AnimeSeries ? " Dizi" : "Film"}</div>}
-                <div className={styles.searchContentButon}>Eleştiri: {props.entity.reviewsCount}</div>
-                <div className={styles.searchContentButon}>Sıralama: {props.entity.arrangement}</div>
-                <div className={styles.searchContentButon}>Fan Art: {props.entity.fanArtCount}</div>
-                <div className={styles.searchContentButon}>Beğeni: {props.entity.like}</div>
-            </div>
-        </div>
-    )
-}
+
 export const NotificationsContainer = () => {
     const [selectedTabs, setSelectedTabs] = useState<number>(1);
     const notifications = useSelector((x: RootState) => x.notificationReducer.notifications);

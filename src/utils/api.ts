@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Anime, AnimeAndMangaModels, AnimeList, AnimeModels, Categories, Comments, ComplaintList, ContentComplaint, ContentNotification, DiscoverModels, FanArt, HomeSlider, Like, Manga, MangaList, MangaModels, Notification, Ratings, Review, Type, UserBlockList, UserEmailVertification, UserList, UserListContents, UserMessageModel, UserModel, Users } from '../types/Entites';
+import { Anime, AnimeAndMangaModels, AnimeList, AnimeModels, Announcement, Categories, Comments, ComplaintList, Contact, ContactSubject, ContentComplaint, ContentNotification, DiscoverModels, FanArt, HomeSlider, Like, Manga, MangaList, MangaModels, Notification, Ratings, Review, SocialMediaAccount, Type, UserBlockList, UserEmailVertification, UserList, UserListContents, UserMessageModel, UserModel, Users } from '../types/Entites';
 import ServiceResponse from '../types/ServiceResponse';
 export const baseUrl = "http://192.168.2.175:37323";
 export default function api() {
@@ -171,4 +171,16 @@ export const getMessages = async () => {
 }
 export const getSearchUser = async (message: string) => {
     return await api().get<ServiceResponse<UserMessageModel>>("/getSearchUser/" + message);
+}
+export const addContact = async (entity: Contact) => {
+    return await api().post<ServiceResponse<Contact>>("/addContact", entity);
+}
+export const getContactSubject = async () => {
+    return await api().get<ServiceResponse<ContactSubject>>("/getContactSubjects");
+}
+export const getAnnouncements = async () => {
+    return await api().get<ServiceResponse<Announcement>>("/getAnnouncements");
+}
+export const getSocialMediaAccounts = async () => {
+    return await api().get<ServiceResponse<SocialMediaAccount>>("/getSocialMediaAccounts");
 }

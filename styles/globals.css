@@ -14,10 +14,12 @@ a {
   color: inherit;
   text-decoration: none;
 }
-p{
+
+p {
   margin: 0px;
   padding: 0px;
 }
+
 * {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -42,3 +44,19 @@ ul li {
   user-select: none;
 }
 
+#headerFilterButon {
+  display: none;
+}
+#shuffleButon{
+  display: none;
+}
+@media screen and (max-width:1024px) {
+  #headerFilterButon {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+  }
+  #shuffleButon{
+    display: flex !important;
+  }
+}

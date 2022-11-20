@@ -4,12 +4,12 @@ import { RootState } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleLeft, faAngleRight, faAngleUp, faCamera, faClose, faPaperPlane, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { IDeleteModal, handleDeleteModal, handleOpenAddListItemModal, handleOpenBackgroundBlur, handleOpenEditListItemModal, handleOpenEditListModal, handleOpenEditUserModal, handleOpenInfoSiteModal, handleOpenLoginModal, handleOpenMessageModal, handleOpenRegisterModal, handleOpenBlockModal, handleOpenComplaintModal, handleOpenEditDynamicListModal, handleOpenRosetteModal, handleOpenAddReviews, handleOpenEditReviews, handleOpenAboutModal, handleOpenContentComplaintModal } from '../store/features/modalReducer';
-import { baseUrl, deleteAnimeList, deleteMangaList, deleteUserBlockList, deleteUserList, deleteUserListContent, getHomeSliders, getMessages, getNotifications, getSearchAnime, getSearchAnimeAndManga, getSearchUser, getUser, getUserBySeoUrl, postAddUser, postAgainUserEmailVertification, postAnimeList, postAnimeLists, postComplaintList, postContentComplaint, postLogin, postMangaList, postMangaLists, postReviews, postUserBlockList, postUserList, postUserListContent, postUserListContents, putEmailChange, putPassword, putReviews, putUserImg, putUserInfo, putUserList } from '../utils/api';
-import { Anime, AnimeAndMangaModels, AnimeEpisodes, AnimeList, AnimeListModels, AnimeStatus, ComplaintList, ContentComplaint, MangaList, MangaListModels, MangaStatus, Review, Type, UserBlockList, UserEmailVertification, UserFullModels, UserList, UserListContents, UserMessage, UserMessageModel, UserModel, Users } from '../types/Entites';
+import { IDeleteModal, handleDeleteModal, handleOpenAddListItemModal, handleOpenBackgroundBlur, handleOpenEditListItemModal, handleOpenEditListModal, handleOpenEditUserModal, handleOpenInfoSiteModal, handleOpenLoginModal, handleOpenMessageModal, handleOpenRegisterModal, handleOpenBlockModal, handleOpenComplaintModal, handleOpenEditDynamicListModal, handleOpenRosetteModal, handleOpenAddReviews, handleOpenEditReviews, handleOpenAboutModal, handleOpenContentComplaintModal, handleOpenDiscoveryReviesModal } from '../store/features/modalReducer';
+import { addContact, baseUrl, deleteAnimeList, deleteMangaList, deleteUserBlockList, deleteUserList, deleteUserListContent, getAnnouncements, getContactSubject, getHomeSliders, getMessages, getNotifications, getSearchAnime, getSearchAnimeAndManga, getSearchUser, getSocialMediaAccounts, getUser, getUserBySeoUrl, postAddUser, postAgainUserEmailVertification, postAnimeList, postAnimeLists, postComplaintList, postContentComplaint, postLogin, postMangaList, postMangaLists, postReviews, postUserBlockList, postUserList, postUserListContent, postUserListContents, putEmailChange, putPassword, putReviews, putUserImg, putUserInfo, putUserList } from '../utils/api';
+import { Anime, AnimeAndMangaModels, AnimeEpisodes, AnimeList, AnimeListModels, AnimeStatus, ComplaintList, Contact, ContactSubject, ContentComplaint, MangaList, MangaListModels, MangaStatus, Review, RoleType, Type, UserBlockList, UserEmailVertification, UserFullModels, UserList, UserListContents, UserMessage, UserMessageModel, UserModel, Users } from '../types/Entites';
 import { useAuth } from '../hooks/useAuth';
 import { BorderButon } from './Buton';
-import { setIsUserBlock, setMessageUser, setMessageUsers, setSelectedImage, setSignalR, setUser, setViewUser } from '../store/features/userReducer';
+import { setAnnouncement, setIsUserBlock, setMessageUser, setMessageUsers, setSelectedImage, setSignalR, setSocialMediaAccounts, setUser, setViewUser } from '../store/features/userReducer';
 
 import { setSearchListResult, setSelectedAnimeEpisode, setSelectedAnimeEpisodes, setSelectedMangaEpisode, setSelectedMangaEpisodes, setselectedUserListContent, setSelectedUserListContents } from '../store/features/listReducer';
 import { setNotifications } from '../store/features/notificationReducer';
@@ -53,7 +53,9 @@ export default function Layout(props: ILayoutProps) {
         addReviews,
         editReviews,
         aboutModal,
-        contentComplaintModal
+        contentComplaintModal,
+        discoveryReviewModal,
+
 
     } = useSelector((state: RootState) => state.modalReducer.value);
     useEffect(() => {
@@ -63,6 +65,8 @@ export default function Layout(props: ILayoutProps) {
             setupSignalR();
         }
         loadHomeSlider();
+        loadAnnouncement();
+        loadSocialMediaAccount();
     }, []);
     useEffect(() => {
         if (backgroundBlur) {
@@ -72,7 +76,20 @@ export default function Layout(props: ILayoutProps) {
             document.body.style.overflow = 'auto';
         }
     }, [backgroundBlur])
-
+    const loadAnnouncement = async () => {
+        await getAnnouncements().then((res) => {
+            dispatch(setAnnouncement(res.data.list[0]));
+        }).catch((er) => {
+            console.log(er);
+        })
+    }
+    const loadSocialMediaAccount = async () => {
+        await getSocialMediaAccounts().then((res) => {
+            dispatch(setSocialMediaAccounts(res.data.list));
+        }).catch((er) => {
+            console.log(er);
+        })
+    }
     const setupSignalR = async () => {
         if (!signalRConnect) {
             setSignalRConnect(true);
@@ -124,9 +141,10 @@ export default function Layout(props: ILayoutProps) {
     }
     return (
         <div>
-            {backgroundBlur && <div className={styles.filterBlurBackground}></div>}
+            {backgroundBlur && <div onClick={() => dispatch(handleOpenBackgroundBlur(false))} className={styles.filterBlurBackground}></div>}
             {selectedImg.length !== 0 && <SelectedImageShow />}
             {props.children}
+            {discoveryReviewModal && <AddDiscoveryReviewsModal />}
             {contentComplaintModal && <ContentComplaintModal />}
             {aboutModal && <UserAboutModal />}
             {editReviews && <EditReviewsModal />}
@@ -178,11 +196,54 @@ const RosetteInfoModal = () => {
         </Modal>
     )
 }
+const AddDiscoveryReviewsModal = () => {
+    const dispatch = useDispatch();
+    const { user, discoveryReview } = useSelector((x: RootState) => x.userReducer.value);
+    const [form, setForm] = useState<Review>({ userID: user.id, contentID: discoveryReview.id, message: '', type: discoveryReview.type } as Review);
+    const [isSuccess, setIsSuccess] = useState(false);
+    const saveButon = async () => {
+        await postReviews(form).then((res) => {
+            if (res.data.isSuccessful) {
+                setIsSuccess(true);
+                window.location.reload();
+            }
+        });
+    }
+    return (
+        <Modal width={600} onClick={() => {
+            dispatch(handleOpenBackgroundBlur(false))
+            setIsSuccess(false);
+            dispatch(handleOpenDiscoveryReviesModal(false));
+
+        }}>
+            {!isSuccess ? <div style={{ marginLeft: '10px', marginRight: '10px', }}>
+                <div className={styles.registerCol}>
+                    <div className={styles.registerLeftCol} style={{ flex: 1 }}>
+                        <textarea
+                            value={form.message}
+                            onChange={(e) => setForm({ ...form, message: e.target.value })}
+                            style={{ color: 'rgba(255, 255, 255, 0.50)' }}
+                            placeholder='Eleştiri' className={styles["pr"] + " " + styles.registerInput + " " + styles.smallInput}
+                            rows={4}></textarea>
+                    </div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+                    <BorderButon onClick={saveButon} name='Kaydet' />
+                </div>
+            </div>
+                : <div style={{ marginLeft: '10px', marginRight: '10px', textAlign: 'center', paddingBottom: '20px', color: 'rgba(255, 255, 255, 0.50)' }}>
+                    Eleştiriniz oluşturulmuştur.
+                </div>
+            }
+        </Modal>
+    )
+}
 const AddReviewsModal = () => {
     const dispatch = useDispatch();
     const { user } = useSelector((x: RootState) => x.userReducer.value);
     const { animeModel } = useSelector((x: RootState) => x.animeReducer);
-    const [form, setForm] = useState<Review>({ userID: user.id, contentID: animeModel.anime.id, message: '', type: Type.Anime } as Review);
+    const { mangaModel } = useSelector((x: RootState) => x.mangaReducer);
+    const [form, setForm] = useState<Review>({ userID: user.id, contentID: Object.keys(animeModel).length !== 0 ? animeModel.anime.id : mangaModel.manga.id, message: '', type: Type.Anime } as Review);
     const [isSuccess, setIsSuccess] = useState(false);
     const saveButon = async () => {
         await postReviews(form).then((res) => {
@@ -270,33 +331,31 @@ const EditReviewsModal = () => {
 const SiteInfoModal = () => {
     const [steps, setSteps] = useState<number>(1);
     const dispatch = useDispatch();
+    const { announcement, socialMediaAccounts } = useSelector((x: RootState) => x.userReducer.value);
     const About = () => {
         return (<div className={styles.about}>
             <div className={styles.aboutContainer}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehen-derit in voluptate velit esse cillum dolore eu fugiat nul
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehen-derit in voluptate velit esse cillum dolore eu fugiat nul
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehen-derit in voluptate velit esse cillum dolore eu fugiat nul
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehen-derit in voluptate velit esse cillum dolore eu fugiat nul
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehen-derit in voluptate velit esse cillum dolore eu fugiat nul
+                {announcement.about}
             </div>
             <div className={styles.aboutContainer}>
-                <AboutSocialCard name='Eray Atmaca' role='Admin' />
-                <AboutSocialCard name='Eray Atmaca' role='Admin' />
-                <AboutSocialCard name='Eray Atmaca' role='Admin' />
-                <AboutSocialCard name='Eray Atmaca' role='Admin' />
-                <AboutSocialCard name='Eray Atmaca' role='Admin' />
+                {
+                    socialMediaAccounts.length !== 0 &&
+                    socialMediaAccounts.map((item) => {
+                        return <AboutSocialCard instagramUrl={item.instagramUrl} gmailUrl={item.gmailUrl} key={item.id} name={item.users.nameSurname} role={item.users.roleType === RoleType.Admin ? "Admin" : "Moderatör"} />
+                    })
+                }
             </div>
         </div>)
     }
-    const AboutSocialCard = (props: { instagramUrl?: string, gmailUrl?: string, role: string, name: string }) => {
+    const AboutSocialCard = (props: { img?: string, instagramUrl?: string, gmailUrl?: string, role: string, name: string }) => {
         return (
             <div className={styles.aboutSocialCard}>
                 <div className={styles.aboutSocialCardBody}>
-                    <img height={125} width={125} src='http://localhost:3000/socialProfile.png' />
+                    <img height={125} width={125} src={props.img !== undefined && props.img.length !== 0 ? baseUrl + props.img : 'http://localhost:3000/socialProfile.png'} />
                     <div className={styles.aboutSocialInfo}>
                         <div className={styles.rowDirection}>
                             <div>{props.name}</div>
-                            <Link href={props.instagramUrl !== undefined ? props.instagramUrl : "#"}>
+                            <Link target={"_blank"} href={props.gmailUrl !== undefined ? props.gmailUrl : "#"}>
                                 <a>
                                     <img height={30} width={30} src='http://localhost:3000/smallGmail.png' />
                                 </a>
@@ -304,7 +363,7 @@ const SiteInfoModal = () => {
                         </div>
                         <div className={styles.rowDirection}>
                             <div className={styles.aboutContainerRoleText}>{props.role}</div>
-                            <Link href={props.gmailUrl !== undefined ? props.gmailUrl : "#"}>
+                            <Link target={"_blank"} href={props.instagramUrl !== undefined ? props.instagramUrl : "#"}>
                                 <a>
                                     <img height={30} width={30} src='http://localhost:3000/smallInstagram.png' />
                                 </a>
@@ -317,21 +376,70 @@ const SiteInfoModal = () => {
         )
     }
     const Contact = () => {
+        const [sendInfo, setSendInfo] = useState('');
+        const [form, setForm] = useState<Contact>({ nameSurname: '', email: '', subject: '', message: '' } as Contact);
+        const [subjectList, setSubjectList] = useState<Array<ContactSubject>>([]);
+        const [name, setName] = useState('');
+        const [surName, setSurName] = useState('');
+        const [check, setCheck] = useState(false);
+        useEffect(() => {
+            loadSubject();
+        }, [])
+        const loadSubject = async () => {
+            await getContactSubject().then((res) => {
+                setSubjectList(res.data.list);
+            });
+        }
+        const sendButon = async () => {
+            if (name.length !== 0 && surName.length !== 0 && form.subject.length !== 0 && form.email.length !== 0) {
+                setCheck(false);
+                await addContact({ ...form, nameSurname: name + " " + surName }).then((res) => {
+                    setSendInfo("İletildi");
+                }).catch((er) => {
+                    setSendInfo("Bir hata oluştu tekrar deneyiniz");
+                });
+            }
+            else {
+                setCheck(true);
+            }
+
+        }
         return (<div className={styles.contact}>
             <div className={styles.contactContainer}>
+                {sendInfo.length !== 0 && <span className={styles.sendInfo}>{sendInfo}</span>}
                 <div className={styles.row}>
                     <div className={styles.contactForm}>
-                        <input placeholder='Ad' type={"text"} className={styles.defaultInput + " " + styles.contactInput} />
-                        <input placeholder='Soyad' type={"text"} className={styles.defaultInput + " " + styles.contactInput} />
-                        <input placeholder='E-posta' type={"text"} className={styles.defaultInput + " " + styles.contactInput} /></div>
+                        <input
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder='Ad' type={"text"} className={styles.defaultInput + " " + styles.contactInput + " " + (check && name.length === 0 ? styles.errorBorder : undefined)} />
+                        <input
+                            value={surName}
+                            onChange={(e) => setSurName(e.target.value)}
+                            placeholder='Soyad' type={"text"} className={styles.defaultInput + " " + styles.contactInput + " " + (check && surName.length === 0 ? styles.errorBorder : undefined)} />
+                        <input
+                            value={form.email}
+                            onChange={(e) => setForm({ ...form, email: e.target.value })}
+                            placeholder='E-posta' type={"text"} className={styles.defaultInput + " " + styles.contactInput + " " + (check && form.email.length === 0 ? styles.errorBorder : undefined)} /></div>
                     <div className={styles.contactSendButonContainer}>
-                        <button className={styles.contactSendButon}>
+                        <button onClick={sendButon} className={styles.contactSendButon}>
                             Gönder
                         </button>
                     </div>
                 </div>
-                <input placeholder='Konu' type={"text"} className={styles.defaultInput + " " + styles.contactInput} />
-                <textarea placeholder='Konu' className={styles.defaultInput + " " + styles.defaultTextare} />
+                <select className={styles.subjectSelect + " " + (check && form.subject.length === 0 ? styles.errorBorder : undefined)}>
+                    <option value={0}>Konu</option>
+                    {
+                        subjectList.length !== 0 &&
+                        subjectList.map((item) => {
+                            return <option onClick={() => setForm({ ...form, subject: item.subject })} key={item.id}>{item.subject}</option>
+                        })
+                    }
+                </select>
+                <textarea
+                    value={form.message}
+                    onChange={(e) => setForm({ ...form, message: e.target.value })}
+                    placeholder='Mesajınız' className={styles.defaultInput + " " + styles.defaultTextare + " " + (check && form.message.length === 0 ? styles.errorBorder : undefined)} />
             </div>
             <div className={styles.contactContainer}>
                 <div className={styles.contactSocialCard}>
@@ -368,36 +476,37 @@ const SiteInfoModal = () => {
         )
     }
     const Announcements = () => {
+        const announcement = useSelector((x: RootState) => x.userReducer.value.announcement);
         return (<div className={styles.announcementsContainer}>
             <AnnouncementsCard title="Güncelleme"
-                date={new Date().toLocaleDateString()}
+                date={new Date(announcement.updateDate).toLocaleDateString()}
                 imageSrc="http://localhost:3000/guncelleme.png">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit,  sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                {announcement.updateInformation}
             </AnnouncementsCard>
             <AnnouncementsCard title="Yenilikler"
-                date={new Date().toLocaleDateString()}
+                date={new Date(announcement.innovationDate).toLocaleDateString()}
                 imageSrc="http://localhost:3000/yenilik.png">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit,  sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                {announcement.innovationInformation}
             </AnnouncementsCard>
             <AnnouncementsCard title="Şikayetler"
-                date={new Date().toLocaleDateString()}
+                date={new Date(announcement.complaintsDate).toLocaleDateString()}
                 imageSrc="http://localhost:3000/sikayetler.png">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit,  sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                {announcement.complaintsInformation}
             </AnnouncementsCard>
             <AnnouncementsCard title="Eklenecekler"
-                date={new Date().toLocaleDateString()}
+                date={new Date(announcement.addDate).toLocaleDateString()}
                 imageSrc="http://localhost:3000/eklenecekler.png">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit,  sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                {announcement.addToInformation}
             </AnnouncementsCard>
             <AnnouncementsCard title="Uyarı"
-                date={new Date().toLocaleDateString()}
+                date={new Date(announcement.warningDate).toLocaleDateString()}
                 imageSrc="http://localhost:3000/uyari.png">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit,  sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                {announcement.warningInformation}
             </AnnouncementsCard>
             <AnnouncementsCard title="Yakında"
-                date={new Date().toLocaleDateString()}
+                date={new Date(announcement.comingSoonDate).toLocaleDateString()}
                 imageSrc="http://localhost:3000/yakinda.png">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit,  sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                {announcement.comingSoonInfo}
             </AnnouncementsCard>
         </div>)
     }
@@ -495,7 +604,10 @@ const EditUserModal = () => {
         setNameSurname(userInfo.nameSurname);
         setUserName(userInfo.userName);
         setEmail(userInfo.email);
-        setSelectedUser(baseUrl + userInfo.image);
+        console.log(userInfo.image);
+        if (userInfo.image != null && userInfo.image.length !== 0) {
+            setSelectedUser(baseUrl + userInfo.image);
+        }
         setAbout(userInfo.about != null ? userInfo.about : '');
     }, [userInfo])
 
@@ -1462,7 +1574,7 @@ const RegisterModal = () => {
 
     const [registerResult, setRegisterResult] = useState<ServiceResponse<Users>>({} as ServiceResponse<Users>);
     const [vertificationResult, setVertificationResult] = useState<ServiceResponse<UserEmailVertification | Users>>({} as ServiceResponse<UserEmailVertification | Users>);
-
+    const [selectedContract, setSelectedContract] = useState(false);
 
     const saveButon = async () => {
         setRegisterResult({} as ServiceResponse<Users>);
@@ -1643,6 +1755,10 @@ const RegisterModal = () => {
                             :
                             <div className={styles.errorText}>{registerResult.exceptionMessage}</div>
                     }
+                    <div className={styles.contractContainer}>
+                        <Checkbox onClick={() => setSelectedContract(!selectedContract)} selected={selectedContract} />
+                        <span><Link href={"/contract"}><a target={"_blank"} style={{ textDecoration: 'underline', color: 'rgba(255, 255, 255, 0.55)', cursor: 'pointer' }}>Gizlilik sözleşmesini</a></Link> okudum ve kabul ediyorum</span>
+                    </div>
                     <div className={styles.registerCol}>
                         <input
                             onClick={saveButon}
