@@ -1,4 +1,4 @@
-import { faAngleDown, faBell, faEye, faEyeSlash, faPaperPlane, faThumbsUp } from '@fortawesome/free-solid-svg-icons'
+import { faAngleDown, faBell, faEye, faEyeSlash, faFilter, faPaperPlane, faThumbsUp } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { AxiosError } from 'axios'
 import { useRouter } from 'next/router'
@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import MenuButon, { MenuList } from '../../src/components/Buton'
 import { CommentCard } from '../../src/components/Card'
 import DownButon from '../../src/components/DownButon'
+import FilterModal from '../../src/components/FilterModal'
 import Header from '../../src/components/Header'
 import Line from '../../src/components/Line'
 import Loading from '../../src/components/Loading'
@@ -40,7 +41,7 @@ export default function Details() {
     const [loading, setLoading] = useState(true);
 
     const user = useSelector((x: RootState) => x.userReducer.value.user);
-
+    const [isFilterShow, setIsFilterShow] = useState(false);
     const { mangaModel, selectedEpisode, selectedEpisodes } = useSelector((x: RootState) => x.mangaReducer);
     var contentImagesRef = useRef<HTMLDivElement>(null);
 
@@ -189,6 +190,24 @@ export default function Details() {
                                                 })
                                             }
                                         }} icon={faThumbsUp} />
+                                    <MenuButon
+                                        id="headerFilterButon"
+                                        width='50px'
+                                        color={"rgba(255,255,255,0.5)"}
+                                        marginright='10px' onClick={() => {
+                                            setIsRead(!isRead);
+                                            if (isRead) {
+                                                dispatch(setSelectedEpisode({}));
+                                            }
+                                            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                                        }} icon={!isRead ? faEye : faEyeSlash} />
+                                    <MenuButon
+                                        id="headerFilterButon"
+                                        width='50px'
+                                        color={"rgba(255,255,255,0.5)"}
+                                        marginright='0px' onClick={async () => {
+                                            setIsFilterShow(true);
+                                        }} icon={faFilter} />
                                 </div>
                                 <div className={styles.rightMenuContainer}>
                                     <DownButon onClick={() => {
@@ -290,6 +309,67 @@ export default function Details() {
 
                         </div>
                     </div>
+                    {isFilterShow && <FilterModal onClick={() => setIsFilterShow(false)}>
+                        <div style={{ marginBottom: '10px' }}>
+                            <DownButon onClick={() => {
+                                dispatch(handleOpenBackgroundBlur(true));
+                                dispatch(handleOpenAddReviews(true));
+                            }} type='buton' icon={faAngleDown} name='Oluştur' />
+                        </div>
+                        <div style={{ marginBottom: '10px' }}>
+                            <DownButon
+                                onClick={() => {
+                                    if (pointPanelShow === "hide") {
+                                        setPointPanelShow('show')
+                                    }
+                                    else {
+                                        setPointPanelShow('hide')
+                                    }
+                                }}
+                                show={pointPanelShow}
+                                type='dropdown' icon={faAngleDown} name='Puanla'>
+                                <div style={{ display: 'flex', flex: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
+                                    <StarRating rating={rating} handleRating={async (val: number) => {
+                                        if (mangaModel.mangaRating === null) {
+                                            await postRating({ userID: user.id, animeID: mangaModel.manga.id, rating: val, type: Type.Manga } as Ratings).then((res) => {
+                                                dispatch(setMangaModel({ ...mangaModel, mangaRating: null as any } as MangaModels));
+                                            });
+                                        }
+                                        else {
+                                            await putRating({ ...mangaModel.mangaRating, rating: val, type: Type.Manga } as Ratings).then((res) => {
+                                                dispatch(setMangaModel({ ...mangaModel, mangaRating: res.data.entity } as MangaModels));
+                                            });
+                                        }
+                                        setRating(val);
+                                    }} />
+                                </div>
+                            </DownButon>
+                        </div>
+                        <div style={{ marginBottom: '10px' }}>
+                            {selectedEpisode !== undefined && Object.keys(selectedEpisode).length !== 0 && <DownButon
+                                onClick={() => {
+                                    if (listPanelShow === "hide") {
+                                        setListPanelShow('show')
+                                    }
+                                    else {
+                                        setListPanelShow('hide')
+                                    }
+                                }}
+                                show={listPanelShow} type='dropdown' icon={faAngleDown} name='Listele'>
+                                <div className={styles.mangaListContainer}>
+                                    <div onClick={() => {
+                                        addmangaList(MangaStatus.IRead);
+                                    }} className={styles.listButons + " " + styles.userSelected + " " + (Object.keys(selectedEpisode).length !== 0 && mangaModel.mangaLists.find((y) => y.mangaID === mangaModel.manga.id && y.episodeID === selectedEpisode.id && y.status === MangaStatus.IRead) !== undefined && styles.listButonsActive)}>Okudum</div>
+                                    <div onClick={() => {
+                                        addmangaList(MangaStatus.IWillRead);
+                                    }} className={styles.listButons + " " + styles.userSelected + " " + (Object.keys(selectedEpisode).length !== 0 && mangaModel.mangaLists.find((y) => y.mangaID === mangaModel.manga.id && y.episodeID === selectedEpisode.id && y.status === MangaStatus.IWillRead) !== undefined && styles.listButonsActive)}>Okuyacağım</div>
+                                    <div onClick={() => {
+                                        addmangaList(MangaStatus.Reading);
+                                    }} className={styles.listButons + " " + styles.userSelected + " " + (Object.keys(selectedEpisode).length !== 0 && mangaModel.mangaLists.find((y) => y.mangaID === mangaModel.manga.id && y.episodeID === selectedEpisode.id && y.status === MangaStatus.Reading) !== undefined && styles.listButonsActive)}>Okuyorum</div>
+                                </div>
+                            </DownButon>}
+                        </div>
+                    </FilterModal>}
                 </div>}
         </LoadingScreen>
     )

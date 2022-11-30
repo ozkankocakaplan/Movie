@@ -423,6 +423,7 @@ export interface AnimeModels {
     categories: CategoryType[];
     episodes: Episodes[];
     animeSeasons: AnimeSeason[];
+    comments: Comments[];
     animeSeasonMusics: AnimeSeasonMusic[];
     animeEpisodes: AnimeEpisodes[];
     animeLists: AnimeList[];
@@ -447,6 +448,7 @@ export interface MangaModels {
     contentNotification: ContentNotification;
     categories: CategoryType[];
     mangaEpisodes: MangaEpisodes[];
+    comments: Comments[];
     mangaEpisodeContents: MangaEpisodeContent[];
     mangaImages: MangaImages[];
     mangaLists: MangaList[];

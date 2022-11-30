@@ -24,35 +24,37 @@ const ReviewCard = (props: { user: Users, item: any, handleDataChange?: (data: a
     )
   }
   const likeButon = async () => {
-    var likes = props.item.likes as Array<Like>;
-    var check = likes != null ? likes.find((y) => y.contentID === props.item.id) : undefined;
-    if (check === undefined) {
-      await postLike({ contentID: props.item.id, userID: userInfo.id, type: Type.Review } as Like).then((res) => {
-        if (res.data.entity != null) {
-          dispatch(setCommentLike(res.data.entity));
-          if (props.handleDataChange) {
-            let entity = props.item as ReviewsModels;
-            props.handleDataChange({ ...entity, likes: [...entity.likes, res.data.entity] } as ReviewsModels)
+    if (Object.keys(userInfo).length !== 0) {
+      var likes = props.item.likes as Array<Like>;
+      var check = likes != null ? likes.find((y) => y.contentID === props.item.id) : undefined;
+      if (check === undefined) {
+        await postLike({ contentID: props.item.id, userID: userInfo.id, type: Type.Review } as Like).then((res) => {
+          if (res.data.entity != null) {
+            dispatch(setCommentLike(res.data.entity));
+            if (props.handleDataChange) {
+              let entity = props.item as ReviewsModels;
+              props.handleDataChange({ ...entity, likes: [...entity.likes, res.data.entity] } as ReviewsModels)
+            }
+            else {
+              dispatch(setViewUser({ ...viewUser, reviews: viewUser.reviews.map(item => item.id == props.item.id ? { ...item, likes: [...item.likes, res.data.entity] } : item) } as UserFullModels));
+            }
           }
-          else {
-            dispatch(setViewUser({ ...viewUser, reviews: viewUser.reviews.map(item => item.id == props.item.id ? { ...item, likes: [...item.likes, res.data.entity] } : item) } as UserFullModels));
-          }
-        }
-      }).catch((er) => {
-        console.log(er);
-      });
+        }).catch((er) => {
+          console.log(er);
+        });
 
-    }
-    else {
-      await deleteLike(props.item.id, Type.Review);
-      if (props.handleDataChange) {
-        var entity = props.item as ReviewsModels;
-        props.handleDataChange({ ...entity, likes: entity.likes.filter((y) => y.id !== check?.id) } as ReviewsModels)
       }
       else {
-        dispatch(setViewUser({ ...viewUser, reviews: viewUser.reviews.map(item => item.id == props.item.id ? { ...item, likes: likes.filter((y) => y.id !== check?.id) } : item) } as UserFullModels));
+        await deleteLike(props.item.id, Type.Review);
+        if (props.handleDataChange) {
+          var entity = props.item as ReviewsModels;
+          props.handleDataChange({ ...entity, likes: entity.likes.filter((y) => y.id !== check?.id) } as ReviewsModels)
+        }
+        else {
+          dispatch(setViewUser({ ...viewUser, reviews: viewUser.reviews.map(item => item.id == props.item.id ? { ...item, likes: likes.filter((y) => y.id !== check?.id) } : item) } as UserFullModels));
+        }
+        dispatch(setCommentLikes(likes.filter((y) => y.id !== check?.id)))
       }
-      dispatch(setCommentLikes(likes.filter((y) => y.id !== check?.id)))
     }
   }
   return (
@@ -81,29 +83,31 @@ const ReviewCard = (props: { user: Users, item: any, handleDataChange?: (data: a
               </div>
               <div onClick={likeButon} className={styles.fanArtIconButons}>
                 <FontAwesomeIcon fontSize={15}
-                  color={props.item.likes !== undefined && props.item.likes !== null ? props.item.likes.find((y: any) => y.contentID === props.item.id) === undefined ? 'rgba(255, 255, 255, 0.50)' : 'rgb(253, 188, 11)' : 'rgba(255, 255, 255, 0.50)'}
+                  color={props.item.likes !== undefined && props.item.likes !== null ? props.item.likes.find((y: any) => y.contentID === props.item.id && y.userID === userInfo.id) === undefined ? 'rgba(255, 255, 255, 0.50)' : 'rgb(253, 188, 11)' : 'rgba(255, 255, 255, 0.50)'}
                   icon={faThumbsUp} />
               </div>
             </div>
           </div>
         </div>
-        {commentView && <div className={styles.discoverCommentContainer}>
-          {
-            props.item.comments !== null && props.item.comments.length !== 0 &&
-            props.item.comments.map((item: Comments) => {
-              return <div key={item.id} className={styles.discoverComment + " " + styles.userSelected}>
-                <div className={styles.commentUser}>
-                  {item.users.userName}
+        {commentView && <div >
+          <div className={styles.discoverCommentContainer}>
+            {
+              props.item.comments !== null && props.item.comments.length !== 0 &&
+              props.item.comments.map((item: Comments) => {
+                return <div key={item.id} className={styles.discoverComment + " " + styles.userSelected}>
+                  <div className={styles.commentUser}>
+                    {item.users.userName}
+                  </div>
+                  <Line />
+                  <div>
+                    {
+                      item.comment
+                    }
+                  </div>
                 </div>
-                <Line />
-                <div>
-                  {
-                    item.comment
-                  }
-                </div>
-              </div>
-            })
-          }
+              })
+            }</div>
+
           <div className={styles.discoverComment + " " + styles.userSelected}>
             <SendComment contentID={props.item.id} type={Type.Review} handleData={(data: any) => {
               var entity = props.item as ReviewsModels;
@@ -189,26 +193,28 @@ const FanArtCard = (props: { entity: any, handleDataChange?: (data: any) => void
     )
   }
   const likeButon = async () => {
-    var likes = props.entity.likes as Array<Like>;
-    var check = likes.find((y) => y.contentID === props.entity.id);
-    if (check === undefined) {
-      await postLike({ contentID: props.entity.id, userID: userInfo.id, type: Type.FanArt } as Like).then((res) => {
-        if (res.data.entity != null) {
-          if (props.handleDataChange) {
-            props.entity.likes = [...props.entity.likes, res.data.entity];
-            props.handleDataChange(props.entity);
+    if (Object.keys(userInfo).length !== 0) {
+      var likes = props.entity.likes as Array<Like>;
+      var check = likes.find((y) => y.contentID === props.entity.id);
+      if (check === undefined) {
+        await postLike({ contentID: props.entity.id, userID: userInfo.id, type: Type.FanArt } as Like).then((res) => {
+          if (res.data.entity != null) {
+            if (props.handleDataChange) {
+              props.entity.likes = [...props.entity.likes, res.data.entity];
+              props.handleDataChange(props.entity);
+            }
           }
-        }
-      }).catch((er) => {
-        console.log(er);
-      });
+        }).catch((er) => {
+          console.log(er);
+        });
 
-    }
-    else {
-      await deleteLike(props.entity.id, Type.FanArt);
-      if (props.handleDataChange) {
-        props.entity.likes = props.entity.likes.filter((y: any) => y.contentID !== props.entity.id && y.type === Type.FanArt);
-        props.handleDataChange(props.entity);
+      }
+      else {
+        await deleteLike(props.entity.id, Type.FanArt);
+        if (props.handleDataChange) {
+          props.entity.likes = props.entity.likes.filter((y: any) => y.contentID !== props.entity.id && y.type === Type.FanArt);
+          props.handleDataChange(props.entity);
+        }
       }
     }
   }
@@ -240,7 +246,7 @@ const FanArtCard = (props: { entity: any, handleDataChange?: (data: any) => void
 
               <div onClick={likeButon} className={styles.fanArtIconButons}>
                 <FontAwesomeIcon fontSize={15}
-                  color={props.entity.likes !== undefined && props.entity.likes.find((y: any) => y.contentID === props.entity.id) === undefined ? 'rgba(255, 255, 255, 0.50)' : 'rgb(253, 188, 11)'}
+                  color={props.entity.likes !== undefined && props.entity.likes.find((y: any) => y.contentID === props.entity.id && y.userID === userInfo.id) === undefined ? 'rgba(255, 255, 255, 0.50)' : 'rgb(253, 188, 11)'}
                   icon={faThumbsUp} />
               </div>
               {/* {userInfo != null && userInfo.id !== props.entity.userID && props.entity && <div className={styles.fanArtIconButons}>
@@ -248,23 +254,25 @@ const FanArtCard = (props: { entity: any, handleDataChange?: (data: any) => void
               </div>} */}
             </div>
           </div>
-          {commentView && <div className={styles.discoverCommentContainer}>
-            {
-              props.entity.comments !== null && props.entity.comments.length !== 0 &&
-              props.entity.comments.map((item: Comments) => {
-                return <div key={item.id} className={styles.discoverComment + " " + styles.userSelected}>
-                  <div className={styles.commentUser}>
-                    {item.users.userName}
+          {commentView && <div>
+            <div className={styles.discoverCommentContainer}>
+              {
+                props.entity.comments !== null && props.entity.comments.length !== 0 &&
+                props.entity.comments.map((item: Comments) => {
+                  return <div key={item.id} className={styles.discoverComment + " " + styles.userSelected}>
+                    <div className={styles.commentUser}>
+                      {item.users.userName}
+                    </div>
+                    <Line />
+                    <div>
+                      {
+                        item.comment
+                      }
+                    </div>
                   </div>
-                  <Line />
-                  <div>
-                    {
-                      item.comment
-                    }
-                  </div>
-                </div>
-              })
-            }
+                })
+              }
+            </div>
             <div className={styles.discoverComment + " " + styles.userSelected}>
               <SendComment contentID={props.entity.id} type={Type.FanArt} handleData={(data: any) => {
                 var entity = props.entity as FanArtModel;
@@ -330,7 +338,6 @@ const FanArtCard = (props: { entity: any, handleDataChange?: (data: any) => void
   )
 }
 const CommentCard = (props: { item: Comments }) => {
-  console.log(props.item)
   const dispatch = useDispatch();
   const user = useSelector((x: RootState) => x.userReducer.value.user);
   const { commentLikes, comments } = useSelector((x: RootState) => x.commentReducer);
@@ -340,30 +347,37 @@ const CommentCard = (props: { item: Comments }) => {
     setIsSpoiler(props.item.isSpoiler);
   }, [props.item])
   const loadLike = async () => {
-    await getLike(props.item.id, Type.Comment).then((res) => {
-      if (res.data.entity != null) {
-        dispatch(setCommentLike(res.data.entity));
-      }
-    });
-  }
-  const likeButon = async () => {
-    var check = commentLikes.find((y) => y.contentID === props.item.id);
-    if (check === undefined) {
-      await postLike({ contentID: props.item.id, userID: user.id, type: Type.Comment } as Like).then((res) => {
+    if (Object.keys(user).length !== 0) {
+      await getLike(props.item.id, Type.Comment).then((res) => {
         if (res.data.entity != null) {
           dispatch(setCommentLike(res.data.entity));
         }
       });
-
-    }
-    else {
-      await deleteLike(props.item.id, Type.Comment);
-      dispatch(setCommentLikes(commentLikes.filter((y) => y.id !== check?.id)))
     }
   }
+  const likeButon = async () => {
+    if (Object.keys(user).length !== 0) {
+      var check = commentLikes.find((y) => y.contentID === props.item.id);
+      if (check === undefined) {
+        await postLike({ contentID: props.item.id, userID: user.id, type: Type.Comment } as Like).then((res) => {
+          if (res.data.entity != null) {
+            dispatch(setCommentLike(res.data.entity));
+          }
+        });
+
+      }
+      else {
+        await deleteLike(props.item.id, Type.Comment);
+        dispatch(setCommentLikes(commentLikes.filter((y) => y.id !== check?.id)))
+      }
+    }
+
+  }
   const deleteButon = async () => {
-    await deleteComment(props.item.id, Type.Anime);
-    dispatch(setComments(comments.filter((y) => y.id !== props.item.id)))
+    if (Object.keys(user).length !== 0) {
+      await deleteComment(props.item.id, Type.Anime);
+      dispatch(setComments(comments.filter((y) => y.id !== props.item.id)))
+    }
   }
   return (
     <div className={styles.fanArtContainer + " " + styles.commentsCard}>
@@ -405,7 +419,7 @@ const CommentCard = (props: { item: Comments }) => {
             likeButon();
           }} className={styles.fanArtIconButons}>
             <FontAwesomeIcon fontSize={15}
-              color={commentLikes.find((y) => y.contentID === props.item.id) === undefined ? 'rgba(255, 255, 255, 0.50)' : 'rgb(253, 188, 11)'}
+              color={commentLikes.find((y) => y.contentID === props.item.id && y.userID === user.id) === undefined ? 'rgba(255, 255, 255, 0.50)' : 'rgb(253, 188, 11)'}
               icon={faThumbsUp} />
           </div>
           {props.item.userID === user.id && <div onClick={deleteButon} className={styles.fanArtIconButons}>

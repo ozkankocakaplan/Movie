@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Anime, AnimeAndMangaModels, AnimeList, AnimeModels, Announcement, Categories, Comments, ComplaintList, Contact, ContactSubject, ContentComplaint, ContentNotification, DiscoverModels, FanArt, HomeSlider, Like, Manga, MangaList, MangaModels, Notification, Ratings, Review, SocialMediaAccount, Type, UserBlockList, UserEmailVertification, UserList, UserListContents, UserMessageModel, UserModel, Users } from '../types/Entites';
 import ServiceResponse from '../types/ServiceResponse';
-export const baseUrl = "http://192.168.2.175:37323";
+export const baseUrl = "http://192.168.2.102:37323";
 export default function api() {
     const userLocal = localStorage.getItem('user');
     var user: UserModel = {} as UserModel;

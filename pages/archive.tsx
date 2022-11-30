@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { faAngleDown, faBell, faClose, faComment, faPlay, faShuffle } from '@fortawesome/free-solid-svg-icons'
+import { faAngleDown, faAngleLeft, faBell, faClose, faComment, faFilter, faPlay, faShuffle } from '@fortawesome/free-solid-svg-icons'
 import { NextPage } from 'next'
 import Head from 'next/head'
 import MenuButon, { BorderButon, MenuList } from '../src/components/Buton'
@@ -21,6 +21,8 @@ import StarRating from '../src/components/StarRating'
 import { setMangaModels, setSelectedMangaModel } from '../src/store/features/mangaReducer'
 import { useRouter } from 'next/router'
 import LoadingScreen from '../src/components/LoadingScreen'
+import FilterModal from '../src/components/FilterModal'
+import { CommentCard } from '../src/components/Card'
 
 
 const Archive: NextPage = () => {
@@ -41,7 +43,7 @@ const Archive: NextPage = () => {
   const [categories, setCategories] = useState<Array<Categories>>([]);
 
   const [loading, setLoading] = useState(true);
-
+  const [filterModalIsShow, setFilterModalIsShow] = useState(false);
   useEffect(() => {
     setLoading(true);
     window.onpageshow = function (event) {
@@ -96,6 +98,7 @@ const Archive: NextPage = () => {
                 <MenuButon marginright='10px' onClick={() => setSelectedMenu('Anime')} isactive={selectedMenu == "Anime" ? "T" : "F"} name='Anime' />
                 <MenuButon marginright='10px' onClick={() => setSelectedMenu('Manga')} isactive={selectedMenu == "Manga" ? "T" : "F"} name='Manga' />
                 <MenuButon width='45px' icon={faShuffle} />
+                <MenuButon id="headerFilterButon" onClick={() => setFilterModalIsShow(true)} marginright='0px' width='45px' icon={faFilter} />
               </div>
               <div className={styles.rightMenuContainer}>
                 <MenuButon marginright='10px' onClick={() => {
@@ -215,6 +218,80 @@ const Archive: NextPage = () => {
           </div>
 
         </div>
+        {filterModalIsShow && <FilterModal onClick={() => setFilterModalIsShow(false)}>
+          <DownButon
+            show={categoryIsOpen} onClick={() => {
+              if (categoryIsOpen === "hide") {
+                setCategoryIsOpen('show')
+              }
+              else {
+                setCategoryIsOpen('hide')
+              }
+            }}
+            type="dropdown" icon={faAngleDown} name='Kategori'>
+            <div
+              onClick={() => {
+                dispatch(setAnimeFilter({ ...animeFilter, category: { id: 0 } } as AnimeFilter))
+              }}
+              className={styles.listButons + " " + styles.userSelected + " " + (animeFilter.category.id === 0 && styles.listButonsActive)}>Tümü</div>
+            {
+              categories.length !== 0 &&
+              categories.map((item) => {
+                return <div
+                  onClick={() => {
+                    dispatch(setAnimeFilter({ ...animeFilter, category: item } as AnimeFilter))
+                  }}
+                  key={item.id} className={styles.listButons + " " + styles.userSelected + " " + (animeFilter.category.id === item.id && styles.listButonsActive)}>{item.name}</div>
+              })
+            }
+          </DownButon>
+          <div style={{ marginTop: '10px', marginBottom: '10px' }}>
+            <DownButon show={typeIsOpen} onClick={() => {
+              if (typeIsOpen === "hide") {
+                setTypeIsOpen('show')
+              }
+              else {
+                setTypeIsOpen('hide')
+              }
+            }} type="dropdown" icon={faAngleDown} name='Tür'>
+              <div onClick={() => {
+                dispatch(setAnimeFilter({ ...animeFilter, type: 0 } as AnimeFilter))
+              }} className={styles.listButons + " " + styles.userSelected + " " + (animeFilter.type === 0 && styles.listButonsActive)}>Tümü</div>
+              <div onClick={() => {
+                dispatch(setAnimeFilter({ ...animeFilter, type: VideoType.AnimeMovie } as AnimeFilter))
+              }} className={styles.listButons + " " + styles.userSelected + " " + (animeFilter.type === VideoType.AnimeMovie && styles.listButonsActive)}>Film</div>
+              <div onClick={() => {
+                dispatch(setAnimeFilter({ ...animeFilter, type: VideoType.AnimeSeries } as AnimeFilter))
+              }} className={styles.listButons + " " + styles.userSelected + " " + (animeFilter.type === VideoType.AnimeSeries && styles.listButonsActive)}>Dizi</div>
+            </DownButon>
+          </div>
+          <div style={{ marginTop: '10px', marginBottom: '10px' }}>
+            <DownButon show={ratingIsOpen} onClick={() => {
+              if (ratingIsOpen === "hide") {
+                setRatingIsOpen('show')
+              }
+              else {
+                setRatingIsOpen('hide')
+              }
+            }} type="dropdown" icon={faAngleDown} name='Puan'>
+              <div style={{ display: 'flex', flex: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
+                <StarRating rating={rating} handleRating={async (val: number) => {
+                  setRating(val);
+                }} />
+              </div>
+            </DownButon>
+          </div>
+          <div style={{ marginTop: '10px', marginBottom: '10px', marginLeft: '10px', marginRight: '5px' }}>
+            <MenuButon marginright='0px' onClick={() => {
+              if (animeFilter.order === 'AZ') {
+                dispatch(setAnimeFilter({ ...animeFilter, order: null } as AnimeFilter))
+              }
+              else {
+                dispatch(setAnimeFilter({ ...animeFilter, order: 'AZ' } as AnimeFilter))
+              }
+            }} isactive={animeFilter.order !== null ? "T" : "F"} name='A-Z' />
+          </div>
+        </FilterModal>}
         {movieInfoShow && <MovieDescriptionModal handleCloseModal={() => setMovieInfoShow(false)} />}
         {mangaInfoShow && <MangaDescriptionModal handleCloseModal={() => setMangaInfoShow(false)} />}
       </div>
@@ -228,6 +305,7 @@ const MovieDescriptionModal = (props: { handleCloseModal: () => void }) => {
   const dispatch = useDispatch();
   const user = useSelector((x: RootState) => x.userReducer.value.user);
   const { selectedAnimeModel } = useSelector((x: RootState) => x.animeReducer);
+  const [type, setType] = useState('DETAIL' || 'COMMENT');
   const ModalTitleContainer = () => {
     return (
       <div className={styles.titleContainer}>
@@ -263,7 +341,19 @@ const MovieDescriptionModal = (props: { handleCloseModal: () => void }) => {
     return (
       <div className={styles.bodyContainer}>
         {
-          selectedAnimeModel.anime.animeDescription
+          type === 'DETAIL' ?
+            selectedAnimeModel.anime.animeDescription
+            :
+            selectedAnimeModel.comments !== undefined && selectedAnimeModel.comments.length !== 0 ?
+              <div className={styles.discoverCommentContainer}>
+                {
+                  selectedAnimeModel.comments.map((item, index) => {
+                    return <CommentCard key={index} item={item} />
+                  })
+                }
+              </div>
+              :
+              <div style={{ display: 'flex', justifyContent: 'center' }}>Yorum bulunamadı</div>
         }
       </div>
     )
@@ -271,12 +361,18 @@ const MovieDescriptionModal = (props: { handleCloseModal: () => void }) => {
   const ModalFooterContainer = () => {
     return (
       <div className={styles.footerContainer}>
-        <a
+        {type === 'DETAIL' ? <a
           onClick={() => {
             navigate.push("/anime/" + selectedAnimeModel.anime.seoUrl)
           }}>
-          <FontAwesomeIcon color='#ffffff60' icon={faPlay} /></a>
-        <a href={'/anime/' + selectedAnimeModel.anime.seoUrl}><FontAwesomeIcon color='#ffffff60' icon={faComment} /></a>
+          <FontAwesomeIcon color='#ffffff60' icon={faPlay} />
+        </a>
+          :
+          <a onClick={() => setType('DETAIL')}>
+            <FontAwesomeIcon color='#ffffff60' icon={faAngleLeft} />
+          </a>
+        }
+        {type !== 'COMMENT' && <a onClick={() => setType('COMMENT')}><FontAwesomeIcon color='#ffffff60' icon={faComment} /></a>}
       </div>
     )
   }
@@ -293,30 +389,35 @@ const MovieDescriptionModal = (props: { handleCloseModal: () => void }) => {
             <FontAwesomeIcon icon={faClose} color={"#fff"} size={"2x"} />
           </div>
         </div>
-        <ModalTitleContainer />
-        <div className={styles.infoHeaderContainer}>
-          {
-            selectedAnimeModel.categories !== undefined &&
-            selectedAnimeModel.categories.map((item) => {
-              return <Info key={item.id} name={item.categories.name} />
-            })
-          }
-          <Info name={'Mal: ' + selectedAnimeModel.anime.malRating} />
-          <Info name={'Bölümler: ' + selectedAnimeModel.animeEpisodes.length} />
-          <Info name={"Yaş Sınırı: " + selectedAnimeModel.anime.ageLimit} />
-          <Info name={'Beğeni: ' + selectedAnimeModel.likeCount} />
-          <Info name={'Site: ' + selectedAnimeModel.anime.siteRating} />
-          <Info name={'Çıkış: ' + selectedAnimeModel.anime.showTime} />
-          <Info name={selectedAnimeModel.anime.videoType === VideoType.AnimeSeries ? "Tür: Dizi" : "Tür: Film"} />
-          <Info name={'Sıralama: ' + selectedAnimeModel.arrangement} />
-          <Info name={'Sezon Sayısı: ' + selectedAnimeModel.anime.seasonCount} />
-          <Info name={'İzlenme: ' + selectedAnimeModel.viewsCount} />
-          <Info name={selectedAnimeModel.anime.status === Status.Continues ? "Durumu: Devam Ediyor" : "Durumu: Bitti"} />
-        </div>
-        <div className={styles.infoLineContainer}>
-          <Line />
-        </div>
-        <ModalBodyContainer />
+        {type === 'DETAIL' ?
+          <div>
+            <ModalTitleContainer />
+            <div className={styles.infoHeaderContainer}>
+              {
+                selectedAnimeModel.categories !== undefined &&
+                selectedAnimeModel.categories.map((item) => {
+                  return <Info key={item.id} name={item.categories.name} />
+                })
+              }
+              <Info name={'Mal: ' + selectedAnimeModel.anime.malRating} />
+              <Info name={'Bölümler: ' + selectedAnimeModel.animeEpisodes.length} />
+              <Info name={"Yaş Sınırı: " + selectedAnimeModel.anime.ageLimit} />
+              <Info name={'Beğeni: ' + selectedAnimeModel.likeCount} />
+              <Info name={'Site: ' + selectedAnimeModel.anime.siteRating} />
+              <Info name={'Çıkış: ' + selectedAnimeModel.anime.showTime} />
+              <Info name={selectedAnimeModel.anime.videoType === VideoType.AnimeSeries ? "Tür: Dizi" : "Tür: Film"} />
+              <Info name={'Sıralama: ' + selectedAnimeModel.arrangement} />
+              <Info name={'Sezon Sayısı: ' + selectedAnimeModel.anime.seasonCount} />
+              <Info name={'İzlenme: ' + selectedAnimeModel.viewsCount} />
+              <Info name={selectedAnimeModel.anime.status === Status.Continues ? "Durumu: Devam Ediyor" : "Durumu: Bitti"} />
+            </div>
+            <div className={styles.infoLineContainer}>
+              <Line />
+            </div>
+            <ModalBodyContainer />
+          </div>
+          : <ModalBodyContainer />
+        }
         <ModalFooterContainer />
       </div>
     </div>
@@ -327,6 +428,7 @@ const MangaDescriptionModal = (props: { handleCloseModal: () => void }) => {
   const navigate = useRouter();
   const user = useSelector((x: RootState) => x.userReducer.value.user);
   const { selectedMangaModel } = useSelector((x: RootState) => x.mangaReducer);
+  const [type, setType] = useState('DETAIL' || 'COMMENT');
   const ModalTitleContainer = () => {
     return (
       <div className={styles.titleContainer}>
@@ -362,7 +464,19 @@ const MangaDescriptionModal = (props: { handleCloseModal: () => void }) => {
     return (
       <div className={styles.bodyContainer}>
         {
-          selectedMangaModel.manga.description
+          type === 'DETAIL' ?
+            selectedMangaModel.manga.description
+            :
+            selectedMangaModel.comments !== undefined && selectedMangaModel.comments.length !== 0 ?
+              <div className={styles.discoverCommentContainer}>
+                {
+                  selectedMangaModel.comments.map((item, index) => {
+                    return <CommentCard key={index} item={item} />
+                  })
+                }
+              </div>
+              :
+              <div style={{ display: 'flex', justifyContent: 'center' }}>Yorum bulunamadı</div>
         }
       </div>
     )
@@ -370,10 +484,13 @@ const MangaDescriptionModal = (props: { handleCloseModal: () => void }) => {
   const ModalFooterContainer = () => {
     return (
       <div className={styles.footerContainer}>
-        <a onClick={() => {
+        {type === 'DETAIL' ? <a onClick={() => {
           navigate.push("/manga/" + selectedMangaModel.manga.seoUrl)
         }}><FontAwesomeIcon color='#ffffff60' icon={faPlay} /></a>
-        <div><FontAwesomeIcon color='#ffffff60' icon={faComment} /></div>
+          :
+          <div onClick={() => setType('DETAIL')}><FontAwesomeIcon color='#ffffff60' icon={faAngleLeft} /></div>
+        }
+        {type !== 'COMMENT' && <div onClick={() => setType('COMMENT')}><FontAwesomeIcon color='#ffffff60' icon={faComment} /></div>}
       </div>
     )
   }
@@ -390,25 +507,30 @@ const MangaDescriptionModal = (props: { handleCloseModal: () => void }) => {
             <FontAwesomeIcon icon={faClose} color={"#fff"} size={"2x"} />
           </div>
         </div>
-        <ModalTitleContainer />
-        <div className={styles.infoHeaderContainer}>
-          {
-            selectedMangaModel.categories !== undefined &&
-            selectedMangaModel.categories.map((item) => {
-              return <Info key={item.id} name={item.categories.name} />
-            })
-          }
-          <Info name={'Bölümler: ' + selectedMangaModel.mangaEpisodeCount} />
-          <Info name={"Yaş Sınırı: " + selectedMangaModel.manga.ageLimit} />
-          <Info name={'Beğeni: ' + selectedMangaModel.likeCount} />
-          <Info name={'Sıralama: ' + selectedMangaModel.arrangement} />
-          <Info name={'Sezon Sayısı: ' + selectedMangaModel.mangaEpisodeCount} />
-          <Info name={'İzlenme: ' + selectedMangaModel.viewsCount} />
-          <Info name={selectedMangaModel.manga.status === Status.Continues ? "Durumu: Devam Ediyor" : "Durumu: Bitti"} />
-        </div>
-        <div className={styles.infoLineContainer}>
-          <Line />
-        </div>
+        {
+          type === 'DETAIL' &&
+          <div>
+            <ModalTitleContainer />
+            <div className={styles.infoHeaderContainer}>
+              {
+                selectedMangaModel.categories !== undefined &&
+                selectedMangaModel.categories.map((item) => {
+                  return <Info key={item.id} name={item.categories.name} />
+                })
+              }
+              <Info name={'Bölümler: ' + selectedMangaModel.mangaEpisodeCount} />
+              <Info name={"Yaş Sınırı: " + selectedMangaModel.manga.ageLimit} />
+              <Info name={'Beğeni: ' + selectedMangaModel.likeCount} />
+              <Info name={'Sıralama: ' + selectedMangaModel.arrangement} />
+              <Info name={'Sezon Sayısı: ' + selectedMangaModel.mangaEpisodeCount} />
+              <Info name={'İzlenme: ' + selectedMangaModel.viewsCount} />
+              <Info name={selectedMangaModel.manga.status === Status.Continues ? "Durumu: Devam Ediyor" : "Durumu: Bitti"} />
+            </div>
+            <div className={styles.infoLineContainer}>
+              <Line />
+            </div>
+          </div>
+        }
         <ModalBodyContainer />
         <ModalFooterContainer />
       </div>

@@ -104,6 +104,7 @@ export default function Discover() {
       });
       setSearchLoading(false);
     } else {
+      dispatch(setDiscoveryReview({}));
       setSearchLoading(false);
       setSearchResult([]);
       setSearchShow(false);
@@ -353,9 +354,11 @@ export default function Discover() {
             </div>
           </div>
         </div>
-        {filterModalIsShow && <FilterModal onClick={() => setFilterModalIsShow(false)}>
+        {filterModalIsShow && <FilterModal onClick={() => {
+          dispatch(handleOpenBackgroundBlur(false));
+          setFilterModalIsShow(false);
+        }}>
           <div className={styles.discoverFilterSearchContainer}>
-
             <div style={{ flex: 1, flexDirection: 'row', display: 'flex' }}>
               <div className={styles.searchIcon}>
                 <FontAwesomeIcon fontSize={14} icon={faSearch} color={"rgba(255,255,255,0.50)"} />
@@ -393,49 +396,54 @@ export default function Discover() {
               }
             </div>}
           </div>
-          <DownButon
-            show={categoryIsOpen} onClick={() => {
-              if (categoryIsOpen === "hide") {
-                setCategoryIsOpen('show')
+          <div style={{ marginTop: '10px', marginBottom: '10px' }}>
+            <DownButon
+              show={categoryIsOpen} onClick={() => {
+                if (categoryIsOpen === "hide") {
+                  setCategoryIsOpen('show')
+                }
+                else {
+                  setCategoryIsOpen('hide')
+                }
+              }}
+              type="dropdown" icon={faAngleDown} name='Kategori'>
+              <div
+                className={styles.listButons + " " + styles.userSelected + " "}>Tümü</div>
+              {
+                categories.length !== 0 &&
+                categories.map((item) => {
+                  return <div
+                    onClick={() => {
+
+                    }}
+                    key={item.id} className={styles.listButons + " " + styles.userSelected + " "}>{item.name}</div>
+                })
+              }
+            </DownButon>
+          </div>
+          <div style={{ marginTop: '10px', marginBottom: '10px' }}>
+            <DownButon show={typeIsOpen} onClick={() => {
+              if (typeIsOpen === "hide") {
+                setTypeIsOpen('show')
               }
               else {
-                setCategoryIsOpen('hide')
+                setTypeIsOpen('hide')
               }
-            }}
-            type="dropdown" icon={faAngleDown} name='Kategori'>
-            <div
+            }} type="dropdown" icon={faAngleDown} name='Tür'>
+              <div onClick={() => {
 
-              className={styles.listButons + " " + styles.userSelected + " "}>Tümü</div>
-            {
-              categories.length !== 0 &&
-              categories.map((item) => {
-                return <div
-                  onClick={() => {
+              }} className={styles.listButons + " " + styles.userSelected + " "}>Tümü</div>
+              <div onClick={() => {
 
-                  }}
-                  key={item.id} className={styles.listButons + " " + styles.userSelected + " "}>{item.name}</div>
-              })
-            }
-          </DownButon>
-          <DownButon show={typeIsOpen} onClick={() => {
-            if (typeIsOpen === "hide") {
-              setTypeIsOpen('show')
-            }
-            else {
-              setTypeIsOpen('hide')
-            }
-          }} type="dropdown" icon={faAngleDown} name='Tür'>
-            <div onClick={() => {
+              }} className={styles.listButons + " " + styles.userSelected + " "}>Film</div>
+              <div onClick={() => {
 
-            }} className={styles.listButons + " " + styles.userSelected + " "}>Tümü</div>
-            <div onClick={() => {
-
-            }} className={styles.listButons + " " + styles.userSelected + " "}>Film</div>
-            <div onClick={() => {
-
-            }} className={styles.listButons + " " + styles.userSelected + " "}>Dizi</div>
-          </DownButon>
-          <DownButon type="buton" icon={faAngleDown} name='Popülerite' />
+              }} className={styles.listButons + " " + styles.userSelected + " "}>Dizi</div>
+            </DownButon>
+          </div>
+          <div style={{ marginTop: '10px', marginBottom: '10px' }}>
+            <DownButon type="buton" icon={faAngleDown} name='Popülerite' />
+          </div>
           <DownButon type="buton" icon={faAngleDown} name='Tarih' />
         </FilterModal>}
       </div>

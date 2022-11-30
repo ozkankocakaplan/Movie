@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import MenuButon, { MenuList } from '../../src/components/Buton'
 import { CommentCard } from '../../src/components/Card'
 import DownButon from '../../src/components/DownButon'
+import FilterModal from '../../src/components/FilterModal'
 import Header from '../../src/components/Header'
 import Line from '../../src/components/Line'
 import Loading from '../../src/components/Loading'
@@ -40,7 +41,7 @@ export default function Details() {
     const [downloadPanelShow, setDownloadPanelShow] = useState<"show" | "hide">("hide");
     const [isWatch, setIsWatch] = useState(false);
     const [loading, setLoading] = useState(true);
-
+    const [isFilterModal, setIsFilterModal] = useState(false);
     const user = useSelector((x: RootState) => x.userReducer.value.user);
 
     const { animeModel, selectedEpisodes, selectedEpisode } = useSelector((x: RootState) => x.animeReducer);
@@ -165,7 +166,7 @@ export default function Details() {
                         search={'show'}
                         notification={'hide'}
                         style={{ backgroundColor: '#141414', marginTop: 0, padding: '5px' }} />
-                    <div className={styles.archiveContainer}>
+                    <div className={styles.animeContainer}>
                         <div style={{ height: '100%' }}>
                             <MenuContainer>
                                 <div className={styles.leftMenuContainer} >
@@ -196,26 +197,22 @@ export default function Details() {
                                                 })
                                             }
                                         }} icon={faThumbsUp} />
-                                    <MenuButon
 
+                                    <MenuButon
                                         width='50px'
                                         color={"rgba(255,255,255,0.5)"}
-                                        marginright='10px' onClick={async () => {
-
-                                            if (animeModel.like === null) {
-                                                await postLike({ userID: user.id, contentID: animeModel.anime.id, type: Type.Anime, episodeID: 0 } as Like).then((res) => {
-                                                    if (res.data.isSuccessful) {
-                                                        dispatch(setAnimeModel({ ...animeModel, like: res.data.entity } as AnimeModels));
-                                                    }
-                                                })
+                                        marginright='10px' onClick={() => {
+                                            setIsWatch(!isWatch);
+                                            if (isWatch) {
+                                                dispatch(setSelectedEpisode({}));
                                             }
-                                            else {
-                                                await deleteLike(animeModel.anime.id, Type.Anime).then((res) => {
-                                                    if (res.data.isSuccessful) {
-                                                        dispatch(setAnimeModel({ ...animeModel, like: null as any } as AnimeModels));
-                                                    }
-                                                })
-                                            }
+                                            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                                        }} icon={!isWatch ? faEye : faEyeSlash} />
+                                    <MenuButon
+                                        width='50px'
+                                        color={"rgba(255,255,255,0.5)"}
+                                        marginright='0px' onClick={async () => {
+                                            setIsFilterModal(true);
                                         }} icon={faFilter} />
                                 </div>
                                 <div className={styles.rightMenuContainer}>
@@ -324,6 +321,87 @@ export default function Details() {
                             </div>
                         </div>
                     </div>
+                    {isFilterModal && <FilterModal onClick={() => setIsFilterModal(false)}>
+                        <div style={{ marginBottom: '10px' }}>
+                            <DownButon onClick={() => {
+                                dispatch(handleOpenBackgroundBlur(true));
+                                dispatch(handleOpenAddReviews(true));
+                            }} type='buton' icon={faAngleDown} name='Oluştur' />
+                        </div>
+                        <div style={{ marginBottom: '10px' }}>
+                            <DownButon
+                                onClick={() => {
+                                    if (pointPanelShow === "hide") {
+                                        setPointPanelShow('show')
+                                    }
+                                    else {
+                                        setPointPanelShow('hide')
+                                    }
+                                }}
+                                show={pointPanelShow}
+                                type='dropdown' icon={faAngleDown} name='Puanla'>
+                                <div style={{ display: 'flex', flex: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
+                                    <StarRating rating={rating} handleRating={async (val: number) => {
+                                        if (animeModel.animeRating === null) {
+                                            await postRating({ userID: user.id, animeID: animeModel.anime.id, rating: val, type: Type.Anime } as Ratings).then((res) => {
+                                                dispatch(setAnimeModel({ ...animeModel, animeRating: null as any } as AnimeModels));
+                                            });
+                                        }
+                                        else {
+                                            await putRating({ ...animeModel.animeRating, rating: val, type: Type.Anime } as Ratings).then((res) => {
+                                                dispatch(setAnimeModel({ ...animeModel, animeRating: res.data.entity } as AnimeModels));
+                                            });
+                                        }
+                                        setRating(val);
+                                    }} />
+                                </div>
+                            </DownButon>
+                        </div>
+                        <div style={{ marginBottom: '10px' }}>
+                            {selectedEpisode !== undefined && Object.keys(selectedEpisode).length !== 0 && <DownButon
+                                onClick={() => {
+                                    if (listPanelShow === "hide") {
+                                        setListPanelShow('show')
+                                    }
+                                    else {
+                                        setListPanelShow('hide')
+                                    }
+                                }}
+                                show={listPanelShow} type='dropdown' icon={faAngleDown} name='Listele'>
+                                <div className={styles.animeListContainer}>
+                                    <div onClick={() => {
+                                        addAnimeList(AnimeStatus.IWatched);
+                                    }} className={styles.listButons + " " + styles.userSelected + " " + (Object.keys(selectedEpisode).length !== 0 && animeModel.animeLists.find((y) => y.animeID === animeModel.anime.id && y.episodeID === selectedEpisode.id && y.animeStatus === AnimeStatus.IWatched) !== undefined && styles.listButonsActive)}>İzledim</div>
+                                    <div onClick={() => {
+                                        addAnimeList(AnimeStatus.IWillWatch);
+                                    }} className={styles.listButons + " " + styles.userSelected + " " + (Object.keys(selectedEpisode).length !== 0 && animeModel.animeLists.find((y) => y.animeID === animeModel.anime.id && y.episodeID === selectedEpisode.id && y.animeStatus === AnimeStatus.IWillWatch) !== undefined && styles.listButonsActive)}>İzleyeceğim</div>
+                                    <div onClick={() => {
+                                        addAnimeList(AnimeStatus.Watching);
+                                    }} className={styles.listButons + " " + styles.userSelected + " " + (Object.keys(selectedEpisode).length !== 0 && animeModel.animeLists.find((y) => y.animeID === animeModel.anime.id && y.episodeID === selectedEpisode.id && y.animeStatus === AnimeStatus.Watching) !== undefined && styles.listButonsActive)}>İzliyorum</div>
+                                </div>
+                            </DownButon>}
+                        </div>
+                        <div style={{ marginBottom: '10px' }}>
+                            {selectedEpisodes.length !== 0 && <DownButon onClick={() => {
+                                if (downloadPanelShow === "hide") {
+                                    setDownloadPanelShow('show')
+                                }
+                                else {
+                                    setDownloadPanelShow('hide')
+                                }
+
+                            }} show={downloadPanelShow} type='dropdown' icon={faAngleDown} name='İndir'>
+                                {
+                                    selectedEpisodes.length !== 0 &&
+                                    selectedEpisodes.map((item) => {
+                                        return <div key={item.id} onClick={() => {
+                                            router.push(item.alternativeVideoDownloadUrl);
+                                        }} className={styles.listButons + " " + styles.userSelected}>{item.alternativeName}</div>
+                                    })
+                                }
+                            </DownButon>}
+                        </div>
+                    </FilterModal>}
                 </div>}
         </LoadingScreen>
     )
@@ -420,7 +498,7 @@ const Divider = () => {
 }
 const VerticalDivider = () => {
     return (
-        <div style={{ height: '100%', width: '2px', backgroundColor: 'rgba(255,255,255,0.50)' }}></div>
+        <div className={styles.longLine}></div>
     )
 }
 export const Info = (props: { name: string }) => {
