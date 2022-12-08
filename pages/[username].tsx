@@ -6,15 +6,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { MemoFanArtCard, MemoReviewCard } from '../src/components/Card';
 import { useAuth } from '../src/hooks/useAuth';
 import { RootState } from '../src/store';
-import { handleOpenAboutModal, handleOpenAddListItemModal, handleOpenAddListModal, handleOpenBackgroundBlur, handleOpenBlockModal, handleOpenComplaintModal, handleOpenEditDynamicListModal, handleOpenEditListItemModal, handleOpenEditListModal, handleOpenEditUserModal, handleOpenRosetteModal } from '../src/store/features/modalReducer';
+import { handleOpenAboutModal, handleOpenAddListItemModal, handleOpenAddListModal, handleOpenBackgroundBlur, handleOpenBlockModal, handleOpenComplaintModal, handleOpenEditDynamicListModal, handleOpenEditListItemModal, handleOpenEditListModal, handleOpenEditUserModal, handleOpenMessageModal, handleOpenRosetteModal } from '../src/store/features/modalReducer';
 import { Anime, AnimeList, AnimeListModels, AnimeStatus, Manga, MangaList, MangaListModels, MangaStatus, Rosette, Type, UserFullModels, UserList, UserListModels, Users } from '../src/types/Entites';
 
 import LoadingScreen from '../src/components/LoadingScreen';
 import ServiceResponse from '../src/types/ServiceResponse';
 import Link from 'next/link';
 import styles from '../styles/Home.module.css';
-import { setIsUserBlock, setSelectedRosette, setViewUser } from '../src/store/features/userReducer';
-import { baseUrl, getUserBlockList } from '../src/utils/api';
+import { setIsUserBlock, setSelectedRosette, setUserMessageSend, setViewUser } from '../src/store/features/userReducer';
+import { baseUrl, getUserBlockList, getSearchUserByID } from '../src/utils/api';
 import { setEditAnimeList, setEditMangaList, setSelectedAnimeListType, setSelectedList, setSelectedMangaListType } from '../src/store/features/listReducer';
 
 export async function getServerSideProps(context: any) {
@@ -138,7 +138,14 @@ export default function Profile(props: { serviceResponse: ServiceResponse<UserFu
                     dispatch(handleOpenBackgroundBlur(true));
                     dispatch(handleOpenAboutModal(true));
                   }} className={styles.optionsIcon}><FontAwesomeIcon icon={faAddressCard} /></div>
-                  <div className={styles.optionsIcon}><FontAwesomeIcon icon={faEnvelope} /></div>
+                  <div onClick={async () => {
+                    await getSearchUserByID(userProfile.user.id).then((res) => {
+                      console.log(res.data);
+                      dispatch(setUserMessageSend(res.data.entity));
+                      dispatch(handleOpenMessageModal(true));
+                    })
+
+                  }} className={styles.optionsIcon}><FontAwesomeIcon icon={faEnvelope} /></div>
                   <div onClick={() => {
                     dispatch(handleOpenBackgroundBlur(true))
                     dispatch(handleOpenBlockModal(true));

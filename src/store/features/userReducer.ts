@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { AnimeAndMangaModels, Announcement, ContentComplaint, Rosette, SocialMediaAccount, UserFullModels, UserMessageModel, Users } from "../../types/Entites";
+import { AnimeAndMangaModels, Announcement, ContentComplaint, Rosette, SiteInfo, SocialMediaAccount, UserFullModels, UserMessageModel, Users } from "../../types/Entites";
 import { HubConnection } from '@aspnet/signalr';
 export const INITIAL_STATE = {
     user: {} as Users,
@@ -12,7 +12,9 @@ export const INITIAL_STATE = {
     selectedImage: '' as string,
     discoveryReview: {} as AnimeAndMangaModels,
     announcement: {} as Announcement,
-    socialMediaAccounts: [] as Array<SocialMediaAccount>
+    socialMediaAccounts: [] as Array<SocialMediaAccount>,
+    siteInfo: {} as SiteInfo,
+    userMessageSend: {} as UserMessageModel,
 };
 export const userSlice = createSlice({
     name: 'user',
@@ -53,6 +55,12 @@ export const userSlice = createSlice({
         },
         setSocialMediaAccounts: (state, action) => {
             state.value.socialMediaAccounts = action.payload
+        },
+        setSiteInfo: (state, action) => {
+            state.value.siteInfo = action.payload;
+        },
+        setUserMessageSend: (state, action) => {
+            state.value.userMessageSend = action.payload
         }
     }
 });
@@ -69,5 +77,7 @@ export const {
     setSelectedImage,
     setDiscoveryReview,
     setAnnouncement,
-    setSocialMediaAccounts
+    setSocialMediaAccounts,
+    setSiteInfo,
+    setUserMessageSend
 } = userSlice.actions;

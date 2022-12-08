@@ -8,10 +8,11 @@ interface IButonProps extends React.HTMLAttributes<HTMLDivElement> {
     show?: 'show' | 'hide',
     children?: React.ReactNode
     type: 'dropdown' | 'buton',
+    isactive?: 'show' | 'hide'
 }
 const DownButon = (props: IButonProps) => {
     return (<div>
-        <div {...props} className={styles.downMenuButon}>
+        <div {...props} className={styles.downMenuButon + " " + (props.isactive === 'show' && styles.butonButonShadown)}>
             {
                 props.icon !== undefined ? <span className={styles.dropdownContainer}>
                     {props.name}

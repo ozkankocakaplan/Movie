@@ -5,11 +5,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleLeft, faAngleRight, faAngleUp, faCamera, faClose, faPaperPlane, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { IDeleteModal, handleDeleteModal, handleOpenAddListItemModal, handleOpenBackgroundBlur, handleOpenEditListItemModal, handleOpenEditListModal, handleOpenEditUserModal, handleOpenInfoSiteModal, handleOpenLoginModal, handleOpenMessageModal, handleOpenRegisterModal, handleOpenBlockModal, handleOpenComplaintModal, handleOpenEditDynamicListModal, handleOpenRosetteModal, handleOpenAddReviews, handleOpenEditReviews, handleOpenAboutModal, handleOpenContentComplaintModal, handleOpenDiscoveryReviesModal } from '../store/features/modalReducer';
-import { addContact, baseUrl, deleteAnimeList, deleteMangaList, deleteUserBlockList, deleteUserList, deleteUserListContent, getAnnouncements, getContactSubject, getHomeSliders, getMessages, getNotifications, getSearchAnime, getSearchAnimeAndManga, getSearchUser, getSocialMediaAccounts, getUser, getUserBySeoUrl, postAddUser, postAgainUserEmailVertification, postAnimeList, postAnimeLists, postComplaintList, postContentComplaint, postLogin, postMangaList, postMangaLists, postReviews, postUserBlockList, postUserList, postUserListContent, postUserListContents, putEmailChange, putPassword, putReviews, putUserImg, putUserInfo, putUserList } from '../utils/api';
+import { addContact, baseUrl, deleteAnimeList, deleteMangaList, deleteUserBlockList, deleteUserList, deleteUserListContent, getAnnouncements, getContactSubject, getHomeSliders, getMessages, getNotifications, getSearchAnime, getSearchAnimeAndManga, getSearchUser, getSiteInfo, getSocialMediaAccounts, getUser, getUserBySeoUrl, postAddUser, postAgainUserEmailVertification, postAnimeList, postAnimeLists, postComplaintList, postContentComplaint, postLogin, postMangaList, postMangaLists, postReviews, postUserBlockList, postUserList, postUserListContent, postUserListContents, putEmailChange, putPassword, putReviews, putUserImg, putUserInfo, putUserList } from '../utils/api';
 import { Anime, AnimeAndMangaModels, AnimeEpisodes, AnimeList, AnimeListModels, AnimeStatus, ComplaintList, Contact, ContactSubject, ContentComplaint, MangaList, MangaListModels, MangaStatus, Review, RoleType, Type, UserBlockList, UserEmailVertification, UserFullModels, UserList, UserListContents, UserMessage, UserMessageModel, UserModel, Users } from '../types/Entites';
 import { useAuth } from '../hooks/useAuth';
 import { BorderButon } from './Buton';
-import { setAnnouncement, setIsUserBlock, setMessageUser, setMessageUsers, setSelectedImage, setSignalR, setSocialMediaAccounts, setUser, setViewUser } from '../store/features/userReducer';
+import { setAnnouncement, setIsUserBlock, setMessageUser, setMessageUsers, setSelectedImage, setSignalR, setSiteInfo, setSocialMediaAccounts, setUser, setViewUser } from '../store/features/userReducer';
 
 import { setSearchListResult, setSelectedAnimeEpisode, setSelectedAnimeEpisodes, setSelectedMangaEpisode, setSelectedMangaEpisodes, setselectedUserListContent, setSelectedUserListContents } from '../store/features/listReducer';
 import { setNotifications } from '../store/features/notificationReducer';
@@ -32,7 +32,6 @@ interface ILayoutProps {
 export default function Layout(props: ILayoutProps) {
     const dispatch = useDispatch();
     const { user, logout } = useAuth();
-    const [signalRConnect, setSignalRConnect] = useState(false);
     const selectedImg = useSelector((x: RootState) => x.userReducer.value.selectedImage);
     const {
         backgroundBlur,
@@ -59,14 +58,17 @@ export default function Layout(props: ILayoutProps) {
 
     } = useSelector((state: RootState) => state.modalReducer.value);
     useEffect(() => {
+        setupOnlineUser();
         if (user !== null) {
             loadUser();
             loadNotifications();
             setupSignalR();
         }
+
         loadHomeSlider();
         loadAnnouncement();
         loadSocialMediaAccount();
+        loadSiteInfo();
     }, []);
     useEffect(() => {
         if (backgroundBlur) {
@@ -90,31 +92,66 @@ export default function Layout(props: ILayoutProps) {
             console.log(er);
         })
     }
-    const setupSignalR = async () => {
-        if (!signalRConnect) {
-            setSignalRConnect(true);
-            var connection = new HubConnectionBuilder()
-                .withUrl(baseUrl + "/userHub", {
-                    accessTokenFactory() {
-                        return user.token
-                    },
-                    skipNegotiation: true,
-                    transport: HttpTransportType.WebSockets
-                })
-                .configureLogging(LogLevel.None)
-                .build();
-            await connection.start().then((res) => {
-                connection.on("getID", data => {
-                    console.log(data);
-                })
-            }).catch((er) => {
-                setSignalRConnect(false);
-            });
-
-            dispatch(setSignalR(connection));
-        }
-
+    const loadSiteInfo = async () => {
+        await getSiteInfo().then((res) => {
+            console.log(res.data.entity);
+            dispatch(setSiteInfo(res.data.entity));
+        })
     }
+    const setupSignalR = async () => {
+        const date = new Date().getTime();
+        var storage = localStorage.getItem("token");
+        if (storage !== null && Object.keys(storage).length === 0) {
+            await configureSignalr();
+        }
+        else {
+            if (storage !== null && date > JSON.parse(storage).expiry) {
+                localStorage.removeItem("token");
+                await configureSignalr();
+            }
+        }
+    }
+    const configureSignalr = async () => {
+        const date = new Date().getTime();
+        var connection = new HubConnectionBuilder()
+            .withUrl(baseUrl + "/userHubs", {
+                accessTokenFactory() {
+                    return user.token
+                },
+                skipNegotiation: true,
+                transport: HttpTransportType.WebSockets
+            })
+            .configureLogging(LogLevel.None)
+            .build();
+        await connection.start().then((res) => {
+            connection.on("getID", data => {
+                var item = {
+                    token: data,
+                    expiry: date + 5000
+                }
+                localStorage.setItem("token", JSON.stringify(item));
+            })
+        }).catch((er) => {
+            console.log(er);
+        });
+        dispatch(setSignalR(connection));
+    }
+    const setupOnlineUser = async () => {
+
+        var connection = new HubConnectionBuilder()
+            .withUrl(baseUrl + "/users", {
+                skipNegotiation: true,
+                transport: HttpTransportType.WebSockets
+            })
+            .configureLogging(LogLevel.None)
+            .build();
+        await connection.start().then((res) => {
+
+        }).catch((er) => {
+
+        });
+    }
+
     const loadUser = async () => {
         await getUser()
             .then((res) => {
@@ -1809,13 +1846,16 @@ const RegisterModal = () => {
 const MessageModal = () => {
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(true);
-    const { messageUser, user, signalR } = useSelector((x: RootState) => x.userReducer.value);
+    const { messageUser, user, signalR, userMessageSend } = useSelector((x: RootState) => x.userReducer.value);
     const [selectedMessage, setSelectedMessage] = useState({} as UserMessageModel);
     const [messageText, setMessageText] = useState('');
     const [searchUser, setSearchUser] = useState('');
     const [searchResult, setSearchResult] = useState<Array<UserMessageModel>>([]);
     var ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
+        if (userMessageSend !== null && Object.keys(userMessageSend).length !== 0) {
+            setSelectedMessage(userMessageSend);
+        }
         loadGetMessages();
     }, []);
     const loadGetMessages = async () => {

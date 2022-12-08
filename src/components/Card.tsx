@@ -121,7 +121,7 @@ const ReviewCard = (props: { user: Users, item: any, handleDataChange?: (data: a
         <div className={styles.listOptions}>
           <div className={styles.listOptionsLeft}>
             {
-              props.user.id === userInfo.id && Object.keys(props.user).length !== 0 &&
+              userInfo.id === props.item.userID && Object.keys(props.user).length !== 0 &&
               <div className={styles.listOptionsLeft}>
                 <div onClick={() => {
                   dispatch(setSelectedReview(props.item));
@@ -249,9 +249,9 @@ const FanArtCard = (props: { entity: any, handleDataChange?: (data: any) => void
                   color={props.entity.likes !== undefined && props.entity.likes.find((y: any) => y.contentID === props.entity.id && y.userID === userInfo.id) === undefined ? 'rgba(255, 255, 255, 0.50)' : 'rgb(253, 188, 11)'}
                   icon={faThumbsUp} />
               </div>
-              {/* {userInfo != null && userInfo.id !== props.entity.userID && props.entity && <div className={styles.fanArtIconButons}>
+              {userInfo != null && userInfo.id !== props.entity.userID && props.entity && <div className={styles.fanArtIconButons}>
                 <FontAwesomeIcon fontSize={15} color='rgba(255, 255, 255, 0.50)' icon={faTrash} />
-              </div>} */}
+              </div>}
             </div>
           </div>
           {commentView && <div>
@@ -337,6 +337,7 @@ const FanArtCard = (props: { entity: any, handleDataChange?: (data: any) => void
     </div >
   )
 }
+
 const CommentCard = (props: { item: Comments }) => {
   const dispatch = useDispatch();
   const user = useSelector((x: RootState) => x.userReducer.value.user);

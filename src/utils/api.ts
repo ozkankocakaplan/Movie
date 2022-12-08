@@ -1,7 +1,8 @@
 import axios from 'axios';
-import { Anime, AnimeAndMangaModels, AnimeList, AnimeModels, Announcement, Categories, Comments, ComplaintList, Contact, ContactSubject, ContentComplaint, ContentNotification, DiscoverModels, FanArt, HomeSlider, Like, Manga, MangaList, MangaModels, Notification, Ratings, Review, SocialMediaAccount, Type, UserBlockList, UserEmailVertification, UserList, UserListContents, UserMessageModel, UserModel, Users } from '../types/Entites';
+import { Anime, AnimeAndMangaModels, AnimeList, AnimeModels, Announcement, Categories, Comments, ComplaintList, Contact, ContactSubject, ContentComplaint, ContentNotification, DiscoverModels, FanArt, HomeSlider, Like, Manga, MangaList, MangaModels, MovieDTO, Notification, Ratings, Review, SiteInfo, SocialMediaAccount, Type, UserBlockList, UserEmailVertification, UserList, UserListContents, UserMessageModel, UserModel, Users } from '../types/Entites';
 import ServiceResponse from '../types/ServiceResponse';
-export const baseUrl = "http://192.168.2.102:37323";
+export const baseUrl = "http://192.168.2.100:37323";
+// export const baseUrl = "https://api.lycorisa.com";
 export default function api() {
     const userLocal = localStorage.getItem('user');
     var user: UserModel = {} as UserModel;
@@ -148,11 +149,11 @@ export const deleteComment = async (commentID: number, type: Type) => {
 export const getHomeSliders = async () => {
     return await api().get<ServiceResponse<HomeSlider>>("/getHomeSliders");
 }
-export const getAnimes = async () => {
-    return await api().get<ServiceResponse<AnimeModels>>("/getAnimes");
+export const getAnimes = async (pageNo: number, showCount: number) => {
+    return await api().get<ServiceResponse<AnimeModels>>(`/getAnimes/${pageNo}/${showCount}`);
 }
-export const getMangas = async () => {
-    return await api().get<ServiceResponse<MangaModels>>("/getMangas");
+export const getMangas = async (pageNo: number, showCount: number) => {
+    return await api().get<ServiceResponse<MangaModels>>(`/getMangas/${pageNo}/${showCount}`);
 }
 export const getManga = async (url: string) => {
     return await api().get<ServiceResponse<MangaModels>>("/getManga/" + url);
@@ -160,8 +161,8 @@ export const getManga = async (url: string) => {
 export const getCategories = async () => {
     return await api().get<ServiceResponse<Categories>>("/getCategories");
 }
-export const getDiscovers = async (type: number) => {
-    return await api().get<ServiceResponse<DiscoverModels>>("/getDiscovers/" + type);
+export const getDiscovers = async (type: number, sno: number, showCount: number) => {
+    return await api().get<ServiceResponse<DiscoverModels>>("/getDiscovers/" + type + "/" + sno + "/" + showCount);
 }
 export const postContentComplaint = async (entity: ContentComplaint) => {
     return await api().post<ServiceResponse<ContentComplaint>>("/addContentComplaint", entity);
@@ -171,6 +172,9 @@ export const getMessages = async () => {
 }
 export const getSearchUser = async (message: string) => {
     return await api().get<ServiceResponse<UserMessageModel>>("/getSearchUser/" + message);
+}
+export const getSearchUserByID = async (id: number) => {
+    return await api().get<ServiceResponse<UserMessageModel>>("/getSearchUserByID/" + id);
 }
 export const addContact = async (entity: Contact) => {
     return await api().post<ServiceResponse<Contact>>("/addContact", entity);
@@ -183,4 +187,10 @@ export const getAnnouncements = async () => {
 }
 export const getSocialMediaAccounts = async () => {
     return await api().get<ServiceResponse<SocialMediaAccount>>("/getSocialMediaAccounts");
+}
+export const getSiteInfo = async () => {
+    return await api().get<ServiceResponse<SiteInfo>>("/siteInfo");
+}
+export const getHomePageMovie = async (pageNo: number, showCount: number) => {
+    return await api().get<ServiceResponse<MovieDTO>>("/getHomePageMovie/" + pageNo + "/" + showCount)
 }

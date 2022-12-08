@@ -9,7 +9,6 @@ export interface MangaFilter {
     category: Categories;
     point: number;
     order: 'AZ' | null;
-    type: VideoType | number;
 }
 
 
@@ -439,6 +438,7 @@ export interface ReviewsModels extends Review {
     manga: Manga;
     likes: Like[];
     comments: Comments[];
+    categories: Categories[];
 }
 export interface MangaModels {
     anime: Anime;
@@ -463,6 +463,7 @@ export interface FanArtModel extends FanArt {
     manga: Manga;
     likes: Like[];
     comments: Comments[];
+    categories: Categories[];
 }
 export interface MovieTheWeek extends BaseEntity {
     contentID: number;
@@ -497,4 +498,22 @@ export interface AnimeImages extends BaseEntity {
 export interface MangaImages extends BaseEntity {
     mangaID: number;
     img: string | null;
+}
+export interface SiteInfo {
+    onlinePeopleCount: number;
+    peopleCount: number;
+    mangaCount: number;
+    animeCount: number;
+    animeFanArtCount: number;
+    animeReviewCount: number;
+    mangaFanArtCount: number;
+    mangaReviewCount: number;
+    animeEpisodeCount: number;
+    mangaEpisodeCount: number;
+}
+export interface MovieDTO {
+    ratingAnimes: AnimeModels[];
+    newEpisodeAnimes: Anime[];
+    ratingMangas: MangaModels[];
+    newEpisodeManga: Manga[];
 }
