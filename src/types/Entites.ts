@@ -47,7 +47,9 @@ export enum VideoType {
 export enum ComplaintType {
     Video = 1,
     Image = 2,
-    Content = 3
+    Content = 3,
+    ContentAnime = 4,
+    ContentManga = 5
 }
 
 export enum AnimeStatus {

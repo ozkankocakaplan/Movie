@@ -73,7 +73,7 @@ const ReviewCard = (props: { user: Users, item: any, handleDataChange?: (data: a
             <div className={styles.options}>
               <div onClick={() => {
                 dispatch(handleOpenBackgroundBlur(true));
-                dispatch(setContentComplaint({ contentID: props.item.id, type: Type.Review, complaintType: ComplaintType.Content } as ContentComplaint));
+                dispatch(setContentComplaint({ contentID: props.item.id, type: Type.Review, complaintType: props.item.type === Type.Anime ? ComplaintType.ContentAnime : ComplaintType.ContentManga } as ContentComplaint));
                 dispatch(handleOpenContentComplaintModal(true));
               }} className={styles.fanArtIconButons}>
                 <FontAwesomeIcon fontSize={15} color='rgba(255, 255, 255, 0.50)' icon={faWarning} />
@@ -232,7 +232,7 @@ const FanArtCard = (props: { entity: any, handleDataChange?: (data: any) => void
             <div className={styles.options}>
               <div
                 onClick={() => {
-                  dispatch(setContentComplaint({ contentID: props.entity.id, type: Type.FanArt, complaintType: ComplaintType.Content } as ContentComplaint));
+                  dispatch(setContentComplaint({ contentID: props.entity.id, type: Type.FanArt, complaintType: props.entity.type === Type.Anime ? ComplaintType.ContentAnime : ComplaintType.ContentManga } as ContentComplaint));
                   dispatch(handleOpenBackgroundBlur(true));
                   dispatch(handleOpenContentComplaintModal(true));
                 }}
