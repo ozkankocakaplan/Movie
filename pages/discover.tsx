@@ -12,17 +12,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../src/store';
 import { baseUrl, getCategories, getDiscovers, getSearchAnimeAndManga } from '../src/utils/api';
-import { AnimeAndMangaModels, AnimeModels, Categories, DiscoverModels, FanArt, MangaModels, Type } from '../src/types/Entites';
+import { AnimeAndMangaModels, AnimeFilter, AnimeModels, Categories, DiscoverModels, FanArt, MangaFilter, MangaModels, Type, VideoType } from '../src/types/Entites';
 import LoadingScreen from '../src/components/LoadingScreen';
 import { MemoFanArtCard, MemoReviewCard } from '../src/components/Card';
 import ReadMore from '../src/components/ReadMore';
-import { handleOpenAddReviews, handleOpenBackgroundBlur, handleOpenDiscoveryReviesModal } from '../src/store/features/modalReducer';
+import { handleOpenBackgroundBlur, handleOpenDiscoveryReviesModal } from '../src/store/features/modalReducer';
 import Loading from '../src/components/Loading';
 import { DiscoverSearchContainerCard, SearchResultCard } from '../src/components/SearchResultCard';
-import { setSelectedAnimeModel } from '../src/store/features/animeReducer';
-import { setSelectedMangaModel } from '../src/store/features/mangaReducer';
 import { setDiscoveryReview } from '../src/store/features/userReducer';
 import FilterModal from '../src/components/FilterModal';
+import { setAnimeFilter } from '../src/store/features/animeReducer';
+import { setMangaFilter } from '../src/store/features/mangaReducer';
 
 export default function Discover() {
   const dispatch = useDispatch();
@@ -40,14 +40,15 @@ export default function Discover() {
 
   const [selectedAnimeWeekIndex, setSelectedAnimeWeekIndex] = useState(0);
   const [selectedMangaWeekIndex, setSelectedMangaWeekIndex] = useState(0);
-
+  const { animeFilter } = useSelector((x: RootState) => x.animeReducer);
+  const { mangaFilter } = useSelector((x: RootState) => x.mangaReducer);
   const [searchResult, setSearchResult] = useState<Array<AnimeAndMangaModels>>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchShow, setSearchShow] = useState(false);
 
   const [selectedSearchResult, setSelectedSearchResult] = useState<AnimeAndMangaModels>({} as AnimeAndMangaModels);
   const [filterModalIsShow, setFilterModalIsShow] = useState(false);
-
+  const [pageNo, setPageNo] = useState(1);
   useEffect(() => {
     loadData();
     setSearch('');
@@ -61,10 +62,21 @@ export default function Discover() {
       setLoading(false);
     }, 300);
   }
+  useEffect(() => {
+    setLoading(true);
+    loadDiscover();
+    setTimeout(() => {
+      setLoading(false);
+    }, 300);
+  }, [pageNo])
+
   const loadDiscover = async () => {
     setAnimeList({} as DiscoverModels);
-    await getDiscovers(selectedMenu === 'Anime' ? 1 : 0).then((res) => {
+    await getDiscovers(selectedMenu === 'Anime' ? 1 : 0, pageNo === 0 ? 1 : pageNo, 48).then((res) => {
       setAnimeList(res.data.entity);
+      if (res.data.entity.reviews.length === 0 && res.data.entity.fanArts.length === 0) {
+        setPageNo(0)
+      }
     }).catch((er) => {
       console.log(er);
     });
@@ -104,6 +116,7 @@ export default function Discover() {
       });
       setSearchLoading(false);
     } else {
+      setSelectedSearchResult({} as AnimeAndMangaModels);
       dispatch(setDiscoveryReview({}));
       setSearchLoading(false);
       setSearchResult([]);
@@ -129,9 +142,9 @@ export default function Discover() {
                 <MenuButon marginright='10px' onClick={() => setSelectedMenu('Anime')} isactive={selectedMenu == "Anime" ? "T" : "F"} name='Anime' />
                 <MenuButon marginright='10px' onClick={() => setSelectedMenu('Manga')} isactive={selectedMenu == "Manga" ? "T" : "F"} name='Manga' />
                 <div className={styles.headerSuffleButon}>
-                  <MenuButon width='45px' icon={faShuffle} />
+                  <MenuButon onClick={() => setPageNo(pageNo + 1)} width='45px' icon={faShuffle} />
                 </div>
-                <MenuButon id='shuffleButon' icon={faShuffle} />
+                <MenuButon id='shuffleButon' onClick={() => setPageNo(pageNo + 1)} icon={faShuffle} />
                 <MenuButon id="headerFilterButon" onClick={() => setFilterModalIsShow(true)} marginright='0px' width='45px' icon={faFilter} />
                 <div className={styles.discoverSearchContainer}>
                   <div className={styles.searchIcon}>
@@ -169,7 +182,16 @@ export default function Discover() {
                     dispatch(handleOpenDiscoveryReviesModal(true));
                   }
                 }} type="buton" icon={faAngleDown} name='Oluştur' />
-                <DownButon type="buton" icon={faAngleDown} name='Tarih' />
+                <DownButon
+                  onClick={() => {
+                    if (animeFilter.order === 'AZ') {
+                      dispatch(setAnimeFilter({ ...animeFilter, order: null } as AnimeFilter))
+                    }
+                    else {
+                      dispatch(setAnimeFilter({ ...animeFilter, order: 'AZ' } as AnimeFilter))
+                    }
+                  }}
+                  type="buton" isactive={animeFilter.order !== null ? 'show' : 'hide'} icon={faAngleDown} name='Tarih' />
                 <DownButon
                   show={categoryIsOpen} onClick={() => {
                     if (categoryIsOpen === "hide") {
@@ -181,20 +203,35 @@ export default function Discover() {
                   }}
                   type="dropdown" icon={faAngleDown} name='Kategori'>
                   <div
-
-                    className={styles.listButons + " " + styles.userSelected + " "}>Tümü</div>
+                    onClick={() => {
+                      if (selectedMenu === 'Anime') {
+                        dispatch(setAnimeFilter({ ...animeFilter, category: { id: 0 } } as AnimeFilter));
+                      }
+                      else {
+                        dispatch(setMangaFilter({ ...mangaFilter, category: { id: 0 } } as MangaFilter));
+                      }
+                      setCategoryIsOpen('hide')
+                    }}
+                    className={styles.listButons + " " + styles.userSelected + " " + (selectedMenu === 'Anime' ? animeFilter.category.id === 0 && styles.listButonsActive : mangaFilter.category.id === 0 && styles.listButonsActive)}>Tümü</div>
                   {
                     categories.length !== 0 &&
                     categories.map((item) => {
                       return <div
                         onClick={() => {
-
+                          if (selectedMenu === 'Anime') {
+                            dispatch(setAnimeFilter({ ...animeFilter, category: item } as AnimeFilter));
+                          }
+                          else {
+                            dispatch(setMangaFilter({ ...mangaFilter, category: item } as MangaFilter));
+                          }
+                          setCategoryIsOpen('hide');
                         }}
-                        key={item.id} className={styles.listButons + " " + styles.userSelected + " "}>{item.name}</div>
+                        key={item.id}
+                        className={styles.listButons + " " + styles.userSelected + " " + (selectedMenu === 'Anime' ? animeFilter.category.id === item.id && styles.listButonsActive : mangaFilter.category.id === item.id && styles.listButonsActive)}>{item.name}</div>
                     })
                   }
                 </DownButon>
-                <DownButon show={typeIsOpen} onClick={() => {
+                {selectedMenu === 'Anime' && <DownButon show={typeIsOpen} onClick={() => {
                   if (typeIsOpen === "hide") {
                     setTypeIsOpen('show')
                   }
@@ -203,16 +240,28 @@ export default function Discover() {
                   }
                 }} type="dropdown" icon={faAngleDown} name='Tür'>
                   <div onClick={() => {
-
-                  }} className={styles.listButons + " " + styles.userSelected + " "}>Tümü</div>
+                    dispatch(setAnimeFilter({ ...animeFilter, type: 0 } as AnimeFilter))
+                    setTypeIsOpen('hide');
+                  }} className={styles.listButons + " " + styles.userSelected + " " + (animeFilter.type === 0 && styles.listButonsActive)}>Tümü</div>
                   <div onClick={() => {
-
-                  }} className={styles.listButons + " " + styles.userSelected + " "}>Film</div>
+                    dispatch(setAnimeFilter({ ...animeFilter, type: VideoType.AnimeMovie } as AnimeFilter))
+                    setTypeIsOpen('hide');
+                  }} className={styles.listButons + " " + styles.userSelected + " " + (animeFilter.type === VideoType.AnimeMovie && styles.listButonsActive)}>Film</div>
                   <div onClick={() => {
-
-                  }} className={styles.listButons + " " + styles.userSelected + " "}>Dizi</div>
-                </DownButon>
-                <DownButon type="buton" icon={faAngleDown} name='Popülerite' />
+                    dispatch(setAnimeFilter({ ...animeFilter, type: VideoType.AnimeSeries } as AnimeFilter))
+                    setTypeIsOpen('hide');
+                  }} className={styles.listButons + " " + styles.userSelected + " " + (animeFilter.type === VideoType.AnimeSeries && styles.listButonsActive)}>Dizi</div>
+                </DownButon>}
+                <DownButon
+                  onClick={() => {
+                    if (animeFilter.point === 1) {
+                      dispatch(setAnimeFilter({ ...animeFilter, point: 0 } as AnimeFilter))
+                    }
+                    else {
+                      dispatch(setAnimeFilter({ ...animeFilter, point: 1 } as AnimeFilter))
+                    }
+                  }}
+                  type="buton" isactive={animeFilter.point === 0 ? "show" : "hide"} icon={faAngleDown} name='Popülerite' />
               </div>
             </MenuContainer>
             <div className={styles.discoverContainer}>
@@ -231,15 +280,71 @@ export default function Discover() {
                 {
                   selectedTab === 'Fanart' ?
                     animeList.fanArts !== undefined &&
-                    animeList.fanArts.map((item) => {
+                    animeList.fanArts.sort((a, b) => {
+                      return -1;
+                    }).filter((y) => {
+                      return y;
+                    }).map((item) => {
                       return <MemoFanArtCard handleDataChange={(data: any) => setAnimeList({ ...animeList, fanArts: animeList.fanArts.map((i) => i.id === data.id ? data : i) } as any)} entity={item as any} key={item.id} />
                     })
                     :
-
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
                       {
                         animeList.reviews != null &&
-                        animeList.reviews.map((item) => {
+                        animeList.reviews.sort((a, b) => {
+                          if (animeFilter.order === 'AZ') {
+                            return b.id - a.id;
+                          }
+                          else {
+                            if (animeFilter.point === 0) {
+                              return a.likes.length - b.likes.length;
+                            }
+                            else {
+                              return a.id - b.id;
+                            }
+                          }
+                        }).filter((y) => {
+                          if (selectedMenu === 'Anime') {
+                            if (Object.keys(selectedSearchResult).length !== 0) {
+                              if (selectedSearchResult.id === y.anime.id && selectedSearchResult.type === Type.Anime) {
+                                if (animeFilter.type === 0) {
+                                  return y;
+                                }
+                                else {
+                                  if (animeFilter.type === y.anime.videoType) {
+                                    return y;
+                                  }
+                                }
+                              }
+                            }
+                            if (animeFilter.category.id !== 0) {
+                              let check = y.categories.find((y) => y.id == animeFilter.category.id);
+                              if (check) {
+                                if (animeFilter.type === 0) {
+                                  return y;
+                                }
+                                else {
+                                  if (animeFilter.type === y.anime.videoType) {
+                                    return y;
+                                  }
+                                }
+                              }
+                            }
+                            else {
+                              if (animeFilter.type === 0) {
+                                return y;
+                              }
+                              else {
+                                if (animeFilter.type === y.anime.videoType) {
+                                  return y;
+                                }
+                              }
+                            }
+                          }
+                          else {
+                            return y;
+                          }
+                        }).map((item) => {
                           return <MemoReviewCard handleDataChange={(data: any) => setAnimeList({ ...animeList, reviews: animeList.reviews.map((i) => i.id === data.id ? data : i) } as any)} key={item.id} user={user} item={item as any} />
                         })
                       }
@@ -408,6 +513,10 @@ export default function Discover() {
               }}
               type="dropdown" icon={faAngleDown} name='Kategori'>
               <div
+                onClick={() => {
+                  dispatch(setAnimeFilter({ ...animeFilter, category: { id: 0 } } as AnimeFilter));
+                  setCategoryIsOpen('hide');
+                }}
                 className={styles.listButons + " " + styles.userSelected + " "}>Tümü</div>
               {
                 categories.length !== 0 &&

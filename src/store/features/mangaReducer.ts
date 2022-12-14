@@ -7,7 +7,7 @@ const INITIAL_STATE = {
     selectedMangaModel: {} as MangaModels,
     selectedEpisodes: [] as Array<MangaEpisodes>,
     selectedEpisode: {} as MangaEpisodes,
-    mangaFilter: { category: { id: 0 }, point: 1, order: null, type: 0 } as MangaFilter
+    mangaFilter: { category: { id: 0 }, point: 1, order: null } as MangaFilter
 }
 const mangaSlice = createSlice({
     name: 'mangaSlice',
