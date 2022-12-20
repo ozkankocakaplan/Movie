@@ -18,9 +18,9 @@ export const SearchResultCard = (props: { entity: AnimeAndMangaModels }) => {
             }} className={styles.searchResultImg}>
                 {
                     props.entity.img !== null && props.entity.img.length !== 0 ?
-                        <img src={baseUrl + props.entity.img} />
+                        <img src={props.entity.img} />
                         :
-                        <img src={"http://localhost:3000/logo.png"} />
+                        <img src={"/logo.png"} />
                 }
 
             </div>
@@ -44,9 +44,9 @@ export const DiscoverSearchContainerCard = (props: IDiscoverSearchContainerProps
             <div style={{ cursor: 'pointer' }} className={styles.searchResultImg}>
                 {
                     props.entity.img !== null && props.entity.img.length !== 0 ?
-                        <img src={baseUrl + props.entity.img} />
+                        <img src={props.entity.img} />
                         :
-                        <img src={"http://localhost:3000/logo.png"} />
+                        <img src={"/logo.png"} />
                 }
             </div>
             <div className={styles.searchResultContent}>

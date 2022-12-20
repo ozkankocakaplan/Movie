@@ -80,15 +80,14 @@ export default function Profile(props: { serviceResponse: ServiceResponse<UserFu
         <div className={styles.listHeader}>
           <div className={styles.rosetteContainer}>
             {
-              userProfile.rosettes.map((item) => {
-                return <RosetteCard onClick={() => {
+              userProfile.rosettes.map((item, index) => {
+                return <RosetteCard key={index} onClick={() => {
                   dispatch(setSelectedRosette(item.rosette));
                   dispatch(handleOpenBackgroundBlur(true));
                   dispatch(handleOpenRosetteModal(true));
-                }} source='http://localhost:3000/rosette.png' />
+                }} source={item.rosette.img} />
               })
             }
-            <RosetteCard source='http://localhost:3000/rosette.png' />
           </div>
           <div className={styles.listContainer}>
             <div className={styles.listHeaderTitle + " " + styles.userSelected}>
@@ -207,7 +206,7 @@ export default function Profile(props: { serviceResponse: ServiceResponse<UserFu
                       {
                         userProfile.user.image != null && userProfile.user.image.length !== 0 ?
                           <img src={baseUrl + userProfile.user.image} />
-                          : <img src={"http://localhost:3000/logo.png"} />
+                          : <img src={"/logo.png"} />
                       }
 
                     </a>
@@ -295,7 +294,7 @@ const Slider = (props: { user: Users, entity?: Array<UserListModels>, userList?:
           dispatch(handleOpenEditDynamicListModal(true));
         }
 
-      }} className={styles.cardImage + " " + styles.userSelected} src='http://localhost:3000/profileFavori.png' />
+      }} className={styles.cardImage + " " + styles.userSelected} src='/profileFavori.png' />
     )
   }
   return (

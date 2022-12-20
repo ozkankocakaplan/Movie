@@ -12,7 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../src/store';
 import { baseUrl, getCategories, getDiscovers, getSearchAnimeAndManga } from '../src/utils/api';
-import { AnimeAndMangaModels, AnimeFilter, AnimeModels, Categories, DiscoverModels, FanArt, MangaFilter, MangaModels, Type, VideoType } from '../src/types/Entites';
+import { Anime, AnimeAndMangaModels, AnimeFilter, AnimeModels, Categories, DiscoverModels, FanArt, Manga, MangaFilter, MangaModels, Type, VideoType } from '../src/types/Entites';
 import LoadingScreen from '../src/components/LoadingScreen';
 import { MemoFanArtCard, MemoReviewCard } from '../src/components/Card';
 import ReadMore from '../src/components/ReadMore';
@@ -86,16 +86,18 @@ export default function Discover() {
       setCategories(res.data.list);
     })
   }
-  const Top100Card = () => {
+  const Top100Card = (props: { anime?: AnimeModels, manga?: MangaModels }) => {
     return (
       <div className={styles.top100Card}>
         <div className={styles.top100Img}>
-          <img height={53} width={43} src={"http://localhost:3000/movieImg.png"} />
+          <img height={53} width={43} src={"/movieImg.png"} />
         </div>
         <div className={styles.topBody}>
-          <span> Banana Fish</span>
+          <span>{
+            props.anime ? props.anime.anime.animeName : props.manga ? props.manga.manga.name : ''
+          }</span>
           <span className={styles.topViewCount}>
-            49817 görüntülenme
+            {props.anime ? props.anime.viewsCount : props.manga ? props.manga.viewsCount : 0} görüntülenme
           </span>
         </div>
         <div className={styles.topNumber}>
@@ -267,13 +269,13 @@ export default function Discover() {
             <div className={styles.discoverContainer}>
               <div className={styles.discoverLeft}>
                 <div onClick={() => setSelectedTab('Review')} className={styles.discoverReview}>
-                  <img src='http://localhost:3000/Layout.png' />
+                  <img src='/Layout.png' />
                 </div>
                 <div className={styles.discoverDivider}>
                   <span></span>
                 </div>
                 <div onClick={() => setSelectedTab('Fanart')} className={styles.discoverFanArt}>
-                  <img src='http://localhost:3000/Palette.svg' />
+                  <img src='/Palette.svg' />
                 </div>
               </div>
               <div className={styles.discoverMiddle}>
@@ -367,7 +369,7 @@ export default function Discover() {
                             style={{ display: 'flex', flexDirection: 'column' }}
                             key={index}>
                             <div className={styles.weekAnimeBody}>
-                              {item.anime !== null && <a href={'/anime/' + item.anime.seoUrl}><img alt={item.anime.animeName} className={styles.leftImage} height="100" width="80" src={baseUrl + item.anime.img} /></a>}
+                              {item.anime !== null && <a href={'/anime/' + item.anime.seoUrl}><img alt={item.anime.animeName} className={styles.leftImage} height="100" width="80" src={item.anime.img} /></a>}
                               {
                                 item.anime !== null && <ReadMore>{item.anime.animeDescription}</ReadMore>
                               }
@@ -408,7 +410,7 @@ export default function Discover() {
                             style={{ display: 'flex', flexDirection: 'column' }}
                             key={index}>
                             <div className={styles.weekAnimeBody}>
-                              {item.manga != null && <a href={'/manga/' + item.manga.seoUrl}><img alt={item.manga.name} className={styles.leftImage} height="100" width="80" src={baseUrl + item.manga.image} /></a>}
+                              {item.manga != null && <a href={'/manga/' + item.manga.seoUrl}><img alt={item.manga.name} className={styles.leftImage} height="100" width="80" src={item.manga.image} /></a>}
                               {item.manga != null && item.manga.description}
                             </div>
                             <div className={styles.weekAnimeFooter}>
@@ -444,13 +446,13 @@ export default function Discover() {
                     {
                       selectedMenu === 'Anime' ?
                         animeList.topAnimes != undefined &&
-                        animeList.topAnimes.map((item) => {
-                          return <Top100Card />
+                        animeList.topAnimes.map((item, key) => {
+                          return <Top100Card anime={item} key={key} />
                         })
                         :
                         animeList.topMangas != undefined &&
-                        animeList.topMangas.map((item) => {
-                          return <Top100Card />
+                        animeList.topMangas.map((item, key) => {
+                          return <Top100Card key={key} manga={item} />
                         })
                     }
                   </div>

@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleLeft, faAngleRight, faAngleUp, faCamera, faClose, faPaperPlane, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { IDeleteModal, handleDeleteModal, handleOpenAddListItemModal, handleOpenBackgroundBlur, handleOpenEditListItemModal, handleOpenEditListModal, handleOpenEditUserModal, handleOpenInfoSiteModal, handleOpenLoginModal, handleOpenMessageModal, handleOpenRegisterModal, handleOpenBlockModal, handleOpenComplaintModal, handleOpenEditDynamicListModal, handleOpenRosetteModal, handleOpenAddReviews, handleOpenEditReviews, handleOpenAboutModal, handleOpenContentComplaintModal, handleOpenDiscoveryReviesModal } from '../store/features/modalReducer';
-import { addContact, baseUrl, deleteAnimeList, deleteMangaList, deleteUserBlockList, deleteUserList, deleteUserListContent, getAnnouncements, getContactSubject, getHomeSliders, getMessages, getNotifications, getSearchAnime, getSearchAnimeAndManga, getSearchUser, getSiteInfo, getSocialMediaAccounts, getUser, getUserBySeoUrl, postAddUser, postAgainUserEmailVertification, postAnimeList, postAnimeLists, postComplaintList, postContentComplaint, postLogin, postMangaList, postMangaLists, postReviews, postUserBlockList, postUserList, postUserListContent, postUserListContents, putEmailChange, putPassword, putReviews, putUserImg, putUserInfo, putUserList } from '../utils/api';
+import { addContact, baseUrl, deleteAnimeList, deleteMangaList, deleteUserBlockList, deleteUserList, deleteUserListContent, getAnnouncements, getContactSubject, getHomeSliders, getMessages, getNotifications, getSearchAnime, getSearchAnimeAndManga, getSearchUser, getSiteInfo, getSocialMediaAccounts, getUser, getUserBySeoUrl, postAddUser, postAgainUserEmailVertification, postAnimeList, postAnimeLists, postComplaintList, postContentComplaint, postLogin, postMangaList, postMangaLists, postMessage, postReviews, postUserBlockList, postUserList, postUserListContent, postUserListContents, putEmailChange, putPassword, putReviews, putUserImg, putUserInfo, putUserList } from '../utils/api';
 import { Anime, AnimeAndMangaModels, AnimeEpisodes, AnimeList, AnimeListModels, AnimeStatus, ComplaintList, Contact, ContactSubject, ContentComplaint, MangaList, MangaListModels, MangaStatus, Review, RoleType, Type, UserBlockList, UserEmailVertification, UserFullModels, UserList, UserListContents, UserMessage, UserMessageModel, UserModel, Users } from '../types/Entites';
 import { useAuth } from '../hooks/useAuth';
 import { BorderButon } from './Buton';
@@ -57,19 +57,32 @@ export default function Layout(props: ILayoutProps) {
 
 
     } = useSelector((state: RootState) => state.modalReducer.value);
+    const { signalR, messageUser } = useSelector((state: RootState) => state.userReducer.value);
     useEffect(() => {
         setupOnlineUser();
         if (user !== null) {
             loadUser();
             loadNotifications();
-            setupSignalR();
+            // setupSignalR();
+
         }
+
 
         loadHomeSlider();
         loadAnnouncement();
         loadSocialMediaAccount();
         loadSiteInfo();
     }, []);
+    useEffect(() => {
+        if (Object.keys(signalR).length !== 0) {
+            console.log(signalR);
+            signalR.on("messageSent", (data: UserMessage) => {
+                console.log(data);
+                // dispatch(setMessageUsers(messageUser.map((i) => i. === selectedMessage.id ? { ...i, userMessages: [...i.userMessages, data] } : i)));
+            });
+        }
+    }, [signalR])
+
     useEffect(() => {
         if (backgroundBlur) {
             document.body.style.overflow = 'hidden';
@@ -94,22 +107,24 @@ export default function Layout(props: ILayoutProps) {
     }
     const loadSiteInfo = async () => {
         await getSiteInfo().then((res) => {
-            console.log(res.data.entity);
             dispatch(setSiteInfo(res.data.entity));
         })
     }
     const setupSignalR = async () => {
         const date = new Date().getTime();
         var storage = localStorage.getItem("token");
-        if (storage !== null && Object.keys(storage).length === 0) {
-            await configureSignalr();
-        }
-        else {
-            if (storage !== null && date > JSON.parse(storage).expiry) {
-                localStorage.removeItem("token");
-                await configureSignalr();
-            }
-        }
+        await configureSignalr();
+        // if (storage !== null && Object.keys(storage).length === 0) {
+
+        //     await configureSignalr();
+        // }
+        // else {
+        //     // if (storage !== null && date > JSON.parse(storage).expiry) {
+
+        //     // }
+        //     localStorage.removeItem("token");
+        //     await configureSignalr();
+        // }
     }
     const configureSignalr = async () => {
         const date = new Date().getTime();
@@ -211,7 +226,7 @@ const SelectedImageShow = () => {
         <div onClick={() => dispatch(setSelectedImage(''))} className={styles.imageShowContainer}>
             <div className={styles.imgShowBody}>
                 <div className={styles.imgShow}>
-                    <img src={baseUrl + selectedImg} />
+                    <img src={selectedImg} />
                 </div>
             </div>
         </div>
@@ -388,13 +403,13 @@ const SiteInfoModal = () => {
         return (
             <div className={styles.aboutSocialCard}>
                 <div className={styles.aboutSocialCardBody}>
-                    <img height={125} width={125} src={props.img !== undefined && props.img.length !== 0 ? baseUrl + props.img : 'http://localhost:3000/socialProfile.png'} />
+                    <img height={125} width={125} src={props.img !== undefined && props.img.length !== 0 ? props.img : '/socialProfile.png'} />
                     <div className={styles.aboutSocialInfo}>
                         <div className={styles.rowDirection}>
                             <div>{props.name}</div>
                             <Link target={"_blank"} href={props.gmailUrl !== undefined ? props.gmailUrl : "#"}>
                                 <a>
-                                    <img height={30} width={30} src='http://localhost:3000/smallGmail.png' />
+                                    <img height={30} width={30} src='/smallGmail.png' />
                                 </a>
                             </Link>
                         </div>
@@ -402,7 +417,7 @@ const SiteInfoModal = () => {
                             <div className={styles.aboutContainerRoleText}>{props.role}</div>
                             <Link target={"_blank"} href={props.instagramUrl !== undefined ? props.instagramUrl : "#"}>
                                 <a>
-                                    <img height={30} width={30} src='http://localhost:3000/smallInstagram.png' />
+                                    <img height={30} width={30} src='/smallInstagram.png' />
                                 </a>
                             </Link>
                         </div>
@@ -482,7 +497,7 @@ const SiteInfoModal = () => {
                 <div className={styles.contactSocialCard}>
                     <Link href="#">
                         <a>
-                            <img src='http://localhost:3000/mdInstagram.png' />
+                            <img src='/mdInstagram.png' />
                         </a>
                     </Link>
                 </div>
@@ -490,7 +505,7 @@ const SiteInfoModal = () => {
                 <div className={styles.contactSocialCard}>
                     <Link href="#">
                         <a>
-                            <img src='http://localhost:3000/mdDiscord.png' />
+                            <img src='/mdDiscord.png' />
                         </a>
                     </Link>
                 </div>
@@ -498,7 +513,7 @@ const SiteInfoModal = () => {
                 <div className={styles.contactSocialCard}>
                     <Link href="#">
                         <a>
-                            <img src='http://localhost:3000/mdYoutube.png' />
+                            <img src='/mdYoutube.png' />
                         </a>
                     </Link>
                 </div>
@@ -517,32 +532,32 @@ const SiteInfoModal = () => {
         return (<div className={styles.announcementsContainer}>
             <AnnouncementsCard title="Güncelleme"
                 date={new Date(announcement.updateDate).toLocaleDateString()}
-                imageSrc="http://localhost:3000/guncelleme.png">
+                imageSrc="/guncelleme.png">
                 {announcement.updateInformation}
             </AnnouncementsCard>
             <AnnouncementsCard title="Yenilikler"
                 date={new Date(announcement.innovationDate).toLocaleDateString()}
-                imageSrc="http://localhost:3000/yenilik.png">
+                imageSrc="/yenilik.png">
                 {announcement.innovationInformation}
             </AnnouncementsCard>
             <AnnouncementsCard title="Şikayetler"
                 date={new Date(announcement.complaintsDate).toLocaleDateString()}
-                imageSrc="http://localhost:3000/sikayetler.png">
+                imageSrc="/sikayetler.png">
                 {announcement.complaintsInformation}
             </AnnouncementsCard>
             <AnnouncementsCard title="Eklenecekler"
                 date={new Date(announcement.addDate).toLocaleDateString()}
-                imageSrc="http://localhost:3000/eklenecekler.png">
+                imageSrc="/eklenecekler.png">
                 {announcement.addToInformation}
             </AnnouncementsCard>
             <AnnouncementsCard title="Uyarı"
                 date={new Date(announcement.warningDate).toLocaleDateString()}
-                imageSrc="http://localhost:3000/uyari.png">
+                imageSrc="/uyari.png">
                 {announcement.warningInformation}
             </AnnouncementsCard>
             <AnnouncementsCard title="Yakında"
                 date={new Date(announcement.comingSoonDate).toLocaleDateString()}
-                imageSrc="http://localhost:3000/yakinda.png">
+                imageSrc="/yakinda.png">
                 {announcement.comingSoonInfo}
             </AnnouncementsCard>
         </div>)
@@ -643,7 +658,7 @@ const EditUserModal = () => {
         setEmail(userInfo.email);
         console.log(userInfo.image);
         if (userInfo.image != null && userInfo.image.length !== 0) {
-            setSelectedUser(baseUrl + userInfo.image);
+            setSelectedUser(userInfo.image);
         }
         setAbout(userInfo.about != null ? userInfo.about : '');
     }, [userInfo])
@@ -718,7 +733,7 @@ const EditUserModal = () => {
                     <div style={{ height: '166px', width: '166px', borderRadius: '100%', display: 'flex' }}>
                         {
                             selectedUser.length !== 0 ? <img src={selectedUser} height={166} width={166} />
-                                : <img src='http://localhost:3000/profilePhoto.png' style={{ borderRadius: '100%' }} height={166} width={166} />
+                                : <img src='/profilePhoto.png' style={{ borderRadius: '100%' }} height={166} width={166} />
                         }
                         <div onClick={() => fileUploadRef.current?.click()} className={styles["p-Image"]}>
                             <FontAwesomeIcon icon={faCamera} />
@@ -1081,7 +1096,7 @@ const ResultCard = (props: { isOpen?: boolean, type: 'EDIT' | 'ADD', entity: Ani
             <div className={styles.resultCard}>
                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                     <div className={styles.resultImg}>
-                        <img src='http://localhost:3000/profileFavori.png' />
+                        <img src='/profileFavori.png' />
                     </div>
                     <div className={styles.searchBody}>
                         <a>{props.entity.name}</a>
@@ -1226,7 +1241,7 @@ const EditDynamicListCard = (props: { animelist?: AnimeListModels, mangaList?: M
             <div className={styles.resultCard}>
                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                     <div className={styles.resultImg}>
-                        <img src='http://localhost:3000/profileFavori.png' />
+                        <img src='/profileFavori.png' />
                     </div>
                     {props.animelist && Object.keys(props.animelist).length !== 0 ?
                         <div className={styles.searchBody}>
@@ -1392,7 +1407,7 @@ const EditStaticListCard = (props: { animelist?: AnimeListModels, mangaList?: Ma
             <div className={styles.resultCard}>
                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                     <div className={styles.resultImg}>
-                        <img src='http://localhost:3000/profileFavori.png' />
+                        <img src='/profileFavori.png' />
                     </div>
                     {props.animelist && Object.keys(props.animelist).length !== 0 ?
                         <div className={styles.searchBody}>
@@ -1565,7 +1580,7 @@ const LoginModal = () => {
                 </div>
                 <div className={styles.loginContent}>
                     <div className={styles.logoContainer}>
-                        <img src='http://localhost:3000/logo.png' />
+                        <img src='/logo.png' />
                     </div>
                     <input
                         onChange={(e) => setUserName(e.target.value)}
@@ -1694,7 +1709,7 @@ const RegisterModal = () => {
                 </div>
                 {Tabs === 'REGISTER' && <div className={styles.registerContent}>
                     <div className={styles.logoContainer}>
-                        <img src='http://localhost:3000/logo.png' />
+                        <img src='/logo.png' />
                     </div>
                 </div>}
                 {Tabs === 'REGISTER' ? <div className={styles.registerBody}>
@@ -1759,8 +1774,8 @@ const RegisterModal = () => {
                             <div className={(selectedAnime.length !== 0 ? styles["selectedAnime-jc-ai"] : undefined) + " " + styles["pr"] + " " + styles["selectedFavoriContainer"] + " " + styles.registerInput + " " + styles.smallInput + " " + styles.favoriSelected + " " + (check && selectedAnime.length === 0 ? styles.errorBorder : undefined) + " " + styles.userSelected}>
                                 {selectedAnime.length === 0 ? <a>Favori Animeler</a>
                                     :
-                                    selectedAnime.map((item) => {
-                                        return <div className={styles.selectedAnimeCard}>
+                                    selectedAnime.map((item, key) => {
+                                        return <div key={key} className={styles.selectedAnimeCard}>
                                             {item.animeName}
                                             <FontAwesomeIcon onClick={() => {
                                                 setSelectedAnime(selectedAnime.filter((y) => y.id !== item.id))
@@ -1870,10 +1885,9 @@ const MessageModal = () => {
 
     }
 
-    const sendButon = () => {
+    const sendButon = async () => {
         var check = messageUser.find((y) => y.id === selectedMessage.id);
         if (!check) {
-
             dispatch(setMessageUsers([...messageUser, selectedMessage]));
         }
         if (signalR !== undefined && Object.keys(signalR).length !== 0 && messageText.length != 0) {
@@ -1887,6 +1901,17 @@ const MessageModal = () => {
             setTimeout(() => {
                 ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' });
             }, 100);
+        }
+        else {
+            await postMessage({ senderID: user.id, receiverID: selectedMessage.id, message: messageText } as UserMessage).then((res) => {
+                setMessageText('');
+                setTimeout(() => {
+                    ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' });
+                }, 100);
+                dispatch(setMessageUsers(messageUser.map((i) => i.id === selectedMessage.id ? { ...i, userMessages: [...i.userMessages, res.data.entity] } : i)));
+            }).catch((er) => {
+                console.log(er);
+            })
         }
     }
     const handleSearchUser = async (e: string) => {
@@ -1993,7 +2018,7 @@ const UserCard = (props: { item: UserMessageModel, handleClick: () => void }) =>
     return (
         <div onClick={props.handleClick} className={styles.messageUserCard}>
             <div>
-                <img className={styles.messageUserCardImg} src="http://localhost:3000/logo.png" />
+                <img className={styles.messageUserCardImg} src="/logo.png" />
             </div>
             <div className={styles.messageUserCardInfo}>
                 <a>{props.item.userName}</a>
@@ -2008,7 +2033,7 @@ const MessageCard = (props: { whoIsSender: 'SENDER' | 'RECEIVED', entity: UserMe
             <div className={styles.messageCard}>
                 <div className={styles.messageImg}>
                     <div className={styles.messageCardImgContainer}>
-                        <img height={"50px"} width={"50px"} src="http://localhost:3000/logo.png" />
+                        <img height={"50px"} width={"50px"} src="/logo.png" />
                     </div>
                 </div>
                 <div className={styles.messageCardContent}>
@@ -2024,7 +2049,7 @@ const MessageCard = (props: { whoIsSender: 'SENDER' | 'RECEIVED', entity: UserMe
             <div className={styles.messageCardRight}>
                 <div className={styles.messageImg}>
                     <div className={styles.messageCardImgContainerRight}>
-                        <img height={"50px"} width={"50px"} src="http://localhost:3000/logo.png" />
+                        <img height={"50px"} width={"50px"} src="/logo.png" />
                     </div>
                 </div>
                 <div className={styles.messageCardContentRight}>

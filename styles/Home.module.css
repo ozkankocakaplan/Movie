@@ -309,7 +309,7 @@
 
 .homePage2 {
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
-  background: url('http://localhost:3000/homePage2.jpeg');
+  background: url('/homePage2.jpeg');
 
   background-repeat: no-repeat;
   background-size: 100% 100%;
@@ -333,32 +333,32 @@
 }
 
 .homePage2Col1 {
-  height: 20vh;
+  height: 30vh;
 }
 
 .homePage2Col2 {
-  height: 26.66vh;
-
+  height: 35vh;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .homePage2Col3 {
-  height: 26.66vh;
+  height: 35vh;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .homePage2Col4 {
-  height: 26.66vh;
+  height: 35vh;
   display: flex;
   flex-direction: column;
   justify-content: space-betweenÇ;
 }
 
 .footerScroll {
+  background: #090A0C;
   display: flex;
   justify-content: space-between;
 }
@@ -368,7 +368,7 @@
   width: 500px;
   height: 100%;
   left: 483.5px;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), rgba(24, 24, 24, 0.01), url('http://localhost:3000/children.png');
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), rgba(24, 24, 24, 0.01), url('/children.png');
   /* backdrop-filter: blur(1.5px); */
 }
 
@@ -443,10 +443,10 @@
 .footerContentInfo {
   color: rgba(255, 255, 255, 0.75);
   position: relative;
-  left: 185px;
+  left: 100px;
   width: 230px;
   height: 120px;
-  top: 10px;
+  top: 40px;
   padding: 10px;
   display: flex;
   justify-content: center;
@@ -571,7 +571,7 @@
 }
 
 .archiveBackground {
-  background-image: url('http://localhost:3000/archive.png');
+  background-image: url('/archive.png');
   background-repeat: no-repeat;
   background-size: 100% 100%;
   box-sizing: content-box;
@@ -580,9 +580,9 @@
 
 .childrenContainer {
   position: absolute;
-  margin-left: 41%;
-  top: 130vh;
+  margin-left: 39%;
   z-index: 500;
+  margin-top: -70vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1582,21 +1582,25 @@
 
 }
 
+.mobileQuickButon {
+  display: none;
+}
+
+.mobileQuickButonContainer {
+  display: flex;
+
+}
+
 .imageShowContainer {
   flex-direction: column;
-  height: 100%;
-  width: 100%;
   background-color: #14141495;
   position: fixed;
+  height: 100%;
+  width: 100%;
   z-index: 2000;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.imgShowBody {
-  width: 80%;
-  margin-top: 40px;
 }
 
 .imgShow {
@@ -1605,6 +1609,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.imgShow img {
+  height: 70%;
+  width: 70%;
 }
 
 .detailsImagesContainer img {
@@ -2136,7 +2145,7 @@
 
 .profileHeader {
   height: 191px;
-  background: url("http://localhost:3000/profileHeader.png");
+  background: url("/profileHeader.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
   display: flex;
@@ -2672,6 +2681,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   gap: 10px;
+  max-height: 80vh;
   row-gap: 30px;
   justify-content: space-between;
 }
@@ -2765,7 +2775,7 @@
   border-radius: 7px;
   padding: 10px;
   width: 350px;
-  height: 707px;
+  height: 80vh;
   display: flex;
   flex-direction: column;
 }
@@ -2797,7 +2807,7 @@
 
 .aboutContainer:nth-child(1) {
   overflow-y: scroll;
-  max-height: 710px;
+  max-height: 80vh;
   font-weight: 400;
   font-size: 17px;
   line-height: 27px;
@@ -2806,7 +2816,7 @@
 
 .aboutContainer:nth-child(2) {
   overflow-y: scroll;
-  max-height: 710px;
+  max-height: 80vh;
 }
 
 .aboutSocialCard {
@@ -3244,12 +3254,53 @@
 
 .animeContainer {
   height: calc(100vh);
+  max-height: calc(100vh+10vh);
+  padding-bottom: 20px;
   margin-top: 20px;
   margin-left: 20px;
   margin-right: 20px;
 }
 
+.homePage2Mobile {
+  display: none;
+}
+
+.homePage2Desktop {
+  display: block;
+}
+
+@media screen and (max-width:720px) {
+  .homePage2Footer {
+    display: none;
+  }
+}
+
 @media screen and (max-width:1024px) {
+  .mobileQuickButon {
+    display: block !important;
+  }
+
+  .homePage2Col4 {
+    justify-content: flex-end;
+  }
+
+  .top2EpisodeContainer, .topEpisodeContainer {
+    width: 90% !important;
+    max-width: 90% !important;
+  }
+
+  .homePage2Mobile {
+    display: block !important
+  }
+
+  .homePage2Desktop {
+    display: none !important;
+  }
+
+  .childrenContainer {
+    display: none;
+  }
+
   .animeContainer {
     height: inherit;
     padding-bottom: 20px;

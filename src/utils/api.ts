@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { Anime, AnimeAndMangaModels, AnimeList, AnimeModels, Announcement, Categories, Comments, ComplaintList, Contact, ContactSubject, ContentComplaint, ContentNotification, DiscoverModels, FanArt, HomeSlider, Like, Manga, MangaList, MangaModels, MovieDTO, Notification, Ratings, Review, SiteInfo, SocialMediaAccount, Type, UserBlockList, UserEmailVertification, UserList, UserListContents, UserMessageModel, UserModel, Users } from '../types/Entites';
+import { Anime, AnimeAndMangaModels, AnimeList, AnimeModels, Announcement, Categories, Comments, ComplaintList, Contact, ContactSubject, ContentComplaint, ContentNotification, DiscoverModels, FanArt, HomeSlider, Like, Manga, MangaList, MangaModels, MovieDTO, Notification, Ratings, Review, SiteInfo, SocialMediaAccount, Type, UserBlockList, UserEmailVertification, UserList, UserListContents, UserMessage, UserMessageModel, UserModel, Users } from '../types/Entites';
 import ServiceResponse from '../types/ServiceResponse';
-export const baseUrl = "http://192.168.1.107:37323";
-// export const baseUrl = "https://api.lycorisa.com";
+// export const baseUrl = "http://localhost:5000";
+export const baseUrl = "https://api.lycorisa.com";
 export default function api() {
     const userLocal = localStorage.getItem('user');
     var user: UserModel = {} as UserModel;
@@ -169,6 +169,9 @@ export const postContentComplaint = async (entity: ContentComplaint) => {
 }
 export const getMessages = async () => {
     return await api().get<ServiceResponse<UserMessageModel>>("/getMessages");
+}
+export const postMessage = async (message: UserMessage) => {
+    return await api().post<ServiceResponse<UserMessage>>("/addMessage", message);
 }
 export const getSearchUser = async (message: string) => {
     return await api().get<ServiceResponse<UserMessageModel>>("/getSearchUser/" + message);

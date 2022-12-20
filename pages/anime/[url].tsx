@@ -6,7 +6,7 @@ import React, { HTMLAttributes, useEffect, useState } from 'react'
 import ReactPlayer from 'react-player'
 import { useDispatch, useSelector } from 'react-redux'
 import MenuButon, { MenuList } from '../../src/components/Buton'
-import { CommentCard } from '../../src/components/Card'
+import { CommentCard, MemoFanArtCard, MemoReviewCard } from '../../src/components/Card'
 import DownButon from '../../src/components/DownButon'
 import FilterModal from '../../src/components/FilterModal'
 import Header from '../../src/components/Header'
@@ -112,12 +112,12 @@ export default function Details() {
                                 return <Info key={item.id} name={item.categories.name} />
                             })
                         }
-                        <Info name={'Mal: ' + animeModel.anime.malRating} />
+                        <Info name={'Mal: ' + animeModel.anime.malRating + "/10"} />
                         <Info name={'Bölümler: ' + animeModel.animeEpisodes.length} />
                         <Info name={"Yaş Sınırı: " + animeModel.anime.ageLimit} />
                         <Info name={'Beğeni: ' + animeModel.likeCount} />
-                        <Info name={'Site: ' + animeModel.anime.siteRating} />
-                        <Info name={'Çıkış: ' + animeModel.anime.showTime} />
+                        <Info name={animeModel.anime.siteRating === undefined ? "Site: " + 1 + "/10" : "Site: " + animeModel.anime.siteRating + "/10"} />
+                        <Info name={'Çıkış: ' + new Date(animeModel.anime.showTime).toLocaleDateString()} />
                         <Info name={animeModel.anime.videoType === VideoType.AnimeSeries ? "Tür: Dizi" : "Tür: Film"} />
                         <Info name={'Sıralama: ' + animeModel.arrangement} />
                         <Info name={'Sezon Sayısı: ' + animeModel.anime.seasonCount} />
@@ -198,22 +198,26 @@ export default function Details() {
                                             }
                                         }} icon={faThumbsUp} />
 
-                                    <MenuButon
-                                        width='50px'
-                                        color={"rgba(255,255,255,0.5)"}
-                                        marginright='10px' onClick={() => {
-                                            setIsWatch(!isWatch);
-                                            if (isWatch) {
-                                                dispatch(setSelectedEpisode({}));
-                                            }
-                                            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                                        }} icon={!isWatch ? faEye : faEyeSlash} />
-                                    <MenuButon
-                                        width='50px'
-                                        color={"rgba(255,255,255,0.5)"}
-                                        marginright='0px' onClick={async () => {
-                                            setIsFilterModal(true);
-                                        }} icon={faFilter} />
+                                    <span className={styles.mobileQuickButon}>
+                                        <div className={styles.mobileQuickButonContainer}>
+                                            <MenuButon
+                                                width='50px'
+                                                color={"rgba(255,255,255,0.5)"}
+                                                marginright='10px' onClick={() => {
+                                                    setIsWatch(!isWatch);
+                                                    if (isWatch) {
+                                                        dispatch(setSelectedEpisode({}));
+                                                    }
+                                                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                                                }} icon={!isWatch ? faEye : faEyeSlash} />
+                                            <MenuButon
+                                                width='50px'
+                                                color={"rgba(255,255,255,0.5)"}
+                                                marginright='0px' onClick={async () => {
+                                                    setIsFilterModal(true);
+                                                }} icon={faFilter} />
+                                        </div>
+                                    </span>
                                 </div>
                                 <div className={styles.rightMenuContainer}>
                                     <DownButon onClick={() => {
@@ -467,9 +471,26 @@ const Comments = (props: { contentID: number, type: Type }) => {
     )
 }
 const Statuss = () => {
+    const dispatch = useDispatch();
+    const { animeModel } = useSelector((x: RootState) => x.animeReducer);
+    const { user } = useSelector((x: RootState) => x.userReducer.value);
     return (
         <div className={styles.statussContainer}>
-            gönderiler
+            {
+                animeModel.discoverModels.fanArts.map((item) => {
+                    return <MemoFanArtCard handleDataChange={(data: any) => {
+                        dispatch(setAnimeModel({ ...animeModel, discoverModels: { ...animeModel.discoverModels, fanArts: animeModel.discoverModels.fanArts.map((i) => i.id === data.id ? data : i) } }));
+                    }} entity={item as any} key={item.id} />
+                })
+            }
+            {
+                animeModel.discoverModels.reviews.map((item) => {
+                    return <MemoReviewCard handleDataChange={(data: any) => {
+                        dispatch(setAnimeModel({ ...animeModel, discoverModels: { ...animeModel.discoverModels, reviews: animeModel.discoverModels.fanArts.map((i) => i.id === data.id ? data : i) } }));
+
+                    }} key={item.id} user={user} item={item as any} />
+                })
+            }
         </div>
     )
 }
@@ -523,14 +544,14 @@ const Images = () => {
                 <div>
                     <div className={styles.detailsImagesContainer}>
                         {
-                            <img onClick={() => dispatch(setSelectedImage(animeModel.animeImages[selectedIndex].img))} src={baseUrl + animeModel.animeImages[selectedIndex]?.img} />
+                            <img onClick={() => dispatch(setSelectedImage(baseUrl + animeModel.animeImages[selectedIndex].img))} src={baseUrl + animeModel.animeImages[selectedIndex]?.img as any} />
                         }
                     </div>
                     <div className={styles.detailsImagesListContainer}>
                         <div className={styles.detailsImages}>
                             {
                                 animeModel.animeImages.map((item, index) => {
-                                    return <img key={index} onClick={() => setSelectedIndex(index)} src={baseUrl + item.img} />
+                                    return <img key={index} onClick={() => setSelectedIndex(index)} src={baseUrl + item.img as any} />
                                 })
                             }
                         </div>

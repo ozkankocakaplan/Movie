@@ -419,6 +419,7 @@ export interface AnimeModels {
     anime: Anime;
     manga: Manga;
     like: Like;
+    discoverModels: DiscoverModels;
     animeRating: Ratings;
     contentNotification: ContentNotification;
     categories: CategoryType[];
@@ -446,6 +447,7 @@ export interface MangaModels {
     anime: Anime;
     manga: Manga;
     like: Like;
+    discoverModels: DiscoverModels;
     mangaRating: Ratings;
     contentNotification: ContentNotification;
     categories: CategoryType[];
@@ -481,8 +483,8 @@ export interface MovieTheWeekModels extends MovieTheWeek {
 export interface DiscoverModels {
     fanArts: FanArtModel[];
     reviews: ReviewsModels[];
-    topAnimes: Anime[];
-    topMangas: Manga[];
+    topAnimes: AnimeModels[];
+    topMangas: MangaModels[];
     movieTheWeeks: MovieTheWeekModels[];
 }
 export interface UserMessage extends BaseEntity {

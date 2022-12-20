@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import React, { HTMLAttributes, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import MenuButon, { MenuList } from '../../src/components/Buton'
-import { CommentCard } from '../../src/components/Card'
+import { CommentCard, MemoFanArtCard, MemoReviewCard } from '../../src/components/Card'
 import DownButon from '../../src/components/DownButon'
 import FilterModal from '../../src/components/FilterModal'
 import Header from '../../src/components/Header'
@@ -442,9 +442,26 @@ const Comments = (props: { contentID: number, type: Type }) => {
     )
 }
 const Statuss = () => {
+    const dispatch = useDispatch();
+    const { mangaModel } = useSelector((x: RootState) => x.mangaReducer);
+    const { user } = useSelector((x: RootState) => x.userReducer.value);
     return (
         <div className={styles.statussContainer}>
-            gönderiler
+            {
+                mangaModel.discoverModels.fanArts.map((item) => {
+                    return <MemoFanArtCard handleDataChange={(data: any) => {
+                        dispatch(setMangaModel({ ...mangaModel, discoverModels: { ...mangaModel.discoverModels, fanArts: mangaModel.discoverModels.fanArts.map((i) => i.id === data.id ? data : i) } }));
+                    }} entity={item as any} key={item.id} />
+                })
+            }
+            {
+                mangaModel.discoverModels.reviews.map((item) => {
+                    return <MemoReviewCard handleDataChange={(data: any) => {
+                        dispatch(setAnimeModel({ ...mangaModel, discoverModels: { ...mangaModel.discoverModels, reviews: mangaModel.discoverModels.fanArts.map((i) => i.id === data.id ? data : i) } }));
+
+                    }} key={item.id} user={user} item={item as any} />
+                })
+            }
         </div>
     )
 }
@@ -503,7 +520,7 @@ const Images = () => {
                 <div>
                     <div className={styles.detailsImagesContainer}>
                         {
-                            <img onClick={() => dispatch(setSelectedImage(mangaModel.mangaImages[selectedIndex].img))} src={baseUrl + mangaModel.mangaImages[selectedIndex]?.img} />
+                            <img onClick={() => dispatch(setSelectedImage(baseUrl + mangaModel.mangaImages[selectedIndex].img))} src={baseUrl + mangaModel.mangaImages[selectedIndex]?.img} />
                         }
                     </div>
                     <div className={styles.detailsImagesListContainer}>

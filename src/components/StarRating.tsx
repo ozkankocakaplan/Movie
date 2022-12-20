@@ -18,7 +18,7 @@ export default function StarRating(props: IStarRatingProps) {
                         id='starRating'
                         type="button"
                         key={index}
-                        style={index <= (hover || props.rating) ? { color: '#FDBC0B' } : { color: '#ccc' }}
+                        style={index <= (hover || props.rating) ? { color: 'rgba(255,255,255,.6)' } : { color: 'rgba(255,255,255,.2)' }}
                         onMouseEnter={() => setHover(index)}
                         onMouseLeave={() => setHover(props.rating)}
                     >

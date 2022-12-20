@@ -6,10 +6,10 @@ import { RootState } from '../store';
 import { Comments, ComplaintType, ContentComplaint, FanArtModel, Like, ReviewsModels, Type, UserFullModels, Users } from '../types/Entites';
 
 import styles from '../../styles/Home.module.css';
-import { baseUrl, deleteComment, deleteFanArt, deleteLike, deleteReview, getLike, postLike } from '../utils/api';
+import { deleteComment, deleteFanArt, deleteLike, deleteReview, getLike, postLike } from '../utils/api';
 import { IDeleteModal, handleDeleteModal, handleOpenBackgroundBlur, handleOpenEditReviews, handleOpenContentComplaintModal } from '../store/features/modalReducer';
 import { setSelectedReview } from '../store/features/animeReducer';
-import { setContentComplaint, setViewUser } from '../store/features/userReducer';
+import { setContentComplaint, setSelectedImage, setViewUser } from '../store/features/userReducer';
 import { setCommentLike, setCommentLikes, setComments } from '../store/features/commentsReducer';
 import Line from './Line';
 import SendComment from './SendComment';
@@ -58,13 +58,13 @@ const ReviewCard = (props: { user: Users, item: any, handleDataChange?: (data: a
     }
   }
   return (
-    <div>
+    <div style={{ width: '100%' }}>
       <div className={styles.topLeftBorder}></div>
       <div className={styles.leftBorder}></div>
       <div className={styles.listCard2}>
         <div className={styles.sliderContainer}>
           <div className={styles.sliderImages}>
-            {props.item.type === Type.Anime ? <CardImg image={baseUrl + props.item.anime.img} /> : <CardImg image={baseUrl + props.item.manga.image} />}
+            {props.item.type === Type.Anime ? <CardImg image={props.item.anime.img} /> : <CardImg image={props.item.manga.image} />}
             <div style={{ flex: 1, display: 'flex' }} className={styles.userSelected + " " + styles.fdirectionColumn}>
               <div className={styles.reviewView + " " + styles.userSelected}>
                 {props.item.message ? props.item.message : props.item.description}
@@ -189,7 +189,7 @@ const FanArtCard = (props: { entity: any, handleDataChange?: (data: any) => void
   const [commentView, setCommentView] = useState(false);
   const CardImg = (props: { img: string, alt: string }) => {
     return (
-      <img alt={props.alt} className={styles.cardImage + " " + styles.userSelected} src={baseUrl + props.img} />
+      <img alt={props.alt} className={styles.cardImage + " " + styles.userSelected} src={props.img} />
     )
   }
   const likeButon = async () => {
@@ -219,14 +219,16 @@ const FanArtCard = (props: { entity: any, handleDataChange?: (data: any) => void
     }
   }
   return (
-    <div>
+    <div style={{ width: '100%' }}>
       <div className={styles.topLeftBorder}></div>
       <div className={styles.leftBorder}></div>
       <div className={styles.listCard2} >
         <div className={styles.sliderContainer}>
           <div className={styles.sliderImages}>
             <CardImg alt={props.entity.description} img={props.entity.users.image} />
-            <div className={styles.fanArtView + " " + styles.userSelected}>
+            <div onClick={() => {
+              dispatch(setSelectedImage(props.entity.image));
+            }} className={styles.fanArtView + " " + styles.userSelected}>
               fan art’ı görüntülemek için tıkla
             </div>
             <div className={styles.options}>
@@ -239,7 +241,7 @@ const FanArtCard = (props: { entity: any, handleDataChange?: (data: any) => void
                 className={styles.fanArtIconButons}>
                 <FontAwesomeIcon fontSize={15} color='rgba(255, 255, 255, 0.50)' icon={faWarning} />
               </div>
-              <div
+              <div onClick={() => setCommentView(!commentView)}
                 className={styles.fanArtIconButons}>
                 <FontAwesomeIcon fontSize={15} color='rgba(255, 255, 255, 0.50)' icon={faComment} />
               </div>
@@ -254,35 +256,36 @@ const FanArtCard = (props: { entity: any, handleDataChange?: (data: any) => void
               </div>}
             </div>
           </div>
-          {commentView && <div>
-            <div className={styles.discoverCommentContainer}>
-              {
-                props.entity.comments !== null && props.entity.comments.length !== 0 &&
-                props.entity.comments.map((item: Comments) => {
-                  return <div key={item.id} className={styles.discoverComment + " " + styles.userSelected}>
-                    <div className={styles.commentUser}>
-                      {item.users.userName}
-                    </div>
-                    <Line />
-                    <div>
-                      {
-                        item.comment
-                      }
-                    </div>
-                  </div>
-                })
-              }
-            </div>
-            <div className={styles.discoverComment + " " + styles.userSelected}>
-              <SendComment contentID={props.entity.id} type={Type.FanArt} handleData={(data: any) => {
-                var entity = props.entity as FanArtModel;
-                if (props.handleDataChange) {
-                  props.handleDataChange({ ...entity, comments: [...entity.comments, data] } as FanArtModel)
-                }
-              }} />
-            </div>
-          </div>}
         </div>
+        {commentView && <div>
+          <div className={styles.discoverCommentContainer}>
+            {
+              props.entity.comments !== null && props.entity.comments.length !== 0 &&
+              props.entity.comments.map((item: Comments) => {
+                return <div key={item.id} className={styles.discoverComment + " " + styles.userSelected}>
+                  <div className={styles.commentUser}>
+                    {item.users.userName}
+                  </div>
+                  <Line />
+                  <div>
+                    {
+                      item.comment
+                    }
+                  </div>
+                </div>
+              })
+            }
+          </div>
+          <div className={styles.discoverComment + " " + styles.userSelected}>
+            <SendComment contentID={props.entity.id} type={Type.FanArt} handleData={(data: any) => {
+              var entity = props.entity as FanArtModel;
+              if (props.handleDataChange) {
+                props.handleDataChange({ ...entity, comments: [...entity.comments, data] } as FanArtModel)
+              }
+            }} />
+          </div>
+        </div>}
+
         <div className={styles.listOptions}>
           <div className={styles.listOptionsLeft}>
             {
@@ -387,9 +390,9 @@ const CommentCard = (props: { item: Comments }) => {
           <div className={styles.shareUserName}><a>{props.item.users.userName}</a></div>
           {
             props.item.users.image !== null && props.item.users.image.length !== 0 ?
-              <img src={baseUrl + props.item.users.image} />
+              <img src={props.item.users.image} />
               :
-              <img src={"http://localhost:3000/profilePhoto.png"} />
+              <img src={"/profilePhoto.png"} />
           }
 
         </div>
