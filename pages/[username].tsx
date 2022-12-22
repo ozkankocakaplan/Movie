@@ -205,8 +205,8 @@ export default function Profile(props: { serviceResponse: ServiceResponse<UserFu
                     <a>
                       {
                         userProfile.user.image != null && userProfile.user.image.length !== 0 ?
-                          <img src={baseUrl + userProfile.user.image} />
-                          : <img src={"/logo.png"} />
+                          <picture><img src={baseUrl + userProfile.user.image} /></picture>
+                          : <picture><img src={"/logo.png"} /></picture>
                       }
 
                     </a>
@@ -254,47 +254,49 @@ const Slider = (props: { user: Users, entity?: Array<UserListModels>, userList?:
   }
   const CardImg = (entity: AnimeListModels | MangaListModels | UserListModels) => {
     return (
-      <img onClick={() => {
-        if (props.listType === 'STATIC') {
-          if (props.listName === "İzledim" || props.listName === "İzliyorum" || props.listName === "İzleyeceğim") {
-            dispatch(setEditMangaList({} as MangaListModels));
-            dispatch(setEditAnimeList(entity as AnimeListModels));
-          }
-          if (props.listName === "Okudum" || props.listName === "Okuyorum" || props.listName === "Okuyacağım") {
-            dispatch(setEditAnimeList({} as AnimeListModels));
-            dispatch(setEditMangaList(entity as MangaListModels));
-          }
-          dispatch(handleOpenBackgroundBlur(true));
-          dispatch(handleOpenEditListItemModal(true));
-        }
-        else {
-          var userListModel = entity as UserListModels;
-          if (userListModel.type === Type.Anime) {
-            var animeListModels = {
-              ...userListModel,
-              categories: userListModel.categories,
-              animeSeasons: userListModel.animeSeasons,
-              animeEpisodes: userListModel.animeEpisodes,
-              anime: userListModel.anime
-            } as AnimeListModels;
-            dispatch(setEditMangaList({} as MangaListModels));
-            dispatch(setEditAnimeList(animeListModels));
+      <picture>
+        <img onClick={() => {
+          if (props.listType === 'STATIC') {
+            if (props.listName === "İzledim" || props.listName === "İzliyorum" || props.listName === "İzleyeceğim") {
+              dispatch(setEditMangaList({} as MangaListModels));
+              dispatch(setEditAnimeList(entity as AnimeListModels));
+            }
+            if (props.listName === "Okudum" || props.listName === "Okuyorum" || props.listName === "Okuyacağım") {
+              dispatch(setEditAnimeList({} as AnimeListModels));
+              dispatch(setEditMangaList(entity as MangaListModels));
+            }
+            dispatch(handleOpenBackgroundBlur(true));
+            dispatch(handleOpenEditListItemModal(true));
           }
           else {
-            var mangaListModels = {
-              ...userListModel,
-              categories: userListModel.categories,
-              mangaEpisodes: userListModel.mangaEpisodes,
-              manga: userListModel.manga
-            } as MangaListModels;
-            dispatch(setEditAnimeList({} as AnimeListModels));
-            dispatch(setEditMangaList(mangaListModels));
+            var userListModel = entity as UserListModels;
+            if (userListModel.type === Type.Anime) {
+              var animeListModels = {
+                ...userListModel,
+                categories: userListModel.categories,
+                animeSeasons: userListModel.animeSeasons,
+                animeEpisodes: userListModel.animeEpisodes,
+                anime: userListModel.anime
+              } as AnimeListModels;
+              dispatch(setEditMangaList({} as MangaListModels));
+              dispatch(setEditAnimeList(animeListModels));
+            }
+            else {
+              var mangaListModels = {
+                ...userListModel,
+                categories: userListModel.categories,
+                mangaEpisodes: userListModel.mangaEpisodes,
+                manga: userListModel.manga
+              } as MangaListModels;
+              dispatch(setEditAnimeList({} as AnimeListModels));
+              dispatch(setEditMangaList(mangaListModels));
+            }
+            dispatch(handleOpenBackgroundBlur(true));
+            dispatch(handleOpenEditDynamicListModal(true));
           }
-          dispatch(handleOpenBackgroundBlur(true));
-          dispatch(handleOpenEditDynamicListModal(true));
-        }
 
-      }} className={styles.cardImage + " " + styles.userSelected} src='/profileFavori.png' />
+        }} className={styles.cardImage + " " + styles.userSelected} src='/profileFavori.png' />
+      </picture>
     )
   }
   return (

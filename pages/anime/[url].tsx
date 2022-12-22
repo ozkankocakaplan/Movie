@@ -544,14 +544,14 @@ const Images = () => {
                 <div>
                     <div className={styles.detailsImagesContainer}>
                         {
-                            <img onClick={() => dispatch(setSelectedImage(baseUrl + animeModel.animeImages[selectedIndex].img))} src={baseUrl + animeModel.animeImages[selectedIndex]?.img as any} />
+                            <picture> <img onClick={() => dispatch(setSelectedImage(baseUrl + animeModel.animeImages[selectedIndex].img))} src={baseUrl + animeModel.animeImages[selectedIndex]?.img as any} /></picture>
                         }
                     </div>
                     <div className={styles.detailsImagesListContainer}>
                         <div className={styles.detailsImages}>
                             {
                                 animeModel.animeImages.map((item, index) => {
-                                    return <img key={index} onClick={() => setSelectedIndex(index)} src={baseUrl + item.img as any} />
+                                    return <picture><img key={index} onClick={() => setSelectedIndex(index)} src={baseUrl + item.img as any} /></picture>
                                 })
                             }
                         </div>

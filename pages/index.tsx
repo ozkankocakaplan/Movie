@@ -202,21 +202,21 @@ const MoviesPage = () => {
                   <span>
                     <Link href={""}>
                       <a>
-                        <img src="/instagram.png" />
+                        <picture><img src="/instagram.png" /></picture>
                       </a>
                     </Link>
                   </span>
                   <span>
                     <Link href={""}>
                       <a>
-                        <img src="/youtube.png" />
+                        <picture><img src="/youtube.png" /></picture>
                       </a>
                     </Link>
                   </span>
                   <span>
                     <Link href={""}>
                       <a>
-                        <img src="/discord.png" />
+                        <picture><img src="/discord.png" /></picture>
                       </a>
                     </Link>
                   </span>
@@ -281,8 +281,8 @@ const MoviesPage = () => {
           className={styles.childrenMangaText + " " + styles.userSelected}>{
             type === "Anime" ? "Anime" : "Manga"
           }</div>}
-        <img
-          src='/children.png' />
+        <picture>  <img
+          src='/children.png' /></picture>
       </div>
       {movieInfoShow && <MovieDescriptionModal top={'130vh'} handleCloseModal={() => {
         setMovieInfoShow(false);
@@ -460,21 +460,21 @@ const MobileViewMoviesPage2 = () => {
                   <span>
                     <Link href={""}>
                       <a>
-                        <img src="/instagram.png" />
+                        <picture>  <img src="/instagram.png" /></picture>
                       </a>
                     </Link>
                   </span>
                   <span>
                     <Link href={""}>
                       <a>
-                        <img src="/youtube.png" />
+                        <picture>  <img src="/youtube.png" /></picture>
                       </a>
                     </Link>
                   </span>
                   <span>
                     <Link href={""}>
                       <a>
-                        <img src="/discord.png" />
+                        <picture>  <img src="/discord.png" /></picture>
                       </a>
                     </Link>
                   </span>
@@ -562,7 +562,7 @@ const HomeSlider = (props: { children: React.ReactNode }) => {
           </div>
           <span>
             <a href={entity.url}>
-              <img src="/playButons.png" className={styles.playButons} />
+              <picture> <img src="/playButons.png" className={styles.playButons} /></picture>
             </a>
           </span>
         </div>

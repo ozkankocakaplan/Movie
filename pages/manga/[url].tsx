@@ -520,14 +520,14 @@ const Images = () => {
                 <div>
                     <div className={styles.detailsImagesContainer}>
                         {
-                            <img onClick={() => dispatch(setSelectedImage(baseUrl + mangaModel.mangaImages[selectedIndex].img))} src={baseUrl + mangaModel.mangaImages[selectedIndex]?.img} />
+                            <picture> <img onClick={() => dispatch(setSelectedImage(baseUrl + mangaModel.mangaImages[selectedIndex].img))} src={baseUrl + mangaModel.mangaImages[selectedIndex]?.img} /></picture>
                         }
                     </div>
                     <div className={styles.detailsImagesListContainer}>
                         <div className={styles.detailsImages}>
                             {
                                 mangaModel.mangaImages.map((item, index) => {
-                                    return <img key={index} onClick={() => setSelectedIndex(index)} src={baseUrl + item.img} />
+                                    return <picture><img key={index} onClick={() => setSelectedIndex(index)} src={baseUrl + item.img} /></picture>
                                 })
                             }
                         </div>

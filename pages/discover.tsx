@@ -90,7 +90,7 @@ export default function Discover() {
     return (
       <div className={styles.top100Card}>
         <div className={styles.top100Img}>
-          <img height={53} width={43} src={"/movieImg.png"} />
+          <picture> <img height={53} width={43} src={"/movieImg.png"} /></picture>
         </div>
         <div className={styles.topBody}>
           <span>{
@@ -269,13 +269,13 @@ export default function Discover() {
             <div className={styles.discoverContainer}>
               <div className={styles.discoverLeft}>
                 <div onClick={() => setSelectedTab('Review')} className={styles.discoverReview}>
-                  <img src='/Layout.png' />
+                  <picture> <img src='/Layout.png' /></picture>
                 </div>
                 <div className={styles.discoverDivider}>
                   <span></span>
                 </div>
                 <div onClick={() => setSelectedTab('Fanart')} className={styles.discoverFanArt}>
-                  <img src='/Palette.svg' />
+                  <picture>  <img src='/Palette.svg' /></picture>
                 </div>
               </div>
               <div className={styles.discoverMiddle}>
@@ -369,7 +369,7 @@ export default function Discover() {
                             style={{ display: 'flex', flexDirection: 'column' }}
                             key={index}>
                             <div className={styles.weekAnimeBody}>
-                              {item.anime !== null && <a href={'/anime/' + item.anime.seoUrl}><img alt={item.anime.animeName} className={styles.leftImage} height="100" width="80" src={item.anime.img} /></a>}
+                              {item.anime !== null && <a href={'/anime/' + item.anime.seoUrl}><picture><img alt={item.anime.animeName} className={styles.leftImage} height="100" width="80" src={item.anime.img} /></picture></a>}
                               {
                                 item.anime !== null && <ReadMore>{item.anime.animeDescription}</ReadMore>
                               }
@@ -410,7 +410,7 @@ export default function Discover() {
                             style={{ display: 'flex', flexDirection: 'column' }}
                             key={index}>
                             <div className={styles.weekAnimeBody}>
-                              {item.manga != null && <a href={'/manga/' + item.manga.seoUrl}><img alt={item.manga.name} className={styles.leftImage} height="100" width="80" src={item.manga.image} /></a>}
+                              {item.manga != null && <a href={'/manga/' + item.manga.seoUrl}><picture><img alt={item.manga.name} className={styles.leftImage} height="100" width="80" src={item.manga.image} /></picture></a>}
                               {item.manga != null && item.manga.description}
                             </div>
                             <div className={styles.weekAnimeFooter}>

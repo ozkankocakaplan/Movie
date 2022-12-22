@@ -189,7 +189,7 @@ const FanArtCard = (props: { entity: any, handleDataChange?: (data: any) => void
   const [commentView, setCommentView] = useState(false);
   const CardImg = (props: { img: string, alt: string }) => {
     return (
-      <img alt={props.alt} className={styles.cardImage + " " + styles.userSelected} src={props.img} />
+      <picture><img alt={props.alt} className={styles.cardImage + " " + styles.userSelected} src={props.img} /></picture>
     )
   }
   const likeButon = async () => {
