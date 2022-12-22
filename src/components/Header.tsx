@@ -109,17 +109,18 @@ export default function Header(props: IHeaderProps) {
                         {notificationShow && <NotificationsContainer />}
                     </li>
                     }
-                    {loggedUser !== null && <li>
+                    {/* {loggedUser !== null && <li>
                         <div>
                             <a onClick={() => {
                                 dispatch(handleOpenBackgroundBlur(true))
                                 dispatch(handleOpenMessageModal(true))
                             }}><FontAwesomeIcon size="xl" icon={faEnvelope} /></a>
                         </div>
-                    </li>}
+                    </li>} */}
                     <li>
+
                         {
-                            loggedUser !== null ?
+                            loggedUser !== null && userInfo !== null ?
                                 <Link href={"/" + userInfo.seoUrl}>
                                     <a>
                                         <ProfilImage alt={userInfo.nameSurname} height='40px' width='40px' src='/profilImage.png' />

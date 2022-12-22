@@ -137,14 +137,14 @@ export default function Profile(props: { serviceResponse: ServiceResponse<UserFu
                     dispatch(handleOpenBackgroundBlur(true));
                     dispatch(handleOpenAboutModal(true));
                   }} className={styles.optionsIcon}><FontAwesomeIcon icon={faAddressCard} /></div>
-                  <div onClick={async () => {
+                  {/* <div onClick={async () => {
                     await getSearchUserByID(userProfile.user.id).then((res) => {
                       console.log(res.data);
                       dispatch(setUserMessageSend(res.data.entity));
                       dispatch(handleOpenMessageModal(true));
                     })
 
-                  }} className={styles.optionsIcon}><FontAwesomeIcon icon={faEnvelope} /></div>
+                  }} className={styles.optionsIcon}><FontAwesomeIcon icon={faEnvelope} /></div> */}
                   <div onClick={() => {
                     dispatch(handleOpenBackgroundBlur(true))
                     dispatch(handleOpenBlockModal(true));

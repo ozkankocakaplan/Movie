@@ -273,7 +273,7 @@ const Archive: NextPage = () => {
                       show={Object.keys(selectedAnimeModel).length != 0 && selectedAnimeModel.anime.id === item.anime.id ? "1" : undefined} key={item.anime.id} />
                   })
                   :
-                  mangaModels.sort((a, b) => {
+                  [...mangaModels].sort((a, b) => {
                     if (mangaFilter.order == 'AZ') {
                       if (a.manga.name < b.manga.name) {
                         return 1;
