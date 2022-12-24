@@ -527,7 +527,7 @@ const Images = () => {
                         <div className={styles.detailsImages}>
                             {
                                 mangaModel.mangaImages.map((item, index) => {
-                                    return <picture><img key={index} onClick={() => setSelectedIndex(index)} src={baseUrl + item.img} /></picture>
+                                    return <picture key={index} ><img onClick={() => setSelectedIndex(index)} src={baseUrl + item.img} /></picture>
                                 })
                             }
                         </div>
@@ -545,8 +545,6 @@ const Episodes = () => {
         dispatch(setSelectedEpisode(mangaModel.mangaEpisodes[mangaModel.mangaEpisodes.length - 1]));
     }, [])
 
-
-    console.log(mangaModel);
     return (
         <div className={styles.detailsBody}>
             <div className={styles.detailsHeader}>
@@ -558,7 +556,7 @@ const Episodes = () => {
                     <div className={styles.episodesBody}>
                         {
                             mangaModel.mangaEpisodes !== null &&
-                            mangaModel.mangaEpisodes.map((item) => {
+                            mangaModel.mangaEpisodes.map((item, i) => {
                                 return <EpisodeCard onClick={() => {
                                     dispatch(setSelectedEpisode(item));
 
