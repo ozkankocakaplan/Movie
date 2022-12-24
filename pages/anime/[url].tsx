@@ -551,7 +551,7 @@ const Images = () => {
                         <div className={styles.detailsImages}>
                             {
                                 animeModel.animeImages.map((item, index) => {
-                                    return <picture><img key={index} onClick={() => setSelectedIndex(index)} src={baseUrl + item.img as any} /></picture>
+                                    return <img key={index} onClick={() => setSelectedIndex(index)} src={baseUrl + item.img as any} />
                                 })
                             }
                         </div>
