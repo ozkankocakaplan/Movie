@@ -3311,6 +3311,12 @@
   width: 0px;
 }
 
+@media screen and (max-width:500px) {
+  .pageContainer:nth-child(1) {
+    min-height: calc(46vh);
+  }
+}
+
 @media screen and (max-width:720px) {
   .seasonsMusic {
     margin-top: 10px;
