@@ -13,10 +13,10 @@ import Line from '../src/components/Line'
 
 import Movie from '../src/components/Movie'
 import { RootState } from '../src/store'
-import { handleOpenBackgroundBlur } from '../src/store/features/modalReducer'
+import { handleOpenBackgroundBlur, handleWarningModal } from '../src/store/features/modalReducer'
 import { setSelectedIndex } from '../src/store/features/sliderReducer'
 import { Anime, AnimeModels, HomeSlider, Manga, MangaModels } from '../src/types/Entites'
-import { getHomePageMovie } from '../src/utils/api'
+import { baseUrl, getHomePageMovie } from '../src/utils/api'
 import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => {
@@ -184,7 +184,6 @@ const MoviesPage = () => {
           </div>
         </div>
         <div className={styles.homePage2Col4}>
-
           <div className={styles.homePage2Footer}>
             <div className={styles.leftFooter}>
               <div className={styles.leftFooterInfo}>
@@ -544,7 +543,7 @@ const HomeSlider = (props: { children: React.ReactNode }) => {
   const time = 6000;
   useEffect(() => {
     const timeOut = setTimeout(() => {
-      dispatch(setSelectedIndex((selectedIndex + 1) === sliders.length ? 0 : selectedIndex + 1));
+      // dispatch(setSelectedIndex((selectedIndex + 1) === sliders.length ? 0 : selectedIndex + 1));
     }, time);
 
     return () => {
@@ -554,6 +553,9 @@ const HomeSlider = (props: { children: React.ReactNode }) => {
 
 
   const SliderDescription = (entity: HomeSlider) => {
+    const user = useSelector((x: RootState) => x.userReducer.value.user);
+    console.log(user);
+    const dispatch = useDispatch();
     return (
       <div className={styles.homeSliderDescription}>
         <div className={styles.homeSliderDescriptionContainer}>
@@ -561,9 +563,20 @@ const HomeSlider = (props: { children: React.ReactNode }) => {
             <h2>{entity.sliderTitle}</h2>
           </div>
           <span>
-            <a href={entity.url}>
-              <picture> <img src="/playButons.png" className={styles.playButons} /></picture>
-            </a>
+            {
+              user !== undefined && Object.keys(user).length !== 0 ?
+                <a href={entity.url}>
+                  <picture><img src="/playButons.png" className={styles.playButons} /></picture>
+                </a>
+                :
+                <div onClick={() => {
+                  dispatch(handleOpenBackgroundBlur(true));
+                  dispatch(handleWarningModal({ text: 'İçeriği görüntülemek için giriş yapmalısınız', isOpen: true }));
+                }}>
+                  <picture><img src="/playButons.png" className={styles.playButons} /></picture>
+                </div>
+            }
+
           </span>
         </div>
         <div className={styles.homeSliderDescriptionContent}>
@@ -589,11 +602,13 @@ const HomeSlider = (props: { children: React.ReactNode }) => {
       </div>
     )
   }
-  const image = sliders != undefined && sliders.length !== 0 ? sliders[selectedIndex].image : "";
+  const image = sliders != undefined && sliders.length !== 0 ? baseUrl + sliders[selectedIndex].image : "";
   return (
-    <div className={styles.homeBg} style={{
-      background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15)), linear-gradient(90.16deg, rgba(0, 0, 0, 0.5) 50.68%, rgba(0, 0, 0, 0) 70.09%),url(' + image + ')',
-    }}>
+    <div className={styles.homeBg}
+      style={{
+        backgroundImage: `url(${image}), linear-gradient(0deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15)), linear-gradient(90.16deg, rgba(0, 0, 0, 0.5) 50.68%, rgba(0, 0, 0, 0) 70.09%)`,
+      }}
+    >
       {props.children}
       {
         sliders !== null && sliders.length !== 0 &&

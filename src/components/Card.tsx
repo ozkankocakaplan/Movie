@@ -7,7 +7,7 @@ import { Comments, ComplaintType, ContentComplaint, FanArtModel, Like, ReviewsMo
 
 import styles from '../../styles/Home.module.css';
 import { deleteComment, deleteFanArt, deleteLike, deleteReview, getLike, postLike } from '../utils/api';
-import { IDeleteModal, handleDeleteModal, handleOpenBackgroundBlur, handleOpenEditReviews, handleOpenContentComplaintModal } from '../store/features/modalReducer';
+import { IDeleteModal, handleDeleteModal, handleOpenBackgroundBlur, handleOpenEditReviews, handleOpenContentComplaintModal, handleWarningModal } from '../store/features/modalReducer';
 import { setSelectedReview } from '../store/features/animeReducer';
 import { setContentComplaint, setSelectedImage, setViewUser } from '../store/features/userReducer';
 import { setCommentLike, setCommentLikes, setComments } from '../store/features/commentsReducer';
@@ -72,9 +72,16 @@ const ReviewCard = (props: { user: Users, item: any, handleDataChange?: (data: a
             </div>
             <div className={styles.options}>
               <div onClick={() => {
-                dispatch(handleOpenBackgroundBlur(true));
-                dispatch(setContentComplaint({ contentID: props.item.id, type: Type.Review, complaintType: props.item.type === Type.Anime ? ComplaintType.ContentAnime : ComplaintType.ContentManga } as ContentComplaint));
-                dispatch(handleOpenContentComplaintModal(true));
+                if (userInfo !== undefined && Object.keys(userInfo).length !== 0) {
+                  dispatch(handleOpenBackgroundBlur(true));
+                  dispatch(setContentComplaint({ contentID: props.item.id, type: Type.Review, complaintType: props.item.type === Type.Anime ? ComplaintType.ContentAnime : ComplaintType.ContentManga } as ContentComplaint));
+                  dispatch(handleOpenContentComplaintModal(true));
+                }
+                else {
+                  dispatch(handleOpenBackgroundBlur(true));
+                  dispatch(handleWarningModal({ isOpen: true, text: 'İçeriği şikayet etmek için giriş yapmalısınız' }))
+                }
+
               }} className={styles.fanArtIconButons}>
                 <FontAwesomeIcon fontSize={15} color='rgba(255, 255, 255, 0.50)' icon={faWarning} />
               </div>
@@ -234,9 +241,16 @@ const FanArtCard = (props: { entity: any, handleDataChange?: (data: any) => void
             <div className={styles.options}>
               <div
                 onClick={() => {
-                  dispatch(setContentComplaint({ contentID: props.entity.id, type: Type.FanArt, complaintType: props.entity.type === Type.Anime ? ComplaintType.ContentAnime : ComplaintType.ContentManga } as ContentComplaint));
-                  dispatch(handleOpenBackgroundBlur(true));
-                  dispatch(handleOpenContentComplaintModal(true));
+
+                  if (userInfo !== undefined && Object.keys(userInfo).length !== 0) {
+                    dispatch(setContentComplaint({ contentID: props.entity.id, type: Type.FanArt, complaintType: props.entity.type === Type.Anime ? ComplaintType.ContentAnime : ComplaintType.ContentManga } as ContentComplaint));
+                    dispatch(handleOpenBackgroundBlur(true));
+                    dispatch(handleOpenContentComplaintModal(true));
+                  }
+                  else {
+                    dispatch(handleOpenBackgroundBlur(true));
+                    dispatch(handleWarningModal({ isOpen: true, text: 'İçeriği şikayet etmek için giriş yapmalısınız' }))
+                  }
                 }}
                 className={styles.fanArtIconButons}>
                 <FontAwesomeIcon fontSize={15} color='rgba(255, 255, 255, 0.50)' icon={faWarning} />

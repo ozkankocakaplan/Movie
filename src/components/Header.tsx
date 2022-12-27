@@ -17,6 +17,8 @@ import { AnimeAndMangaModels, Notification, NotificationType, Type, VideoType } 
 import Loading from './Loading';
 import { useRouter } from 'next/router';
 import { SearchResultCard } from './SearchResultCard';
+import FilterModal from './FilterModal';
+import useWindowSize from './useWindowSize';
 
 
 
@@ -36,10 +38,13 @@ export default function Header(props: IHeaderProps) {
     const [search, setSearch] = useState('');
     const [searchResult, setSearchResult] = useState<Array<AnimeAndMangaModels>>([]);
     const [searchLoading, setSearchLoading] = useState(false);
+    const [searchShowModal, setSearchShowModal] = useState(false);
+
+    const [notificationShowModal, setNotificationShowModal] = useState(false);
     useEffect(() => {
         setLoggedUser(user);
     }, [user]);
-
+    const { width } = useWindowSize()
     const handleSearch = async (e: string) => {
         setSearch(e);
         if (e.length >= 1) {
@@ -50,6 +55,10 @@ export default function Header(props: IHeaderProps) {
                 console.log(er);
             });
             setSearchLoading(false);
+        }
+        else {
+            setSearchLoading(false);
+            setSearchResult([]);
         }
 
     }
@@ -88,7 +97,12 @@ export default function Header(props: IHeaderProps) {
                 <ul>
                     {props.search && <li style={{ position: 'relative', zIndex: 10 }} className={searchShow ? styles.headerSearchContainer : ""}>
                         <a onClick={() => {
-                            setSearchShow(!searchShow);
+                            if (width < 768) {
+                                setSearchShowModal(true)
+                            }
+                            else {
+                                setSearchShow(!searchShow);
+                            }
                         }}><FontAwesomeIcon size="xl" icon={faSearch} /></a>
                         {searchShow && <input autoFocus
                             value={search}
@@ -104,8 +118,15 @@ export default function Header(props: IHeaderProps) {
                             }
                         </div>}
                     </li>}
-                    {props.notification && <li style={{ position: 'relative', zIndex: 15 }}>
-                        <a onClick={() => setNotificationShow(!notificationShow)}><FontAwesomeIcon size="xl" icon={faBell} /></a>
+                    {props.notification && loggedUser !== null && userInfo !== null && <li style={{ position: 'relative', zIndex: 15 }}>
+                        <a onClick={() => {
+                            if (width < 768) {
+                                setNotificationShowModal(true);
+                            }
+                            else {
+                                setNotificationShow(!notificationShow)
+                            }
+                        }}><FontAwesomeIcon size="xl" icon={faBell} /></a>
                         {notificationShow && <NotificationsContainer />}
                     </li>
                     }
@@ -134,7 +155,29 @@ export default function Header(props: IHeaderProps) {
                     </li>
                 </ul>
             </div>
-        </div >
+            {searchShowModal && <FilterModal onClick={() => {
+                setSearchShowModal(false)
+            }}>
+                <input autoFocus
+                    value={search}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    type={"text"} className={styles.headerSearchTextFromModal} />
+                <div className={styles.headerSearchResultContainerFromModal}>
+                    {
+                        searchLoading ? <Loading />
+                            :
+                            searchResult.map((item) => {
+                                return <SearchResultCard key={item.id} entity={item} />
+                            })
+                    }
+                </div>
+            </FilterModal>}
+            {notificationShowModal && <FilterModal onClick={() => {
+                setNotificationShowModal(false);
+            }}>
+                <NotificationsContainer />
+            </FilterModal>}
+        </div>
     )
 }
 

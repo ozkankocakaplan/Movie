@@ -4,7 +4,7 @@ import { RootState } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleLeft, faAngleRight, faAngleUp, faCamera, faClose, faPaperPlane, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { IDeleteModal, handleDeleteModal, handleOpenAddListItemModal, handleOpenBackgroundBlur, handleOpenEditListItemModal, handleOpenEditListModal, handleOpenEditUserModal, handleOpenInfoSiteModal, handleOpenLoginModal, handleOpenMessageModal, handleOpenRegisterModal, handleOpenBlockModal, handleOpenComplaintModal, handleOpenEditDynamicListModal, handleOpenRosetteModal, handleOpenAddReviews, handleOpenEditReviews, handleOpenAboutModal, handleOpenContentComplaintModal, handleOpenDiscoveryReviesModal } from '../store/features/modalReducer';
+import { IDeleteModal, handleDeleteModal, handleOpenAddListItemModal, handleOpenBackgroundBlur, handleOpenEditListItemModal, handleOpenEditListModal, handleOpenEditUserModal, handleOpenInfoSiteModal, handleOpenLoginModal, handleOpenMessageModal, handleOpenRegisterModal, handleOpenBlockModal, handleOpenComplaintModal, handleOpenEditDynamicListModal, handleOpenRosetteModal, handleOpenAddReviews, handleOpenEditReviews, handleOpenAboutModal, handleOpenContentComplaintModal, handleOpenDiscoveryReviesModal, handleWarningModal } from '../store/features/modalReducer';
 import { addContact, baseUrl, deleteAnimeList, deleteMangaList, deleteUserBlockList, deleteUserList, deleteUserListContent, getAnnouncements, getContactSubject, getHomeSliders, getMessages, getNotifications, getSearchAnime, getSearchAnimeAndManga, getSearchUser, getSiteInfo, getSocialMediaAccounts, getUser, getUserBySeoUrl, postAddUser, postAgainUserEmailVertification, postAnimeList, postAnimeLists, postComplaintList, postContentComplaint, postLogin, postMangaList, postMangaLists, postMessage, postReviews, postUserBlockList, postUserList, postUserListContent, postUserListContents, putEmailChange, putPassword, putReviews, putUserImg, putUserInfo, putUserList } from '../utils/api';
 import { Anime, AnimeAndMangaModels, AnimeEpisodes, AnimeList, AnimeListModels, AnimeStatus, ComplaintList, Contact, ContactSubject, ContentComplaint, MangaList, MangaListModels, MangaStatus, Review, RoleType, Type, UserBlockList, UserEmailVertification, UserFullModels, UserList, UserListContents, UserMessage, UserMessageModel, UserModel, Users } from '../types/Entites';
 import { useAuth } from '../hooks/useAuth';
@@ -54,6 +54,7 @@ export default function Layout(props: ILayoutProps) {
         aboutModal,
         contentComplaintModal,
         discoveryReviewModal,
+        warningModal
 
 
     } = useSelector((state: RootState) => state.modalReducer.value);
@@ -73,15 +74,15 @@ export default function Layout(props: ILayoutProps) {
         loadSocialMediaAccount();
         loadSiteInfo();
     }, []);
-    useEffect(() => {
-        if (Object.keys(signalR).length !== 0) {
-            console.log(signalR);
-            signalR.on("messageSent", (data: UserMessage) => {
-                console.log(data);
-                // dispatch(setMessageUsers(messageUser.map((i) => i. === selectedMessage.id ? { ...i, userMessages: [...i.userMessages, data] } : i)));
-            });
-        }
-    }, [signalR])
+    // useEffect(() => {
+    //     if (Object.keys(signalR).length !== 0) {
+    //         console.log(signalR);
+    //         signalR.on("messageSent", (data: UserMessage) => {
+    //             console.log(data);
+    //             // dispatch(setMessageUsers(messageUser.map((i) => i. === selectedMessage.id ? { ...i, userMessages: [...i.userMessages, data] } : i)));
+    //         });
+    //     }
+    // }, [signalR])
 
     useEffect(() => {
         if (backgroundBlur) {
@@ -215,6 +216,7 @@ export default function Layout(props: ILayoutProps) {
             {loginModal && <LoginModal />}
             {registerModal && <RegisterModal />}
             {messageModal && <MessageModal />}
+            {warningModal.isOpen && <WarningModal />}
         </div>
     )
 }
@@ -2231,4 +2233,20 @@ const UserAboutModal = () => {
             </div>
         </Modal>
     )
+}
+const WarningModal = () => {
+    const dispatch = useDispatch();
+    const { warningModal } = useSelector((x: RootState) => x.modalReducer.value);
+    return (
+        <Modal onClick={() => {
+            dispatch(handleWarningModal({ text: "", isOpen: false }));
+            dispatch(handleOpenBackgroundBlur(false));
+        }}>
+            <div style={{ margin: '10px' }}>
+
+                <div className={styles.deleteModalContainer}><label>{warningModal.text}</label></div>
+            </div>
+        </Modal>
+    )
+
 }

@@ -15,6 +15,7 @@ export const INITIAL_STATE = {
     socialMediaAccounts: [] as Array<SocialMediaAccount>,
     siteInfo: {} as SiteInfo,
     userMessageSend: {} as UserMessageModel,
+
 };
 export const userSlice = createSlice({
     name: 'user',
@@ -61,7 +62,8 @@ export const userSlice = createSlice({
         },
         setUserMessageSend: (state, action) => {
             state.value.userMessageSend = action.payload
-        }
+        },
+
     }
 });
 export const userReducer = userSlice.reducer;

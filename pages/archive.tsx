@@ -24,6 +24,7 @@ import LoadingScreen from '../src/components/LoadingScreen'
 import FilterModal from '../src/components/FilterModal'
 import { CommentCard } from '../src/components/Card'
 import { MangaDescriptionModal, MovieDescriptionModal } from '../src/components/DescriptionModal'
+import { handleOpenBackgroundBlur, handleWarningModal } from '../src/store/features/modalReducer'
 
 
 const Archive: NextPage = () => {
@@ -265,9 +266,13 @@ const Archive: NextPage = () => {
                       src={item.anime.img}
                       blur={Object.keys(selectedAnimeModel).length === 0 ? "1" : selectedAnimeModel.anime.id !== item.anime.id ? "0" : "1"}
                       onClick={() => {
-                        if (Object.keys(user).length !== 0) {
+                        if (user !== undefined && Object.keys(user).length !== 0) {
                           setMovieInfoShow(true)
                           dispatch(setSelectedAnimeModel(item));
+                        }
+                        else {
+                          dispatch(handleOpenBackgroundBlur(true));
+                          dispatch(handleWarningModal({ isOpen: true, text: 'İçeriği görüntülemek için giriş yapmalısınız' }));
                         }
                       }}
                       show={Object.keys(selectedAnimeModel).length != 0 && selectedAnimeModel.anime.id === item.anime.id ? "1" : undefined} key={item.anime.id} />
@@ -303,9 +308,13 @@ const Archive: NextPage = () => {
                       src={item.manga.image}
                       blur={Object.keys(selectedMangaModel).length === 0 ? "1" : selectedMangaModel.manga.id !== item.manga.id ? "0" : "1"}
                       onClick={() => {
-                        if (Object.keys(user).length !== 0) {
+                        if (user !== undefined && Object.keys(user).length !== 0) {
                           setMangaInfoShow(true)
                           dispatch(setSelectedMangaModel(item));
+                        }
+                        else {
+                          dispatch(handleOpenBackgroundBlur(true));
+                          dispatch(handleWarningModal({ isOpen: true, text: 'İçeriği görüntülemek için giriş yapmalısınız' }));
                         }
                       }}
                       show={Object.keys(selectedMangaModel).length != 0 && selectedMangaModel.manga.id === item.manga.id ? "1" : undefined} key={item.manga.id} />

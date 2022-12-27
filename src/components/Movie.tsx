@@ -1,10 +1,11 @@
 import { useRouter } from 'next/router';
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styles from '../../styles/Home.module.css'
+import { RootState } from '../store';
 import { setSelectedAnimeModel } from '../store/features/animeReducer';
 import { setSelectedMangaModel } from '../store/features/mangaReducer';
-import { handleOpenBackgroundBlur } from '../store/features/modalReducer';
+import { handleOpenBackgroundBlur, handleWarningModal } from '../store/features/modalReducer';
 interface IMovieProps {
     src: string,
     marginLeft?: string,
@@ -15,6 +16,7 @@ interface IMovieProps {
     type: 'MODAL' | 'LINK'
 }
 export default function Movie(props: IMovieProps) {
+    const user = useSelector((state: RootState) => state.userReducer.value.user);
     const navigate = useRouter();
     const dispatch = useDispatch();
     return (
@@ -23,16 +25,23 @@ export default function Movie(props: IMovieProps) {
                 props.type === 'MODAL' ?
                     <img
                         onClick={() => {
-                            if (props.anime) {
-                                dispatch(setSelectedAnimeModel(props.anime));
+                            if (user !== undefined && Object.keys(user).length !== 0) {
+                                if (props.anime) {
+                                    dispatch(setSelectedAnimeModel(props.anime));
+                                }
+                                else {
+                                    dispatch(setSelectedMangaModel(props.manga));
+                                }
+                                if (props.handleOpenModal) {
+                                    dispatch(handleOpenBackgroundBlur(true));
+                                    props.handleOpenModal();
+                                }
                             }
                             else {
-                                dispatch(setSelectedMangaModel(props.manga));
-                            }
-                            if (props.handleOpenModal) {
                                 dispatch(handleOpenBackgroundBlur(true));
-                                props.handleOpenModal();
+                                dispatch(handleWarningModal({ text: 'İçeriği görüntülemek için giriş yapmalısınız', isOpen: true }));
                             }
+
                         }}
                         src={props.src}
                         className={styles.movieCover}
@@ -46,12 +55,19 @@ export default function Movie(props: IMovieProps) {
                         }} />
                     :
                     <img onClick={() => {
-                        if (props.anime) {
-                            navigate.push("/anime/" + props.anime.seoUrl)
+                        if (user !== undefined && Object.keys(user).length !== 0) {
+                            if (props.anime) {
+                                navigate.push("/anime/" + props.anime.seoUrl)
+                            }
+                            else {
+                                navigate.push("/manga/" + props.manga.seoUrl)
+                            }
                         }
                         else {
-                            navigate.push("/manga/" + props.manga.seoUrl)
+                            dispatch(handleOpenBackgroundBlur(true));
+                            dispatch(handleWarningModal({ text: 'İçeriği görüntülemek için giriş yapmalısınız', isOpen: true }));
                         }
+
                     }} src={props.src}
                         className={styles.movieCover}
                         style={{

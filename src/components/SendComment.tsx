@@ -17,17 +17,23 @@ export default function SendComment(props: { contentID: any, type: Type, handleD
     }
     return (
         <div className={styles.commentsText}>
-            <div className={styles.sendTextInputContainer + " " + styles.commentTextInput}>
-                <textarea
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    placeholder='Yorum yazınız'></textarea>
-                <div style={{ display: 'flex', flex: 1, flexDirection: 'column', gap: 5 }}>
-                    <div onClick={saveButon} className={styles.sendButon}>
-                        <FontAwesomeIcon icon={faPaperPlane} color="#fff" />
+            {
+                userInfo !== undefined && Object.keys(userInfo).length !== 0 ?
+                    <div className={styles.sendTextInputContainer + " " + styles.commentTextInput}>
+                        <textarea
+                            value={comment}
+                            onChange={(e) => setComment(e.target.value)}
+                            placeholder='Yorum yazınız'></textarea>
+                        <div style={{ display: 'flex', flex: 1, flexDirection: 'column', gap: 5 }}>
+                            <div onClick={saveButon} className={styles.sendButon}>
+                                <FontAwesomeIcon icon={faPaperPlane} color="#fff" />
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                    :
+                    <div style={{ textAlign: 'center' }}>İçeriğe yorum yazmak için giriş yapmalısınız</div>
+            }
+
         </div>
     )
 }

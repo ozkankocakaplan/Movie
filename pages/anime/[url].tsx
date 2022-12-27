@@ -112,7 +112,7 @@ export default function Details() {
                                 return <Info key={item.id} name={item.categories.name} />
                             })
                         }
-                        <Info name={'Mal: ' + animeModel.anime.malRating + "/10"} />
+                        <Info name={'Mal: ' + parseInt(animeModel.anime.malRating).toFixed(2) + "/10"} />
                         <Info name={'Bölümler: ' + animeModel.animeEpisodes.length} />
                         <Info name={"Yaş Sınırı: " + animeModel.anime.ageLimit} />
                         <Info name={'Beğeni: ' + animeModel.likeCount} />
@@ -197,27 +197,28 @@ export default function Details() {
                                                 })
                                             }
                                         }} icon={faThumbsUp} />
-
-                                    <span className={styles.mobileQuickButon}>
+                                    <MenuButon
+                                        id="headerFilterButon"
+                                        width='50px'
+                                        color={"rgba(255,255,255,0.5)"}
+                                        marginright='10px' onClick={() => {
+                                            setIsWatch(!isWatch);
+                                            if (isWatch) {
+                                                dispatch(setSelectedEpisode({}));
+                                            }
+                                            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                                        }} icon={!isWatch ? faEye : faEyeSlash} />
+                                    <MenuButon
+                                        width='50px'
+                                        color={"rgba(255,255,255,0.5)"}
+                                        marginright='0px' onClick={async () => {
+                                            setIsFilterModal(true);
+                                        }} icon={faFilter} />
+                                    {/* <span className={styles.mobileQuickButon}>
                                         <div className={styles.mobileQuickButonContainer}>
-                                            <MenuButon
-                                                width='50px'
-                                                color={"rgba(255,255,255,0.5)"}
-                                                marginright='10px' onClick={() => {
-                                                    setIsWatch(!isWatch);
-                                                    if (isWatch) {
-                                                        dispatch(setSelectedEpisode({}));
-                                                    }
-                                                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                                                }} icon={!isWatch ? faEye : faEyeSlash} />
-                                            <MenuButon
-                                                width='50px'
-                                                color={"rgba(255,255,255,0.5)"}
-                                                marginright='0px' onClick={async () => {
-                                                    setIsFilterModal(true);
-                                                }} icon={faFilter} />
+                                           
                                         </div>
-                                    </span>
+                                    </span> */}
                                 </div>
                                 <div className={styles.rightMenuContainer}>
                                     <DownButon onClick={() => {

@@ -111,11 +111,11 @@ export default function Details() {
                                 return <Info key={item.id} name={item.categories.name} />
                             })
                         }
-                        <Info name={'Mal: ' + mangaModel.manga.malRating} />
+                        <Info name={'Mal: ' + parseInt(mangaModel.manga.malRating).toFixed(2)} />
                         <Info name={'Bölümler: ' + mangaModel.mangaEpisodes.length} />
                         <Info name={"Yaş Sınırı: " + mangaModel.manga.ageLimit} />
                         <Info name={'Beğeni: ' + mangaModel.likeCount} />
-                        <Info name={'Site: ' + mangaModel.manga.siteRating} />
+                        <Info name={mangaModel.manga.siteRating === undefined ? "Site: " + 1 + "/10" : "Site: " + mangaModel.manga.siteRating + "/10"} />
                         <Info name={'Sıralama: ' + mangaModel.arrangement} />
                         <Info name={'İzlenme: ' + mangaModel.viewsCount} />
                         <Info name={mangaModel.manga.status === Status.Continues ? "Durumu: Devam Ediyor" : "Durumu: Bitti"} />
@@ -312,6 +312,7 @@ export default function Details() {
                     {isFilterShow && <FilterModal onClick={() => setIsFilterShow(false)}>
                         <div style={{ marginBottom: '10px' }}>
                             <DownButon onClick={() => {
+                                setIsFilterShow(false);
                                 dispatch(handleOpenBackgroundBlur(true));
                                 dispatch(handleOpenAddReviews(true));
                             }} type='buton' icon={faAngleDown} name='Oluştur' />
