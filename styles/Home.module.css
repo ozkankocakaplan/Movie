@@ -1,3 +1,15 @@
+.react-datepicker__month-container, .react-datepicker__header {
+  background-color: #1a1a1a;
+}
+
+.react-datepicker__day:hover {
+  background-color: #424242;
+}
+
+.react-datepicker__day {
+  color: #fff !important;
+}
+
 .userSelected {
   -webkit-user-select: none;
   -ms-user-select: none;
@@ -960,6 +972,12 @@
 .registerBody {
   margin: 0px 30px;
   padding-bottom: 70px;
+  max-height: 400px;
+  overflow-y: scroll;
+}
+
+.registerBody::-webkit-scrollbar {
+  width: 0px;
 }
 
 .textInput {
@@ -3319,6 +3337,30 @@
     margin-right: 10px;
   }
 
+  .registerColUser {
+    flex-direction: column !important;
+    align-items: baseline !important;
+  }
+
+  .registerColUser .registerRightCol, .registerColUser .registerLeftCol {
+    margin-left: 0px !important;
+    width: 100%;
+  }
+
+  .registerColFavori {
+    flex-direction: column !important;
+    align-items: baseline !important;
+  }
+
+  .registerColFavori .registerRightCol, .registerColFavori .registerLeftCol {
+    margin-left: 0px !important;
+    width: 100%;
+  }
+
+  .smallInput {
+    width: 100% !important;
+  }
+
   .detailsEpidoesContainer {
     flex-direction: column !important;
   }
@@ -3336,6 +3378,10 @@
 }
 
 @media screen and (max-width:1024px) {
+  .loginContainer, .registerContainer, .registerInput {
+    width: 100% !important;
+  }
+
   .homePage2Footer {
     display: none;
   }

@@ -1723,7 +1723,7 @@ const RegisterModal = () => {
                                 placeholder='Ad soyad' type={"text"} className={styles.registerInput + " " + (check && form.nameSurname.length === 0 ? styles.errorBorder : undefined)} />
                         </div>
                     </div>
-                    <div className={styles.registerCol}>
+                    <div className={styles.registerCol + " " + styles.registerColUser}>
                         <div className={styles.registerLeftCol}>
                             <input
                                 value={form.userName}
@@ -1771,7 +1771,7 @@ const RegisterModal = () => {
                                 placeholder='Onay kodu' type={"text"} className={styles.registerInput + " " + styles.smallInput + " " + (check && code.length === 0 ? styles.errorBorder : undefined)} />
                         </div>
                     </div>
-                    <div className={styles.registerCol}>
+                    <div className={styles.registerCol + " " + styles.registerColFavori}>
                         <div className={styles.registerLeftCol}>
                             <div className={(selectedAnime.length !== 0 ? styles["selectedAnime-jc-ai"] : undefined) + " " + styles["pr"] + " " + styles["selectedFavoriContainer"] + " " + styles.registerInput + " " + styles.smallInput + " " + styles.favoriSelected + " " + (check && selectedAnime.length === 0 ? styles.errorBorder : undefined) + " " + styles.userSelected}>
                                 {selectedAnime.length === 0 ? <a>Favori Animeler</a>
