@@ -3344,6 +3344,11 @@
 
 
 @media screen and (max-width:720px) {
+  .discoverComment {
+    width: 100% !important;
+    margin-left: 0% !important;
+  }
+
   .seasonsMusic {
     margin-top: 10px;
     margin-right: 10px;
