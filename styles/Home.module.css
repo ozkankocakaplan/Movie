@@ -610,7 +610,7 @@
   position: absolute;
   margin-left: 39%;
   z-index: 500;
-  margin-top: -70vh;
+  margin-top: -71vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -3317,9 +3317,7 @@
     right: 20px !important;
   }
 
-  .homePage2Footer {
-    display: none;
-  }
+
 
   .detailsHeader {
     flex-direction: column !important;
@@ -3327,6 +3325,10 @@
 }
 
 @media screen and (max-width:1024px) {
+  .homePage2Footer {
+    display: none;
+  }
+
   .about {
     flex-direction: column !important;
   }
