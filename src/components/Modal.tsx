@@ -5,10 +5,11 @@ import styles from '../../styles/Home.module.css';
 interface IModalProps extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode,
     width?: number,
+    id?: string
 }
 export default function Modal(props: IModalProps) {
     return (
-        <div className={styles.modal}>
+        <div id={props.id ? props.id : "modal-" + Math.floor(Math.random() * 11)} className={styles.modal}>
             <div style={props.width ? { width: props.width + "px" } : undefined} className={styles.modalContainer}>
                 <div className={styles.modalHeader}>
                     <div {...props} className={styles.modalClose}>

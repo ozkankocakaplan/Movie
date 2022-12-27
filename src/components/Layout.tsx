@@ -726,7 +726,7 @@ const EditUserModal = () => {
         }
     }
     return (
-        <Modal onClick={() => {
+        <Modal id="userModalContainer" onClick={() => {
             dispatch(handleOpenBackgroundBlur(false))
             dispatch(handleOpenEditUserModal(false))
         }}>
