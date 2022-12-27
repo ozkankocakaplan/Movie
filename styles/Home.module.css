@@ -3481,7 +3481,7 @@
   }
 
   .pageContainer:nth-child(1) {
-    min-height: calc(46vh);
+    min-height: calc(44vh);
   }
 
   .profileHeaderContainer {
