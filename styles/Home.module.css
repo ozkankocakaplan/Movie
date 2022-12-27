@@ -2,6 +2,10 @@
   background-color: #1a1a1a;
 }
 
+.react-datepicker__current-month {
+  color: #fff !important;
+}
+
 .react-datepicker__day:hover {
   background-color: #424242;
 }
