@@ -3302,6 +3302,15 @@
   display: block;
 }
 
+.favoriCardContainer {
+  max-height: 300px;
+  overflow-y: scroll;
+}
+
+.favoriCardContainer::-webkit-scrollbar {
+  width: 0px;
+}
+
 @media screen and (max-width:720px) {
   .seasonsMusic {
     margin-top: 10px;

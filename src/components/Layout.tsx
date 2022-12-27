@@ -1827,7 +1827,7 @@ const RegisterModal = () => {
                                 placeholder='Anime ara' type={"text"} className={styles.registerInput} />
                         </div>
                     </div>
-                    <div style={{ maxHeight: '300px' }}>
+                    <div className={styles.favoriCardContainer}>
                         {
                             searchLoading ? <Loading />
                                 :
