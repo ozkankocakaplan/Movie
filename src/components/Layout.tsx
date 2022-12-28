@@ -482,7 +482,7 @@ const SiteInfoModal = () => {
                     </div>
                 </div>
                 <select className={styles.subjectSelect + " " + (check && form.subject.length === 0 ? styles.errorBorder : undefined)}>
-                    <option value={0}>Konu</option>
+                    <option value={0}>Konu Seçiniz</option>
                     {
                         subjectList.length !== 0 &&
                         subjectList.map((item) => {
@@ -1746,12 +1746,21 @@ const RegisterModal = () => {
                                 placeholder='Şifre' type={"password"} className={styles.registerInput + " " + styles.smallInput + " " + (check && form.password.length === 0 ? styles.errorBorder : undefined)} />
                         </div>
                         <div className={styles.registerRightCol}>
-                            <input
+                            <select
+                                onChange={(e) => {
+                                    setForm({ ...form, gender: e.target.value })
+                                }}
+                                className={styles.subjectSelect + " " + (check && form.gender.length === 0 ? styles.errorBorder : undefined)}>
+                                <option value={"Erkek"}>Erkek</option>
+                                <option value={"Kadın"}>Kadın</option>
+
+                            </select>
+                            {/* <input
                                 value={form.gender}
                                 onChange={(e) => setForm({ ...form, gender: e.target.value })}
                                 placeholder='Cinsiyet'
                                 type={"text"}
-                                className={styles.registerInput + " " + styles.smallInput + " " + (check && form.password.length === 0 ? styles.errorBorder : undefined)} />
+                                className={styles.registerInput + " " + styles.smallInput + " " + (check && form.password.length === 0 ? styles.errorBorder : undefined)} /> */}
                         </div>
                     </div>
                     <div className={styles.registerCol}>
