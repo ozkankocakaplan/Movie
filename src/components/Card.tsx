@@ -64,7 +64,7 @@ const ReviewCard = (props: { user: Users, item: any, handleDataChange?: (data: a
       <div className={styles.listCard2}>
         <div className={styles.sliderContainer}>
           <div className={styles.sliderImages}>
-            {props.item.type === Type.Anime ? <CardImg image={props.item.anime.img} /> : <CardImg image={props.item.manga.image} />}
+            {props.item.type === Type.Anime ? <CardImg image={props.item.anime?.img != null ? props.item.anime.img : "/logo.png"} /> : <CardImg image={props.item.manga.image} />}
             <div style={{ flex: 1, display: 'flex' }} className={styles.userSelected + " " + styles.fdirectionColumn}>
               <div className={styles.reviewView + " " + styles.userSelected}>
                 {props.item.message ? props.item.message : props.item.description}

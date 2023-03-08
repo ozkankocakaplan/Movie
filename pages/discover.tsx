@@ -85,18 +85,17 @@ export default function Discover() {
       setCategories(res.data.list);
     })
   }
-  const Top100Card = (props: { anime?: AnimeModels, manga?: MangaModels }) => {
+  const Top100Card = (props: { anime?: AnimeModels, manga?: MangaModels, indexNo: number }) => {
     const user = useSelector((x: RootState) => x.userReducer.value.user);
-    const dispatch = useDispatch();
 
     return (
       <div className={styles.top100Card}>
         <div className={styles.top100Img}>
           {
             user !== undefined && Object.keys(user).length !== 0 ?
-              <div> <img height={53} width={43} src={props.anime ? props.anime.anime.img : props.manga?.manga.image} /></div>
+              <div> <img height={53} width={43} src={props.anime?.anime.img != null ? props.anime.anime.img : props.manga?.manga.image} /></div>
               :
-              props.anime ?
+              props.anime?.anime.img ?
                 <picture> <img height={53} width={43} src={props.anime.anime.img} /></picture>
                 :
                 <picture> <img height={53} width={43} src={props.manga?.manga.image} /></picture>
@@ -111,7 +110,7 @@ export default function Discover() {
           </span>
         </div>
         <div className={styles.topNumber}>
-          <h1>1</h1>
+          <h1>{props.indexNo}</h1>
         </div>
       </div>
     )
@@ -477,12 +476,12 @@ export default function Discover() {
                       selectedMenu === 'Anime' ?
                         animeList.topAnimes != undefined &&
                         animeList.topAnimes.map((item, key) => {
-                          return <Top100Card anime={item} key={key} />
+                          return <Top100Card anime={item} key={key} indexNo={key + 1} />
                         })
                         :
                         animeList.topMangas != undefined &&
                         animeList.topMangas.map((item, key) => {
-                          return <Top100Card key={key} manga={item} />
+                          return <Top100Card key={key} manga={item} indexNo={key + 1} />
                         })
                     }
                   </div>
