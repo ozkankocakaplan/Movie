@@ -380,12 +380,12 @@ export default function Discover() {
                             <div className={styles.weekAnimeBody}>
                               {
                                 user !== undefined && Object.keys(user).length !== 0 ?
-                                  <a href={'/anime/' + item.anime.seoUrl}><picture><img alt={item.anime.animeName} className={styles.leftImage} height="100" width="80" src={item.anime.img} /></picture></a>
+                                  <a href={'/anime/' + item.anime.seoUrl}><picture><img alt={item.anime.animeName} className={styles.leftImage} height="100" width="80" src={item.anime.img != null ? item.anime.img : "/logo.png"} /></picture></a>
                                   :
                                   <div onClick={() => {
                                     dispatch(handleOpenBackgroundBlur(true));
                                     dispatch(handleWarningModal({ isOpen: true, text: 'İçeriği görüntülemek için giriş yapmalısınız' }));
-                                  }}><picture><img alt={item.anime.animeName} className={styles.leftImage} height="100" width="80" src={item.anime.img} /></picture></div>
+                                  }}><picture><img alt={item.anime.animeName} className={styles.leftImage} height="100" width="80" src={item.anime.img != null ? item.anime.img : "/logo.png"} /></picture></div>
                               }
 
                               {
